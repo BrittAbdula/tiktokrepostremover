@@ -24,12 +24,12 @@ const HowItWorksSection = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-16 bg-gray-50 rounded-2xl">
+    <section id="how-it-works" className="py-16 bg-gray-900 rounded-2xl border border-gray-800">
       <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+        <h2 className="text-3xl font-bold text-white mb-4">
           How It Works
         </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="text-lg text-gray-300 max-w-2xl mx-auto">
           Three simple steps to clean up your TikTok profile in minutes
         </p>
       </div>
@@ -37,19 +37,19 @@ const HowItWorksSection = () => {
         {steps.map((step, index) => (
           <div key={index} className="text-center">
             <div className="relative">
-              <div className="mx-auto mb-6 w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center">
+              <div className="mx-auto mb-6 w-20 h-20 bg-gradient-to-r from-[#FE2C55] to-[#FF0050] rounded-full flex items-center justify-center">
                 <img 
                   src={step.icon} 
                   alt={step.title} 
                   className="w-8 h-8 filter invert"
                 />
               </div>
-              <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-sm font-bold">
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-[#00F2EA] to-[#25F4EE] rounded-full flex items-center justify-center text-sm font-bold text-black">
                 {step.step}
               </div>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">{step.title}</h3>
-            <p className="text-gray-600">{step.description}</p>
+            <h3 className="text-xl font-semibold text-white mb-2">{step.title}</h3>
+            <p className="text-gray-300">{step.description}</p>
           </div>
         ))}
       </div>

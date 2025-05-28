@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 
 const CTASection = () => {
   return (
-    <section id="download" className="py-20 bg-gradient-to-br from-blue-600 to-purple-700 rounded-2xl text-white text-center">
-      <div className="max-w-3xl mx-auto px-4">
+    <section id="download" className="py-20 bg-gradient-to-br from-[#FE2C55] via-[#FF0050] to-[#00F2EA] rounded-2xl text-white text-center relative overflow-hidden">
+      <div className="absolute inset-0 bg-black/20"></div>
+      <div className="max-w-3xl mx-auto px-4 relative z-10">
         <h2 className="text-4xl font-bold mb-6">
           Ready to Clean Your TikTok?
         </h2>
@@ -12,7 +13,7 @@ const CTASection = () => {
           Join thousands of users who have already cleaned up their TikTok profiles
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-          <Button size="lg" variant="secondary" className="text-lg px-8 py-4" asChild>
+          <Button size="lg" variant="secondary" className="text-lg px-8 py-4 bg-white text-black hover:bg-gray-100 font-bold shadow-lg hover:shadow-xl transition-all" asChild>
             <a href="https://chrome.google.com/webstore/detail/your-extension-id">
               <img 
                 src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/googlechrome.svg" 
