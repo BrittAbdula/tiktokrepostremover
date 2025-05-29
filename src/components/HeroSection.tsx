@@ -1,6 +1,7 @@
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+// 引入 Font Awesome 6 的 Chrome 图标
+import { FaChrome } from "react-icons/fa6";
 
 const HeroSection = () => {
   return (
@@ -17,14 +18,15 @@ const HeroSection = () => {
           <strong className="text-[#FE2C55]">Delete every reposted TikTok video in one click.</strong><br />
           Clean up your profile, fix accidental shares, and keep your brand on point.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button size="lg" className="text-lg px-8 py-4 bg-gradient-to-r from-[#FE2C55] to-[#FF0050] hover:from-[#FF0050] hover:to-[#FE2C55] text-white font-bold shadow-lg hover:shadow-xl transition-all" asChild>
-            <a href="#download">
-              <img 
-                src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/googlechrome.svg" 
-                alt="Chrome" 
-                className="w-5 h-5 mr-2 filter invert"
-              />
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center ">
+          <Button 
+            size="lg" 
+            className="text-lg px-8 py-4 bg-gradient-to-r from-[#FE2C55] to-[#FF0050] hover:from-[#FF0050] hover:to-[#FE2C55] text-white font-bold shadow-lg hover:shadow-xl transition-all" 
+            asChild
+          >
+            <a href="#download" className="flex items-center justify-center "> {/* 确保链接内部的flex布局应用到图标和文本 */}
+              {/* 渲染引入的 Font Awesome Chrome 图标 */}
+              <FaChrome className="w-5 h-5 mr-2 text-white" />
               Get the Free Chrome Extension
             </a>
           </Button>

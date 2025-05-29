@@ -37,10 +37,10 @@ const FAQSection = () => {
   return (
     <section id="faq" className="py-16">
       <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+        <h2 className="text-3xl font-bold text-white mb-4">
           Frequently Asked Questions
         </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="text-lg text-gray-300 max-w-2xl mx-auto">
           Get answers to common questions about the TikTok Repost Remover extension
         </p>
       </div>
@@ -48,10 +48,10 @@ const FAQSection = () => {
         <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq, index) => (
             <AccordionItem key={index} value={`item-${index}`}>
-              <AccordionTrigger className="text-left">
+              <AccordionTrigger className="text-left text-white">
                 {faq.question}
               </AccordionTrigger>
-              <AccordionContent className="text-gray-600">
+              <AccordionContent className="text-gray-300">
                 {faq.answer}
               </AccordionContent>
             </AccordionItem>

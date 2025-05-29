@@ -1,5 +1,10 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+// 引入 Font Awesome 6 图标组件
+import {
+  FaRightToBracket, // 用于“Sign In” (登录图标)
+  FaPuzzlePiece,    // 用于“Open Extension” (扩展程序图标)
+  FaGear            // 用于“Sit Back & Relax” (齿轮，表示自动化或工作进行中)
+} from "react-icons/fa6"; 
 
 const HowItWorksSection = () => {
   const steps = [
@@ -7,19 +12,20 @@ const HowItWorksSection = () => {
       step: "1",
       title: "Sign In",
       description: "Sign in to TikTok.com on Chrome browser",
-      icon: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/login.svg"
+      // 直接引用图标组件
+      icon: FaRightToBracket 
     },
     {
       step: "2", 
       title: "Open Extension",
       description: "Open the 'TikTok Repost Remover' icon & click Start Removing",
-      icon: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/extension.svg"
+      icon: FaPuzzlePiece 
     },
     {
       step: "3",
       title: "Sit Back & Relax",
       description: "The tool scans your Reposts tab and clicks 'Remove Repost' on every video—safely respecting TikTok rate-limits",
-      icon: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/automation.svg"
+      icon: FaGear 
     }
   ];
 
@@ -38,11 +44,11 @@ const HowItWorksSection = () => {
           <div key={index} className="text-center">
             <div className="relative">
               <div className="mx-auto mb-6 w-20 h-20 bg-gradient-to-r from-[#FE2C55] to-[#FF0050] rounded-full flex items-center justify-center">
-                <img 
-                  src={step.icon} 
-                  alt={step.title} 
-                  className="w-8 h-8 filter invert"
-                />
+                {/* 渲染引入的图标组件 */}
+                {/* Font Awesome 图标默认是 SVG，可以直接通过 className 控制大小和颜色 */}
+                {step.icon && (
+                  <step.icon className="w-8 h-8 text-white" />
+                )}
               </div>
               <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-[#00F2EA] to-[#25F4EE] rounded-full flex items-center justify-center text-sm font-bold text-black">
                 {step.step}

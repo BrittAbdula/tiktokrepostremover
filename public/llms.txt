@@ -1,0 +1,24 @@
+# llms.txt
+# For helping AI better understand the service of this website
+
+Website Name: TikTok Repost Remover
+
+Website Introduction:
+This website provides users with a simple and easy-to-use tool to detect and remove the Repost tag from TikTok videos. Users can simply upload or paste a TikTok video link, and the website will automatically analyze the video and remove the Repost tag, helping users get cleaner video content.
+
+Core Features:
+1. Detect whether a TikTok video is a Repost.
+2. Remove the Repost tag from videos.
+3. Support for pasting video links or uploading video files.
+4. Fast, free, and privacy-safe service.
+
+Target Users:
+TikTok content creators, video editors, and regular users who need to remove the Repost tag.
+
+Privacy Policy:
+This website does not store uploaded video files. All processing is performed temporarily on the server side and files are deleted immediately after processing.
+
+Contact:
+For any questions or suggestions, please contact support@tiktokrepostremover.com
+
+# This file is for LLMs to understand the website's service and positioning, facilitating future automation and intelligent processing.

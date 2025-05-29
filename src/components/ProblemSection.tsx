@@ -1,27 +1,34 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+// 引入 Font Awesome 6 图标组件
+import {
+  FaCircleExclamation, // 用于“意外转发”
+  FaPalette,            // 用于“品牌一致性”
+  FaShieldHalved,       // 用于“隐私与数字足迹”
+  FaBroom               // 用于“无原生批量删除”
+} from "react-icons/fa6";
 
 const ProblemSection = () => {
   const problems = [
     {
       title: "Accidental Reposts",
       description: "The repost button sits centimeters from 'Like', leading to unwanted shares.",
-      icon: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/target.svg"
+      // 直接引用图标组件
+      icon: FaCircleExclamation
     },
     {
       title: "Brand Consistency",
       description: "Out-of-niche videos dilute your aesthetic & confuse followers.",
-      icon: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/brand.svg"
+      icon: FaPalette
     },
     {
       title: "Privacy & Digital Footprint",
       description: "Remove dated or controversial content fast.",
-      icon: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/shield.svg"
+      icon: FaShieldHalved
     },
     {
       title: "No Native Bulk Delete",
       description: "TikTok forces you to remove reposts one-by-one. Our extension automates the grind.",
-      icon: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/automate.svg"
+      icon: FaBroom
     }
   ];
 
@@ -40,11 +47,11 @@ const ProblemSection = () => {
           <Card key={index} className="text-center hover:shadow-lg transition-all bg-gray-900 border-gray-800 hover:border-[#FE2C55]/50">
             <CardHeader>
               <div className="mx-auto mb-4 w-12 h-12 bg-gradient-to-r from-[#FE2C55] to-[#00F2EA] rounded-full flex items-center justify-center">
-                <img 
-                  src={problem.icon} 
-                  alt={problem.title} 
-                  className="w-6 h-6 filter invert"
-                />
+                {/* 渲染引入的图标组件 */}
+                {/* Font Awesome 图标默认是 SVG，可以直接通过 className 控制大小和颜色 */}
+                {problem.icon && (
+                  <problem.icon className="w-6 h-6 text-white" />
+                )}
               </div>
               <CardTitle className="text-lg text-white">{problem.title}</CardTitle>
             </CardHeader>
