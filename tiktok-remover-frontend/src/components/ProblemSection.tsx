@@ -1,10 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 // 引入 Font Awesome 6 图标组件
 import {
-  FaCircleExclamation, // 用于“意外转发”
-  FaPalette,            // 用于“品牌一致性”
-  FaShieldHalved,       // 用于“隐私与数字足迹”
-  FaBroom               // 用于“无原生批量删除”
+  FaCircleExclamation, // 用于"意外转发"
+  FaPalette,            // 用于"品牌一致性"
+  FaShieldHalved,       // 用于"隐私与数字足迹"
+  FaBroom               // 用于"无原生批量删除"
 } from "react-icons/fa6";
 
 const ProblemSection = () => {
@@ -36,10 +36,10 @@ const ProblemSection = () => {
     <section className="py-16">
       <div className="text-center mb-12">
         <h2 className="text-3xl font-bold text-white mb-4">
-          Why You Need a TikTok Repost Remover
+          Why You Need ClearTok
         </h2>
         <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-          Managing TikTok reposts manually is time-consuming and frustrating. Here's why you need an automated solution.
+          Managing TikTok reposts manually is time-consuming and frustrating. Here's why you need our automated TikTok repost remover solution.
         </p>
       </div>
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

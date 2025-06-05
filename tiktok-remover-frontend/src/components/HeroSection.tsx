@@ -7,27 +7,39 @@ const HeroSection = () => {
   return (
     <section className="text-center py-20 bg-gradient-to-br from-black via-gray-900 to-black rounded-2xl relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-[#FE2C55]/10 to-[#00F2EA]/10"></div>
+      {/* 添加动态背景粒子效果 */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-2 h-2 bg-[#FE2C55] rounded-full animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-3 h-3 bg-[#00F2EA] rounded-full animate-bounce delay-150"></div>
+        <div className="absolute bottom-32 left-20 w-2 h-2 bg-[#FE2C55] rounded-full animate-ping delay-300"></div>
+        <div className="absolute bottom-20 right-32 w-2 h-2 bg-[#00F2EA] rounded-full animate-pulse delay-500"></div>
+      </div>
       <div className="max-w-4xl mx-auto px-4 relative z-10">
-        <Badge variant="secondary" className="mb-4 bg-[#FE2C55] text-white border-none">
+        <Badge variant="secondary" className="mb-4 bg-gradient-to-r from-[#FE2C55] to-[#FF0050] text-white border-none
+                                           shadow-lg animate-pulse">
           Free Chrome Extension
         </Badge>
         <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
-          TikTok Repost Remover Extension
+          ClearTok
         </h1>
-        <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-          <strong className="text-[#FE2C55]">Delete every reposted TikTok video in one click.</strong><br />
-          Clean up your profile, fix accidental shares, and keep your brand on point.
+        <p className="text-xl text-gray-300 mb-4 max-w-2xl mx-auto">
+          <strong className="text-[#FE2C55]">The Ultimate TikTok Repost Remover</strong>
+        </p>
+        <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+          Delete every reposted TikTok video in one click. Clean up your profile, fix accidental shares, and keep your brand on point.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center ">
           <Button 
             size="lg" 
-            className="text-lg px-8 py-4 bg-gradient-to-r from-[#FE2C55] to-[#FF0050] hover:from-[#FF0050] hover:to-[#FE2C55] text-white font-bold shadow-lg hover:shadow-xl transition-all" 
+            className="text-lg px-8 py-4 bg-gradient-to-r from-[#FE2C55] to-[#FF0050] hover:from-[#FF0050] hover:to-[#FE2C55] 
+                     text-white font-bold shadow-lg hover:shadow-xl hover:shadow-[#FE2C55]/50 transition-all duration-300
+                     transform hover:scale-105" 
             asChild
           >
-            <a href="#download" className="flex items-center justify-center "> {/* 确保链接内部的flex布局应用到图标和文本 */}
+            <a href="#download" className="flex items-center justify-center"> {/* 确保链接内部的flex布局应用到图标和文本 */}
               {/* 渲染引入的 Font Awesome Chrome 图标 */}
               <FaChrome className="w-5 h-5 mr-2 text-white" />
-              Get the Free Chrome Extension
+              Get ClearTok Free
             </a>
           </Button>
         </div>

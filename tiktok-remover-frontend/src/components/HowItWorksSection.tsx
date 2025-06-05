@@ -1,9 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 // 引入 Font Awesome 6 图标组件
 import {
-  FaRightToBracket, // 用于“Sign In” (登录图标)
-  FaPuzzlePiece,    // 用于“Open Extension” (扩展程序图标)
-  FaGear            // 用于“Sit Back & Relax” (齿轮，表示自动化或工作进行中)
+  FaRightToBracket, // 用于"Sign In" (登录图标)
+  FaPuzzlePiece,    // 用于"Open Extension" (扩展程序图标)
+  FaGear            // 用于"Sit Back & Relax" (齿轮，表示自动化或工作进行中)
 } from "react-icons/fa6"; 
 
 const HowItWorksSection = () => {
@@ -18,13 +18,13 @@ const HowItWorksSection = () => {
     {
       step: "2", 
       title: "Open Extension",
-      description: "Open the 'TikTok Repost Remover' icon & click Start Removing",
+      description: "Open the 'ClearTok' icon & click Start Removing",
       icon: FaPuzzlePiece 
     },
     {
       step: "3",
-      title: "Sit Back & Relax",
-      description: "The tool scans your Reposts tab and clicks 'Remove Repost' on every video—safely respecting TikTok rate-limits",
+      title: "Enjoy Advanced Features",
+      description: "Watch real-time progress, switch tabs to multitask, and export deleted URLs when complete—all while our TikTok repost remover works safely in the background",
       icon: FaGear 
     }
   ];
@@ -36,7 +36,7 @@ const HowItWorksSection = () => {
           How It Works
         </h2>
         <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-          Three simple steps to clean up your TikTok profile in minutes
+          Three simple steps to clean up your TikTok profile with advanced monitoring and export features
         </p>
       </div>
       <div className="grid md:grid-cols-3 gap-8">

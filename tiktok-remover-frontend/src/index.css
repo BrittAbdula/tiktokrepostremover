@@ -99,3 +99,89 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* TikTok风格的自定义动画和样式 */
+@layer utilities {
+  /* 平滑滚动 */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* 自定义渐变动画 */
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .gradient-animation {
+    background: linear-gradient(-45deg, #FE2C55, #FF0050, #00F2EA, #25F4EE);
+    background-size: 400% 400%;
+    animation: gradient-shift 8s ease infinite;
+  }
+
+  /* 脉冲发光效果 */
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba(254, 44, 85, 0.4), 0 0 10px rgba(254, 44, 85, 0.3), 0 0 15px rgba(254, 44, 85, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 10px rgba(254, 44, 85, 0.6), 0 0 20px rgba(254, 44, 85, 0.5), 0 0 30px rgba(254, 44, 85, 0.4);
+    }
+  }
+
+  .glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+
+  /* 浮动动画 */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .float-animation {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* 淡入动画 */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+
+  /* 自定义滚动条 */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #1f2937;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #FE2C55, #00F2EA);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #FF0050, #25F4EE);
+  }
+}

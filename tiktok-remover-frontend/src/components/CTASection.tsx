@@ -16,7 +16,7 @@ const CTASection = () => {
           Ready to Clean Your TikTok?
         </h2>
         <p className="text-xl mb-8 opacity-90">
-          Join thousands of users who have already cleaned up their TikTok profiles
+          Join thousands of users who have already cleaned up their TikTok profiles with ClearTok
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
           <Button 
@@ -28,7 +28,7 @@ const CTASection = () => {
             <a href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb" className="flex items-center justify-center">
               {/* 渲染引入的 Font Awesome Chrome 图标 */}
               <FaChrome className="w-5 h-5 mr-2 text-black" /> {/* Chrome 按钮是白色背景，所以图标用黑色 */}
-              Add to Chrome – It's Free
+              Add ClearTok to Chrome – It's Free
             </a>
           </Button>
         </div>

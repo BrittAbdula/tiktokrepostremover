@@ -7,6 +7,7 @@ import HeroSection from "@/components/HeroSection";
 import ProblemSection from "@/components/ProblemSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import FeaturesSection from "@/components/FeaturesSection";
+import ScreenshotsSection from "@/components/ScreenshotsSection";
 import SecuritySection from "@/components/SecuritySection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import FAQSection from "@/components/FAQSection";
@@ -21,15 +22,16 @@ const Index = () => {
       <Header />
       <main className="container mx-auto px-4 py-8 space-y-16">
         <HeroSection />
+        <TimeEstimatorSection />
         <ProblemSection />
         <HowItWorksSection />
         <FeaturesSection />
+        <ScreenshotsSection />
         <SecuritySection />
         <TestimonialsSection />
-        <FAQSection />
         <ComparisonSection />
         <CTASection />
-        <TimeEstimatorSection />
+        <FAQSection />
       </main>
       <Footer />
     </div>

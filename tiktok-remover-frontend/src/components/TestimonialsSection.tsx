@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const TestimonialsSection = () => {
@@ -32,23 +31,23 @@ const TestimonialsSection = () => {
       </div>
       <div className="grid md:grid-cols-3 gap-6">
         {testimonials.map((testimonial, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow">
+          <Card key={index} className="hover:shadow-xl hover:shadow-[#FE2C55]/20 transition-all duration-300 bg-gray-900 border-gray-800 hover:border-[#FE2C55]/50">
             <CardHeader>
               <div className="flex items-center space-x-1 mb-2">
                 {[...Array(5)].map((_, i) => (
-                  <span key={i} className="text-yellow-400 text-lg">★</span>
+                  <span key={i} className="text-[#00F2EA] text-lg">★</span>
                 ))}
               </div>
             </CardHeader>
             <CardContent>
-              <blockquote className="text-gray-700 mb-4">
+              <blockquote className="text-gray-300 mb-4 italic">
                 "{testimonial.quote}"
               </blockquote>
               <div>
-                <CardTitle className="text-sm font-semibold text-blue-600">
+                <CardTitle className="text-sm font-semibold text-[#FE2C55]">
                   {testimonial.author}
                 </CardTitle>
-                <CardDescription className="text-xs">
+                <CardDescription className="text-xs text-gray-400">
                   {testimonial.role}
                 </CardDescription>
               </div>
