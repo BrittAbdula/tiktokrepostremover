@@ -684,6 +684,33 @@ class ClearTokExtension {
     }
     
     this.addLogEntry(`🎉 Process completed! Removed ${removedCount} videos${durationText}.`, 'success');
+    
+    // add refresh page function
+    if (removedCount > 0) {
+      this.refreshTikTokPage();
+    }
+  }
+  
+  // refresh tiktok page
+  async refreshTikTokPage() {
+    try {
+      const tabs = await chrome.tabs.query({ url: "*://www.tiktok.com/*" });
+      if (tabs.length > 0) {
+        // refresh tiktok page
+        await chrome.tabs.reload(tabs[0].id);
+        
+        this.addLogEntry('🔄 Refreshing TikTok page to show updated content...', 'info');
+        this.showNotification('🔄 TikTok page refreshed to show updated content', 'success');
+        
+        // wait for page to load and check login status
+        setTimeout(() => {
+          this.checkTikTokLogin();
+        }, 3000);
+      }
+    } catch (error) {
+      console.log('Error refreshing TikTok page:', error);
+      this.addLogEntry('⚠️ Unable to refresh page automatically', 'info');
+    }
   }
 
   copyRemovedList() {
