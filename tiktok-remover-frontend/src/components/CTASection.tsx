@@ -25,7 +25,7 @@ const CTASection = () => {
             className="text-lg px-8 py-4 bg-white text-black hover:bg-gray-100 font-bold shadow-lg hover:shadow-xl transition-all" 
             asChild
           >
-            <a href="https://chromewebstore.google.com/detail/tiktok-all-reposted-video/amgpfdpibiacligkkkbeonfhmonkgjhg/reviews" className="flex items-center justify-center">
+            <a href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb" className="flex items-center justify-center">
               {/* 渲染引入的 Font Awesome Chrome 图标 */}
               <FaChrome className="w-5 h-5 mr-2 text-black" /> {/* Chrome 按钮是白色背景，所以图标用黑色 */}
               Add to Chrome – It's Free

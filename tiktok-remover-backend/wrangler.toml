@@ -1,0 +1,8 @@
+name = "repost-counter-worker"
+main = "src/index.ts"
+compatibility_date = "2025-05-30"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tiktok-repost-stats"
+database_id = "3dc249de-71de-4863-a5ad-29f0617ebe2b"
