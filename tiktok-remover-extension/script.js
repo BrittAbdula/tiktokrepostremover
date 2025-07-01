@@ -40,6 +40,8 @@ if (window.clearTokExtensionLoaded && window.clearTokRemover) {
         this.checkLoginStatus();
       } else if (message.action === 'startRemoval') {
         this.start();
+      } else if (message.action === 'navigateToReposts') {
+        this.navigateToRepostsTab();
       }
     }
 
@@ -574,14 +576,90 @@ if (window.clearTokExtensionLoaded && window.clearTokRemover) {
 
     stopScript(message, error = "") {
       this.isRunning = false;
-      let logMessage = `${message}`;
-      
-      if (error) {
-        console.log({ message: logMessage, error });
-        this.sendMessage('error', { message: logMessage, error: error.toString() });
-      } else {
-        console.log(logMessage);
-        this.sendMessage('error', { message: logMessage });
+      this.sendMessage('error', { message: message, error: error.toString() });
+      console.log(`Script stopped: ${message}`, error);
+    }
+
+    // Add new method to navigate to reposts tab after refresh
+    async navigateToRepostsTab() {
+      try {
+        this.sendMessage('statusUpdate', { status: 'Navigating to profile and reposts...' });
+        
+        // Step 1: Navigate to profile if not already there
+        const currentUrl = window.location.href;
+        const isOnProfile = currentUrl.includes('/@') && !currentUrl.includes('/video/');
+        
+        if (!isOnProfile) {
+          // Click profile button to go to profile
+          const success = await this.clickProfileTab();
+          if (!success) {
+            this.sendMessage('statusUpdate', { status: 'Unable to navigate to profile' });
+            return;
+          }
+          
+          // Wait for profile page to load
+          await this.waitWithProgress(3, 'Loading profile');
+        }
+        
+        // Step 2: Click reposts tab
+        this.sendMessage('statusUpdate', { status: 'Opening reposts tab...' });
+        
+        // Try to find and click reposts tab
+        let repostTab = null;
+        const selectors = [
+          '[class*="PRepost"]',
+          '[data-e2e="profile-repost-tab"]',
+          'a[href*="repost"]',
+          'button[data-testid="repost-tab"]'
+        ];
+        
+        for (const selector of selectors) {
+          repostTab = document.querySelector(selector);
+          if (repostTab) {
+            console.log('Found reposts tab with selector:', selector);
+            break;
+          }
+        }
+        
+        if (!repostTab) {
+          // Try to find by text content
+          const tabElements = document.querySelectorAll('a, button, div[role="tab"]');
+          for (const element of tabElements) {
+            const text = element.textContent?.toLowerCase().trim();
+            if (text === 'reposts' || text === 'repost' || text.includes('repost')) {
+              repostTab = element;
+              console.log('Found reposts tab by text content:', text);
+              break;
+            }
+          }
+        }
+        
+        if (repostTab) {
+          repostTab.click();
+          console.log('Successfully clicked reposts tab');
+          this.sendMessage('statusUpdate', { status: 'Reposts tab opened - You can see the results!' });
+          
+          // Wait a moment to let the tab load
+          setTimeout(() => {
+            // Check if there are any reposts left
+            const repostVideos = document.querySelectorAll('[class*="DivPlayerContainer"], [data-e2e="user-post-item"]');
+            const remainingCount = repostVideos.length;
+            
+            if (remainingCount === 0) {
+              this.sendMessage('statusUpdate', { status: '🎉 All reposts successfully removed!' });
+            } else {
+              this.sendMessage('statusUpdate', { status: `${remainingCount} repost(s) remaining on your profile` });
+            }
+          }, 2000);
+          
+        } else {
+          this.sendMessage('statusUpdate', { status: 'Reposts tab not found - please check manually' });
+          console.log('Reposts tab not found');
+        }
+        
+      } catch (error) {
+        console.error('Error navigating to reposts tab:', error);
+        this.sendMessage('statusUpdate', { status: 'Error navigating to reposts - please check manually' });
       }
     }
 

@@ -184,4 +184,14 @@
   ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, #FF0050, #25F4EE);
   }
+
+  /* Scroll up animation for recent deletions */
+  @keyframes scrollUp {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-50%);
+    }
+  }
 }

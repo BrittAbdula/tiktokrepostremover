@@ -69,6 +69,16 @@
             </div>
           </div>
 
+          <!-- Control Buttons -->
+          <div class="controls">
+            <button id="pauseButton" class="control-button pause">
+              ⏸️ Pause
+            </button>
+            <button id="viewLogButton" class="control-button secondary">
+              🧾 View Log
+            </button>
+          </div>
+
           <!-- Action Log -->
           <div class="log-container">
             <div id="actionLog" class="action-log">
@@ -79,14 +89,14 @@
             </div>
           </div>
 
-          <!-- Control Buttons -->
-          <div class="controls">
-            <button id="pauseButton" class="control-button pause">
-              ⏸️ Pause
-            </button>
-            <button id="viewLogButton" class="control-button secondary">
-              🧾 View Log
-            </button>
+          <!-- Removed Videos List -->
+          <div class="removed-videos-section">
+            <h4 class="section-title">
+              🗑️ Removed Videos (<span id="removedCount">0</span>)
+            </h4>
+            <div id="removedVideosList" class="removed-videos-list">
+              <!-- Removed videos will be added here dynamically -->
+            </div>
           </div>
         </div>
 
@@ -103,6 +113,16 @@
               <button id="restartButton" class="primary-button">
                 🔄 Start New Session
               </button>
+            </div>
+          </div>
+
+          <!-- Removed Videos List for Complete State -->
+          <div class="removed-videos-section">
+            <h4 class="section-title">
+              🗑️ Removed Videos (<span id="removedCountComplete">0</span>)
+            </h4>
+            <div id="removedVideosListComplete" class="removed-videos-list">
+              <!-- Removed videos will be added here dynamically -->
             </div>
           </div>
         </div>

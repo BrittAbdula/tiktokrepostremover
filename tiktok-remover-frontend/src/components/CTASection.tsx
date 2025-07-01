@@ -22,10 +22,14 @@ const CTASection = () => {
           <Button 
             size="lg" 
             variant="secondary" 
-            className="text-lg px-8 py-4 bg-white text-black hover:bg-gray-100 font-bold shadow-lg hover:shadow-xl transition-all" 
+            className="text-lg px-8 py-4 bg-white text-black hover:bg-gray-100 font-bold shadow-lg hover:shadow-xl transition-all relative overflow-hidden 
+                       before:absolute before:inset-0 before:rounded-lg before:p-[2px] before:bg-gradient-to-r before:from-[#FE2C55] before:via-[#FF0050] before:to-[#00F2EA] before:-z-10
+                       after:absolute after:inset-[2px] after:rounded-[6px] after:bg-white after:-z-10
+                       animate-pulse hover:animate-none
+                       shadow-[0_0_20px_rgba(254,44,85,0.5)] hover:shadow-[0_0_30px_rgba(254,44,85,0.8)]" 
             asChild
           >
-            <a href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb" className="flex items-center justify-center" target="_blank">
+            <a href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb" className="flex items-center justify-center relative z-10" target="_blank">
               {/* 渲染引入的 Font Awesome Chrome 图标 */}
               <FaChrome className="w-5 h-5 mr-2 text-black" /> {/* Chrome 按钮是白色背景，所以图标用黑色 */}
               Add ClearTok to Chrome – It's Free

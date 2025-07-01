@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef } from "react";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const headerRef = useRef<HTMLHeadElement>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -13,6 +15,23 @@ const Header = () => {
   // 处理平滑滚动到锚点，考虑header高度
   const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault();
+    
+    // 关闭移动端菜单
+    setIsMobileMenuOpen(false);
+    
+    // 如果不在首页，先跳转到首页再滚动
+    if (location.pathname !== '/') {
+      navigate('/');
+      // 等待页面跳转完成后再滚动
+      setTimeout(() => {
+        scrollToElement(targetId);
+      }, 100);
+    } else {
+      scrollToElement(targetId);
+    }
+  };
+
+  const scrollToElement = (targetId: string) => {
     const targetElement = document.getElementById(targetId);
     const headerHeight = headerRef.current?.offsetHeight || 80; // 默认80px作为fallback
     
@@ -23,15 +42,27 @@ const Header = () => {
         behavior: 'smooth'
       });
     }
-    
-    // 关闭移动端菜单
+  };
+
+  // 处理Logo点击，返回首页顶部
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
     setIsMobileMenuOpen(false);
+    
+    if (location.pathname !== '/') {
+      navigate('/');
+    } else {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
   };
 
   return (
     <header ref={headerRef} className="bg-black/95 backdrop-blur-sm border-b border-gray-800/50 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/">
+        <a href="/" onClick={handleLogoClick}>
           <div className="flex items-center space-x-3 group">
             <div className="w-8 h-8 bg-gradient-to-r from-[#FF0050] to-[#00F2EA] rounded-lg flex items-center justify-center 
                           group-hover:shadow-lg group-hover:shadow-[#FE2C55]/50 transition-all duration-300">
@@ -50,7 +81,7 @@ const Header = () => {
               </p>
             </div>
           </div>
-        </Link>
+        </a>
 
         {/* 桌面端导航 */}
         <nav className="hidden md:flex items-center space-x-6">
@@ -62,7 +93,7 @@ const Header = () => {
                        after:bg-gradient-to-r after:from-[#FE2C55] after:to-[#00F2EA] 
                        hover:after:w-full after:transition-all after:duration-300 cursor-pointer"
           >
-            Calculator
+            Estimator
           </a>
           <a 
             href="#features" 
@@ -84,6 +115,16 @@ const Header = () => {
           >
             How It Works
           </a>
+          <Link 
+            to="/blog"
+            className="text-gray-300 hover:text-[#FE2C55] transition-colors font-medium
+                       relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 
+                       after:bg-gradient-to-r after:from-[#FE2C55] after:to-[#00F2EA] 
+                       hover:after:w-full after:transition-all after:duration-300"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Blog
+          </Link>
           <a 
             href="#faq" 
             onClick={(e) => handleAnchorClick(e, 'faq')}
@@ -98,8 +139,9 @@ const Header = () => {
                                    text-white font-bold shadow-lg hover:shadow-xl hover:shadow-[#FE2C55]/50 transition-all duration-300
                                    transform hover:scale-105">
             <a 
-              href="#download" 
-              onClick={(e) => handleAnchorClick(e, 'download')}
+              href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb"
+              target="_blank"
+              rel="noopener noreferrer"
             >
             <img 
                 src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/googlechrome.svg" 
@@ -145,7 +187,7 @@ const Header = () => {
             className="block text-gray-300 hover:text-[#FE2C55] transition-colors font-medium py-2 px-4 rounded-lg
                        hover:bg-gray-800/30 border border-transparent hover:border-gray-700/50 cursor-pointer"
           >
-            Calculator
+            Estimator
           </a>
           <a 
             href="#features" 
@@ -163,6 +205,14 @@ const Header = () => {
           >
             How It Works
           </a>
+          <Link 
+            to="/blog"
+            className="block text-gray-300 hover:text-[#FE2C55] transition-colors font-medium py-2 px-4 rounded-lg
+                       hover:bg-gray-800/30 border border-transparent hover:border-gray-700/50"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Blog
+          </Link>
           <a 
             href="#faq" 
             onClick={(e) => handleAnchorClick(e, 'faq')}
@@ -175,9 +225,10 @@ const Header = () => {
                                    text-white font-bold shadow-lg hover:shadow-xl hover:shadow-[#FE2C55]/50 transition-all duration-300
                                    mt-4">
             <a 
-              href="#download" 
+              href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb"
               className="flex items-center justify-center" 
-              onClick={(e) => handleAnchorClick(e, 'download')}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <img 
                 src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/googlechrome.svg" 

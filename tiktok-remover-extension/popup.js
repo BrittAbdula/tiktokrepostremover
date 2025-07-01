@@ -28,6 +28,7 @@ class ClearTokExtension {
     document.getElementById('restartButton')?.addEventListener('click', () => this.restart());
     document.getElementById('retryButton')?.addEventListener('click', () => this.restart());
 
+
     // Listen for messages from content script with deduplication
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       this.handleMessageWithDeduplication(message);
@@ -246,6 +247,10 @@ class ClearTokExtension {
       actionLog.innerHTML = '';
     }
     
+    // Clear removed videos lists
+    this.updateRemovedVideosList('removedVideosList', 'removedCount');
+    this.updateRemovedVideosList('removedVideosListComplete', 'removedCountComplete');
+    
     // Reset progress bar
     const progressFill = document.getElementById('progressFill');
     if (progressFill) {
@@ -383,6 +388,10 @@ class ClearTokExtension {
     if (actionLog) {
       actionLog.innerHTML = '';
     }
+    
+    // Clear removed videos lists
+    this.updateRemovedVideosList('removedVideosList', 'removedCount');
+    this.updateRemovedVideosList('removedVideosListComplete', 'removedCountComplete');
   }
 
   setState(newState) {
@@ -427,119 +436,113 @@ class ClearTokExtension {
   }
 
   addLogEntry(message, type = 'info', videoInfo = null) {
-    // Enhanced duplicate prevention - check for exact matches and similar messages
-    const now = Date.now();
-    const isDuplicate = this.actionLog.some(entry => {
-      const timeDiff = now - new Date(`1970-01-01T${entry.timestamp}Z`).getTime();
-      
-      // Check for exact duplicates within 2 seconds (reduced from 3)
-      if (entry.message === message && entry.type === type && timeDiff < 2000) {
-        return true;
-      }
-      
-      // Check for similar status messages within 800ms (reduced from 1000ms)
-      if (type === 'info' && entry.type === 'info' && timeDiff < 800) {
-        // Remove emoji and compare core message
-        const cleanMessage = message.replace(/[📝ℹ️⏸️▶️⏱️✅❌]/g, '').trim();
-        const cleanEntryMessage = entry.message.replace(/[📝ℹ️⏸️▶️⏱️✅❌]/g, '').trim();
-        if (cleanMessage === cleanEntryMessage) {
-          return true;
-        }
-      }
-      
-      // Check for similar waiting messages within 400ms (reduced from 800ms)
-      if (type === 'waiting' && entry.type === 'waiting' && timeDiff < 400) {
-        return true;
-      }
-      
-      // Check for similar success messages within 1 second
-      if (type === 'success' && entry.type === 'success' && timeDiff < 1000) {
-        const cleanMessage = message.replace(/[📝ℹ️⏸️▶️⏱️✅❌]/g, '').trim();
-        const cleanEntryMessage = entry.message.replace(/[📝ℹ️⏸️▶️⏱️✅❌]/g, '').trim();
-        if (cleanMessage === cleanEntryMessage) {
-          return true;
-        }
-      }
-      
-      return false;
+    const actionLog = document.getElementById('actionLog');
+    if (!actionLog) return;
+
+    const logItem = document.createElement('div');
+    logItem.className = `log-item ${type}`;
+    
+    // Create timestamp
+    const timestamp = new Date().toLocaleTimeString();
+    
+    let icon = '';
+    switch (type) {
+      case 'success':
+        icon = '✅';
+        break;
+      case 'error':
+        icon = '❌';
+        break;
+      case 'waiting':
+        icon = '⏱️';
+        break;
+      case 'info':
+      default:
+        icon = 'ℹ️';
+        break;
+    }
+    
+    logItem.innerHTML = `
+      <div class="log-content">
+        <span class="log-icon">${icon}</span>
+        <span class="log-message">${message}</span>
+      </div>
+      <span class="log-timestamp">${timestamp}</span>
+    `;
+    
+    // Add the new log entry at the top
+    actionLog.insertBefore(logItem, actionLog.firstChild);
+    
+    // Keep only the last 50 log entries
+    while (actionLog.children.length > 50) {
+      actionLog.removeChild(actionLog.lastChild);
+    }
+    
+    // Add fade-in animation
+    logItem.style.opacity = '0';
+    logItem.style.transform = 'translateY(-10px)';
+    requestAnimationFrame(() => {
+      logItem.style.transition = 'all 0.3s ease';
+      logItem.style.opacity = '1';
+      logItem.style.transform = 'translateY(0)';
+    });
+  }
+
+  // Add new method to update removed videos list
+  addRemovedVideo(videoInfo) {
+    // Add to removedUrls array
+    this.removedUrls.push({
+      ...videoInfo,
+      timestamp: new Date().toLocaleString()
     });
     
-    if (isDuplicate) {
-      console.log('Duplicate log entry prevented:', message);
-      return; // Skip duplicate entries
-    }
+    // Update both processing and complete state lists
+    this.updateRemovedVideosList('removedVideosList', 'removedCount');
+    this.updateRemovedVideosList('removedVideosListComplete', 'removedCountComplete');
+  }
+
+  updateRemovedVideosList(listId, countId) {
+    const videosList = document.getElementById(listId);
+    const countElement = document.getElementById(countId);
     
-    const timestamp = new Date().toLocaleTimeString();
-    const logEntry = { message, type, timestamp, videoInfo };
-    this.actionLog.unshift(logEntry); // Add to beginning instead of end
+    if (!videosList || !countElement) return;
     
-    // Track URLs for View Log functionality
-    if (videoInfo && videoInfo.url) {
-      if (type === 'success' && message.includes('Removed')) {
-        // Check if this URL is already in removed URLs
-        if (!this.removedUrls.find(item => item.url === videoInfo.url)) {
-          this.removedUrls.push({
-            url: videoInfo.url,
-            title: videoInfo.title,
-            author: videoInfo.author,
-            timestamp: timestamp
-          });
-        }
-      } else if (type === 'info' && message.includes('Processing')) {
-        // Track videos being processed as pending (avoid duplicates)
-        if (!this.pendingUrls.find(item => item.url === videoInfo.url)) {
-          this.pendingUrls.push({
-            url: videoInfo.url,
-            title: videoInfo.title,
-            author: videoInfo.author,
-            timestamp: timestamp
-          });
-        }
-      }
-    }
+    // Update count
+    countElement.textContent = this.removedUrls.length;
     
-    // Update the visual log with printer effect
-    const actionLog = document.getElementById('actionLog');
-    if (actionLog) {
-      const logItem = document.createElement('div');
-      logItem.className = `log-item ${type} printer-entry`;
-      
-      let icon = '📝';
-      if (type === 'success') icon = '✅';
-      else if (type === 'error') icon = '❌';
-      else if (type === 'waiting') icon = '⏱️';
-      else if (type === 'info') icon = 'ℹ️';
-      
-      logItem.innerHTML = `${icon} ${message}`;
-      
-      // Add printer animation effect
-      logItem.style.opacity = '0';
-      logItem.style.transform = 'translateY(-10px)';
-      
-      // Insert at the top
-      if (actionLog.firstChild) {
-        actionLog.insertBefore(logItem, actionLog.firstChild);
-      } else {
-        actionLog.appendChild(logItem);
-      }
-      
-      // Animate in with printer effect
-      requestAnimationFrame(() => {
-        logItem.style.transition = 'all 0.3s ease-out';
-        logItem.style.opacity = '1';
-        logItem.style.transform = 'translateY(0)';
-      });
-      
-      // Keep only last 25 entries to prevent memory issues (reduced from 30)
-      while (actionLog.children.length > 25) {
-        actionLog.removeChild(actionLog.lastChild);
-      }
-    }
+    // Clear existing list
+    videosList.innerHTML = '';
     
-    // Keep actionLog array manageable
-    if (this.actionLog.length > 40) {
-      this.actionLog = this.actionLog.slice(0, 25);
+    // Add each removed video
+    this.removedUrls.forEach((video, index) => {
+      const videoItem = document.createElement('div');
+      videoItem.className = 'removed-video-item';
+      videoItem.onclick = () => this.openVideoInNewTab(video.url);
+      
+      videoItem.innerHTML = `
+        <div class="video-title">${this.escapeHtml(video.title || 'Unknown Video')}</div>
+        <div class="video-author">${this.escapeHtml(video.author || '@unknown')}</div>
+        <div class="video-timestamp">Removed: ${video.timestamp}</div>
+        <div class="video-url-indicator">🔗 Click to open video</div>
+      `;
+      
+      videosList.appendChild(videoItem);
+    });
+  }
+
+  openVideoInNewTab(url) {
+    if (url && url.startsWith('http')) {
+      chrome.tabs.create({ url: url, active: false });
+      this.showNotification('🔗 Video opened in new tab', 'info');
+    } else {
+      this.showNotification('❌ Invalid video URL', 'error');
     }
+  }
+
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   handleMessage(message) {
@@ -563,6 +566,16 @@ class ClearTokExtension {
         
       case 'videoRemoved':
         this.removedVideos++;
+        
+        // Add video to removed list with all info
+        if (message.title || message.author || message.url) {
+          this.addRemovedVideo({
+            title: message.title,
+            author: message.author,
+            url: message.url
+          });
+        }
+        
         // Create detailed log message with video info
         let removeLogMessage = `Removed repost #${message.index}`;
         if (message.title && message.author) {
@@ -672,8 +685,12 @@ class ClearTokExtension {
         `Successfully removed ${removedCount} reposted video${removedCount !== 1 ? 's' : ''}${durationText}.`;
     }
     
+    // Update removed videos list for complete state
+    this.updateRemovedVideosList('removedVideosListComplete', 'removedCountComplete');
+    
     // Show copy button if there are removed videos
     const copyRemovedButton = document.getElementById('copyRemovedButton');
+    
     if (copyRemovedButton) {
       if (this.removedUrls.length > 0) {
         copyRemovedButton.style.display = 'block';
@@ -691,7 +708,7 @@ class ClearTokExtension {
     }
   }
   
-  // refresh tiktok page
+  // refresh tiktok page and navigate to reposts tab
   async refreshTikTokPage() {
     try {
       const tabs = await chrome.tabs.query({ url: "*://www.tiktok.com/*" });
@@ -700,10 +717,30 @@ class ClearTokExtension {
         await chrome.tabs.reload(tabs[0].id);
         
         this.addLogEntry('🔄 Refreshing TikTok page to show updated content...', 'info');
-        this.showNotification('🔄 TikTok page refreshed to show updated content', 'success');
+        this.showNotification('🔄 TikTok page refreshed, navigating to reposts...', 'success');
         
-        // wait for page to load and check login status
-        setTimeout(() => {
+        // wait for page to load, then navigate to reposts tab
+        setTimeout(async () => {
+          try {
+            // Inject script to navigate to reposts tab
+            await chrome.scripting.executeScript({
+              target: { tabId: tabs[0].id },
+              files: ["script.js"],
+            });
+            
+            // Send message to navigate to reposts tab
+            setTimeout(() => {
+              chrome.tabs.sendMessage(tabs[0].id, { action: 'navigateToReposts' });
+            }, 2000);
+            
+            this.addLogEntry('🎯 Navigating to reposts tab to show results...', 'info');
+            
+          } catch (error) {
+            console.log('Error navigating to reposts:', error);
+            this.addLogEntry('✅ Page refreshed successfully', 'success');
+          }
+          
+          // Check login status
           this.checkTikTokLogin();
         }, 3000);
       }
@@ -773,6 +810,8 @@ class ClearTokExtension {
     
     this.addLogEntry(`✨ No reposts found - your profile is clean!${durationText || ''}`, 'success');
   }
+
+
 }
 
 // Initialize the extension when the popup loads

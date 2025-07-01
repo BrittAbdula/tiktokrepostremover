@@ -9,3 +9,13 @@ CREATE TABLE repost_counts (
   user_agent TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+SELECT 
+  DATE(created_at) as date,
+  COUNT(*) as daily_count,
+  MIN(count) as min_count,
+  MAX(count) as max_count,
+  AVG(count) as avg_count
+FROM repost_counts 
+GROUP BY DATE(created_at)
+ORDER BY date DESC;

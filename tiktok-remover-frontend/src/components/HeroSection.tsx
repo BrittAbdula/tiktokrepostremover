@@ -2,11 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 // 引入 Font Awesome 6 的 Chrome 图标
 import { FaChrome } from "react-icons/fa6";
+import RecentDeletionsScroll from "./RecentDeletionsScroll";
 
 const HeroSection = () => {
   return (
-    <section className="text-center py-20 bg-gradient-to-br from-black via-gray-900 to-black rounded-2xl relative overflow-hidden">
+    <section id="hero" className="text-center py-20 bg-gradient-to-br from-black via-gray-900 to-black rounded-2xl relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-[#FE2C55]/10 to-[#00F2EA]/10"></div>
+      {/* Recent Deletions Live Feed */}
+      <RecentDeletionsScroll />
       {/* 添加动态背景粒子效果 */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-2 h-2 bg-[#FE2C55] rounded-full animate-pulse"></div>
@@ -14,7 +17,7 @@ const HeroSection = () => {
         <div className="absolute bottom-32 left-20 w-2 h-2 bg-[#FE2C55] rounded-full animate-ping delay-300"></div>
         <div className="absolute bottom-20 right-32 w-2 h-2 bg-[#00F2EA] rounded-full animate-pulse delay-500"></div>
       </div>
-      <div className="max-w-4xl mx-auto px-4 relative z-10">
+      <div className="max-w-4xl mx-auto px-4 relative z-20">
         <Badge variant="secondary" className="mb-4 bg-gradient-to-r from-[#FE2C55] to-[#FF0050] text-white border-none
                                            shadow-lg animate-pulse">
           Free Chrome Extension
@@ -36,7 +39,12 @@ const HeroSection = () => {
                      transform hover:scale-105" 
             asChild
           >
-            <a href="#download" className="flex items-center justify-center"> {/* 确保链接内部的flex布局应用到图标和文本 */}
+            <a 
+              href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb" 
+              className="flex items-center justify-center"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {/* 渲染引入的 Font Awesome Chrome 图标 */}
               <FaChrome className="w-5 h-5 mr-2 text-white" />
               Get ClearTok Free
