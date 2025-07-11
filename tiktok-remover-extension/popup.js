@@ -16,8 +16,21 @@ class ClearTokExtension {
     // 会话追踪
     this.sessionId = null;
     this.sessionStartTime = null;
+    this.tikTokUsername = null;
+    
+    // Session管理配置
+    this.SESSION_EXPIRY_TIME = 60 * 60 * 1000; // 1小时过期
+    this.SESSION_STORAGE_KEY = 'clearTokSessionData';
+    
+    // 定时更新配置
+    this.periodicUpdateInterval = null;
+    this.UPDATE_INTERVAL_MS = 10000; // 每10秒更新一次
+    
+    // 状态缓存，避免重复调用updateSession
+    this.currentLoginStatus = null;
     
     this.initializeEventListeners();
+    this.cleanupExpiredSessions(); // 清理过期session
     this.checkTikTokLogin();
     this.initializeSession();
     
@@ -30,14 +43,41 @@ class ClearTokExtension {
     });
   }
 
-  // 初始化会话
+  // 初始化会话（智能管理）
   async initializeSession() {
     try {
+      // 首先检查是否有有效的现有session
+      const existingSession = await this.getStoredSession();
+      
+      if (existingSession && this.isSessionValid(existingSession)) {
+        // 复用现有session
+        this.sessionId = existingSession.sessionId;
+        this.sessionStartTime = existingSession.sessionStartTime;
+        this.tikTokUsername = existingSession.tikTokUsername;
+        
+        console.log('复用现有session:', this.sessionId);
+        
+        // 更新最后活跃时间
+        await this.updateStoredSession({
+          ...existingSession,
+          lastActiveTime: Date.now()
+        });
+        
+        return;
+      }
+      
+      // 创建新session
       this.sessionStartTime = Date.now();
       const response = await window.apiService.createSession();
       this.sessionId = response.session_id;
+      
+      console.log('创建新session:', this.sessionId);
+      
+      // 保存新session到存储
+      await this.saveSessionToStorage();
+      
     } catch (error) {
-      console.warn('Failed to create session:', error);
+      console.warn('Failed to initialize session:', error);
     }
   }
 
@@ -47,8 +87,144 @@ class ClearTokExtension {
     
     try {
       await window.apiService.updateSession(this.sessionId, updateData);
+      
+      // 同时更新存储的session数据
+      if (updateData.tiktok_username) {
+        this.tikTokUsername = updateData.tiktok_username;
+        await this.saveSessionToStorage();
+      }
+      
     } catch (error) {
       console.warn('Failed to update session:', error);
+    }
+  }
+
+  // Session存储管理方法
+  
+  // 获取存储的session
+  async getStoredSession() {
+    try {
+      const result = await chrome.storage.local.get([this.SESSION_STORAGE_KEY]);
+      return result[this.SESSION_STORAGE_KEY] || null;
+    } catch (error) {
+      console.warn('Failed to get stored session:', error);
+      return null;
+    }
+  }
+  
+  // 检查session是否有效
+  isSessionValid(sessionData) {
+    if (!sessionData || !sessionData.sessionId || !sessionData.createdTime) {
+      return false;
+    }
+    
+    const now = Date.now();
+    const sessionAge = now - sessionData.createdTime;
+    
+    // 检查是否超过过期时间
+    if (sessionAge > this.SESSION_EXPIRY_TIME) {
+      console.log('Session expired, age:', Math.floor(sessionAge / 1000 / 60), 'minutes');
+      return false;
+    }
+    
+    return true;
+  }
+  
+  // 保存session到存储
+  async saveSessionToStorage() {
+    try {
+      const sessionData = {
+        sessionId: this.sessionId,
+        sessionStartTime: this.sessionStartTime,
+        tikTokUsername: this.tikTokUsername,
+        createdTime: Date.now(),
+        lastActiveTime: Date.now()
+      };
+      
+      await chrome.storage.local.set({
+        [this.SESSION_STORAGE_KEY]: sessionData
+      });
+      
+      console.log('Session saved to storage:', sessionData);
+    } catch (error) {
+      console.warn('Failed to save session to storage:', error);
+    }
+  }
+  
+  // 更新存储的session
+  async updateStoredSession(sessionData) {
+    try {
+      await chrome.storage.local.set({
+        [this.SESSION_STORAGE_KEY]: sessionData
+      });
+    } catch (error) {
+      console.warn('Failed to update stored session:', error);
+    }
+  }
+  
+  // 清除存储的session
+  async clearStoredSession() {
+    try {
+      await chrome.storage.local.remove([this.SESSION_STORAGE_KEY]);
+      console.log('Stored session cleared');
+    } catch (error) {
+      console.warn('Failed to clear stored session:', error);
+    }
+  }
+  
+  // 清理过期的session
+  async cleanupExpiredSessions() {
+    try {
+      const existingSession = await this.getStoredSession();
+      if (existingSession && !this.isSessionValid(existingSession)) {
+        await this.clearStoredSession();
+        console.log('Expired session cleaned up');
+      }
+    } catch (error) {
+      console.warn('Failed to cleanup expired sessions:', error);
+    }
+  }
+
+  // 开始定时更新session状态
+  startPeriodicUpdate() {
+    if (this.periodicUpdateInterval) {
+      clearInterval(this.periodicUpdateInterval);
+    }
+    
+    this.periodicUpdateInterval = setInterval(() => {
+      this.periodicSessionUpdate();
+    }, this.UPDATE_INTERVAL_MS);
+    
+    console.log('Started periodic session updates');
+  }
+
+  // 停止定时更新session状态
+  stopPeriodicUpdate() {
+    if (this.periodicUpdateInterval) {
+      clearInterval(this.periodicUpdateInterval);
+      this.periodicUpdateInterval = null;
+      console.log('Stopped periodic session updates');
+    }
+  }
+
+  // 执行定时的session更新
+  async periodicSessionUpdate() {
+    if (!this.sessionId || !this.isProcessing) {
+      return;
+    }
+
+    try {
+      const updateData = {
+        process_status: this.isPaused ? 'paused' : 'in_progress',
+        total_reposts_found: this.totalVideos,
+        reposts_removed: this.removedVideos,
+        reposts_skipped: this.processedVideos - this.removedVideos
+      };
+
+      await window.apiService.updateSession(this.sessionId, updateData);
+      
+    } catch (error) {
+      console.warn('Failed to perform periodic session update:', error);
     }
   }
 
@@ -201,6 +377,13 @@ class ClearTokExtension {
   }
 
   updateLoginStatus(status) {
+    // 避免重复更新相同状态
+    if (this.currentLoginStatus === status) {
+      return;
+    }
+    
+    this.currentLoginStatus = status;
+    
     const loginStatus = document.getElementById('loginStatus');
     if (loginStatus) {
       switch (status) {
@@ -209,16 +392,12 @@ class ClearTokExtension {
             <span class="status-indicator">✅</span>
             <span>${this.getText('loginStatusLoggedIn')}</span>
           `;
-          // 更新会话：用户已登录
-          this.updateSession({ login_status: 'logged_in' });
           break;
         case 'notLoggedIn':
           loginStatus.innerHTML = `
             <span class="status-indicator">⚠️</span>
             <span style="color: var(--color-warning)">${this.getText('loginStatusNotLoggedIn')}</span>
           `;
-          // 更新会话：用户未登录
-          this.updateSession({ login_status: 'not_logged_in' });
           break;
         case 'ready':
           loginStatus.innerHTML = `
@@ -273,6 +452,9 @@ class ClearTokExtension {
     // 更新会话：开始删除流程
     this.updateSession({ process_status: 'in_progress' });
     
+    // 启动定时更新
+    this.startPeriodicUpdate();
+    
     // Clear previous data and switch to processing state
     this.clearProcessingData();
     this.setState('processing');
@@ -302,6 +484,7 @@ class ClearTokExtension {
     this.actionLog = [];
     this.removedUrls = [];
     this.pendingUrls = [];
+    
     
     // Clear the demo log content
     const actionLog = document.getElementById('actionLog');
@@ -435,8 +618,16 @@ class ClearTokExtension {
     this.isProcessing = false;
     this.isPaused = false;
     
-    // 重新初始化会话
-    this.initializeSession();
+    // 停止定时更新
+    this.stopPeriodicUpdate();
+    
+    // 只重置状态，不重新创建session（除非当前session无效）
+    if (!this.sessionId) {
+      this.initializeSession();
+    } else {
+      // 更新session状态为重新开始
+      this.updateSession({ process_status: 'restarted' });
+    }
     
     // Clear all data and reset to welcome state
     this.clearProcessingData();
@@ -614,8 +805,26 @@ class ClearTokExtension {
     switch (message.action) {
       case 'loginStatusUpdate':
         if (message.method === 'username-check' && message.isLoggedIn) {
+          // 保存TikTok用户名
+          if (message.username && message.username !== this.tikTokUsername) {
+            console.log('TikTok username detected:', message.username);
+            
+            // 更新会话中的TikTok用户名
+            this.updateSession({ 
+              login_status: 'logged_in',
+              tiktok_username: message.username
+            });
+          } else if (this.currentLoginStatus !== 'loggedIn') {
+            // 只有当登录状态真的变化时才更新
+            this.updateSession({ login_status: 'logged_in' });
+          }
           this.updateLoginStatus('loggedIn');
         } else if (message.method === 'username-check' && !message.isLoggedIn) {
+          if (this.tikTokUsername !== null || this.currentLoginStatus !== 'notLoggedIn') {
+            // 只有当状态真的变化时才更新
+            this.tikTokUsername = null;
+            this.updateSession({ login_status: 'not_logged_in' });
+          }
           this.updateLoginStatus('notLoggedIn');
           this.showNotification('⚠️ Please log in to TikTok.com to continue', 'error');
         } else {
@@ -624,6 +833,8 @@ class ClearTokExtension {
         break;
         
       case 'updateProgress':
+        this.processedVideos = message.current;
+        this.totalVideos = message.total;
         this.updateProgress(message.current, message.total);
         this.updateStatus(`Processing video ${message.current} of ${message.total}`);
         // Don't add a separate log entry for progress updates - too much noise
@@ -715,6 +926,10 @@ class ClearTokExtension {
 
   handleError(message, error = null) {
     this.isProcessing = false;
+    
+    // 停止定时更新
+    this.stopPeriodicUpdate();
+    
     this.setState('error');
     
     const errorMessage = document.getElementById('errorMessage');
@@ -736,6 +951,10 @@ class ClearTokExtension {
 
   handleCompletion(message) {
     this.isProcessing = false;
+    
+    // 停止定时更新
+    this.stopPeriodicUpdate();
+    
     this.setState('complete');
     
     const removedCount = message.removedCount || 0;
@@ -862,6 +1081,10 @@ class ClearTokExtension {
 
   handleNoReposts(message) {
     this.isProcessing = false;
+    
+    // 停止定时更新
+    this.stopPeriodicUpdate();
+    
     this.setState('complete');
     
     this.updateSession({ process_status: 'no_reposts', total_reposts_found: 0, reposts_removed: 0 });

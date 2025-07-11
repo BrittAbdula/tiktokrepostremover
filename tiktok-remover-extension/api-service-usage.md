@@ -4,11 +4,36 @@
 `api-service.js` 是一个专门处理用户会话的API服务模块，负责与后台服务器进行会话相关的通信。它提供了统一的接口、错误处理、重试机制和配置管理。
 
 ## 特性
+- ✅ 智能会话管理（复用有效session，避免重复创建）
+- ✅ 会话持久化存储（使用chrome.storage.local）
+- ✅ 会话过期管理（1小时自动过期）
 - ✅ 会话创建和更新
 - ✅ 自动重试机制
 - ✅ 请求超时处理
 - ✅ 错误处理和日志记录
 - ✅ 开发/生产环境配置
+
+## 智能Session管理
+
+### 工作原理
+1. **Session复用**：扩展启动时首先检查本地存储中是否有有效的session
+2. **有效性检查**：验证session是否在1小时有效期内
+3. **智能创建**：只有在没有有效session时才创建新session
+4. **自动清理**：启动时自动清理过期的session数据
+
+### 优势
+- 🚀 **性能优化**：避免重复创建不必要的session
+- 💾 **数据持久化**：session数据在浏览器关闭重启后仍然保留
+- 🔄 **智能复用**：同一用户在1小时内的多次操作使用同一session
+- 🧹 **自动清理**：过期session自动清理，避免数据冗余
+- 📊 **准确追踪**：更准确地追踪用户的完整操作流程
+
+### Session生命周期
+1. **创建**：首次使用或现有session过期时创建
+2. **存储**：保存到chrome.storage.local
+3. **复用**：有效期内重复使用
+4. **更新**：操作过程中更新session状态
+5. **清理**：过期后自动清理
 
 ## 基本用法
 
@@ -108,20 +133,88 @@ try {
 
 ## 在扩展中的集成
 
-### popup.js 中的使用
+### popup.js 中的使用（智能Session管理）
 ```javascript
 class ClearTokExtension {
   constructor() {
     this.sessionId = null;
+    this.SESSION_EXPIRY_TIME = 60 * 60 * 1000; // 1小时过期
+    this.SESSION_STORAGE_KEY = 'clearTokSessionData';
     this.initializeSession();
   }
 
+  // 智能初始化会话（复用有效session或创建新session）
   async initializeSession() {
     try {
+      // 首先检查是否有有效的现有session
+      const existingSession = await this.getStoredSession();
+      
+      if (existingSession && this.isSessionValid(existingSession)) {
+        // 复用现有session
+        this.sessionId = existingSession.sessionId;
+        console.log('复用现有session:', this.sessionId);
+        return;
+      }
+      
+      // 创建新session
       const response = await window.apiService.createSession();
       this.sessionId = response.session_id;
+      console.log('创建新session:', this.sessionId);
+      
+      // 保存新session到存储
+      await this.saveSessionToStorage();
+      
     } catch (error) {
-      console.warn('会话创建失败:', error);
+      console.warn('会话初始化失败:', error);
+    }
+  }
+
+  // 检查session是否有效
+  isSessionValid(sessionData) {
+    if (!sessionData || !sessionData.sessionId || !sessionData.createdTime) {
+      return false;
+    }
+    
+    const now = Date.now();
+    const sessionAge = now - sessionData.createdTime;
+    
+    // 检查是否超过过期时间
+    if (sessionAge > this.SESSION_EXPIRY_TIME) {
+      return false;
+    }
+    
+    return true;
+  }
+
+  // 获取存储的session
+  async getStoredSession() {
+    try {
+      const result = await chrome.storage.local.get([this.SESSION_STORAGE_KEY]);
+      return result[this.SESSION_STORAGE_KEY] || null;
+    } catch (error) {
+      console.warn('获取存储session失败:', error);
+      return null;
+    }
+  }
+
+  // 保存session到存储
+  async saveSessionToStorage() {
+    try {
+      const sessionData = {
+        sessionId: this.sessionId,
+        sessionStartTime: this.sessionStartTime,
+        tikTokUsername: this.tikTokUsername,
+        createdTime: Date.now(),
+        lastActiveTime: Date.now()
+      };
+      
+      await chrome.storage.local.set({
+        [this.SESSION_STORAGE_KEY]: sessionData
+      });
+      
+      console.log('Session保存到存储:', sessionData);
+    } catch (error) {
+      console.warn('保存session失败:', error);
     }
   }
 
@@ -184,10 +277,12 @@ class ClearTokExtension {
 ## 最佳实践
 
 1. **错误处理**: 始终使用try-catch包装API调用
-2. **会话管理**: 在应用启动时创建会话，在关键节点更新状态
+2. **智能会话管理**: 利用session复用机制，避免重复创建
 3. **配置管理**: 根据环境动态配置API基础URL
 4. **性能优化**: 合并相关的更新操作，避免频繁调用
 5. **错误恢复**: 利用重试机制处理临时网络问题
+6. **存储权限**: 确保manifest.json中包含"storage"权限
+7. **清理机制**: 在应用启动时自动清理过期session
 
 ## 开发环境配置
 
@@ -198,4 +293,23 @@ if (window.location.hostname === 'localhost') {
 }
 ```
 
-这个简化的API服务模块专注于会话管理，提供了清晰、可靠的接口来追踪用户在扩展中的完整操作流程。 
+## 权限要求
+
+为了使用智能session管理功能，需要在manifest.json中添加以下权限：
+
+```json
+{
+  "permissions": ["scripting", "tabs", "activeTab", "sidePanel", "storage"],
+  "host_permissions": [
+    "https://*.tiktok.com/*",
+    "https://api.tiktokrepostremover.com/*"
+  ]
+}
+```
+
+**重要**: `"storage"` 权限是必需的，用于：
+- 保存session数据到本地存储
+- 检查和复用有效session
+- 自动清理过期session
+
+这个智能的API服务模块专注于会话管理，提供了清晰、可靠、高效的接口来追踪用户在扩展中的完整操作流程，同时避免了重复创建session的问题。 

@@ -30,6 +30,7 @@ CREATE TABLE user_sessions (
   
   -- 登录状态
   login_status TEXT, -- 'logged_in', 'not_logged_in', 'unknown'
+  tiktok_username TEXT, -- 用户的TikTok用户名 (例如: @username)
   
   -- 删除过程数据
   total_reposts_found INTEGER DEFAULT 0,
@@ -50,6 +51,25 @@ CREATE TABLE user_sessions (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE session_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  session_id TEXT NOT NULL,
+  
+  -- 基本状态信息
+  process_status TEXT,
+  login_status TEXT,
+  
+  -- 删除数量记录
+  total_reposts_found INTEGER,
+  reposts_removed INTEGER,
+  reposts_skipped INTEGER,
+  
+  -- 记录时间
+  logged_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  
+);
+
+
 SELECT 
   DATE(created_at) as date,
   COUNT(*) as daily_count,
@@ -61,6 +81,7 @@ FROM repost_counts
 GROUP BY DATE(created_at)
 ORDER BY date DESC;
 
+
 SELECT 
   DATE(session_start_at) as date,
   COUNT(*) as total_sessions,
@@ -70,7 +91,13 @@ SELECT
   COUNT(CASE WHEN process_status = 'no_reposts' THEN 1 END) as no_reposts_sessions,
   ROUND(AVG(CASE WHEN process_status = 'completed' THEN total_reposts_found END),2) as avg_total_reposts_found,
   ROUND(AVG(CASE WHEN process_status = 'completed' THEN reposts_removed END),2) as avg_reposts_removed,
-  ROUND(AVG(CASE WHEN process_status = 'completed' THEN total_duration_seconds END),2) as avg_duration_seconds
+  ROUND(AVG(CASE WHEN process_status = 'completed' THEN total_duration_seconds END),2) as avg_duration_seconds,
+  round(min(case when process_status = 'completed' then total_reposts_found end),2) as min_total_reposts_found,
+  round(min(case when process_status = 'completed' then reposts_removed end),2) as min_reposts_removed,
+  round(min(case when process_status = 'completed' then total_duration_seconds end),2) as min_duration_seconds,
+  round(max(case when process_status = 'completed' then total_reposts_found end),2) as max_total_reposts_found,
+  round(max(case when process_status = 'completed' then reposts_removed end),2) as max_reposts_removed,
+  round(max(case when process_status = 'completed' then total_duration_seconds end),2) as max_duration_seconds
 FROM user_sessions 
 GROUP BY DATE(session_start_at)
 ORDER BY date DESC;

@@ -106,15 +106,12 @@ app.post('/session/create', validateSessionCreate, async (c) => {
     
     const result = await c.env.DB.prepare(`
       INSERT INTO user_sessions 
-      (session_id, ip_address, country, region, city, timezone, user_agent, process_status) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, 'started')
+      (session_id, ip_address, country, user_agent, process_status) 
+      VALUES (?, ?, ?, ?, 'started')
     `).bind(
       finalSessionId,
       locationInfo.ip,
       locationInfo.country,
-      locationInfo.region,
-      locationInfo.city,
-      locationInfo.timezone,
       userAgent
     ).run()
 
@@ -184,6 +181,11 @@ app.put('/session/update', validateSessionUpdate, async (c) => {
       updateValues.push(updateData.total_duration_seconds)
     }
     
+    if (updateData.tiktok_username) {
+      updateFields.push('tiktok_username = ?')
+      updateValues.push(updateData.tiktok_username)
+    }
+    
     // 总是更新 updated_at
     updateFields.push('updated_at = CURRENT_TIMESTAMP')
     updateValues.push(session_id) // 用于 WHERE 条件
@@ -194,6 +196,27 @@ app.put('/session/update', validateSessionUpdate, async (c) => {
     
     const sql = `UPDATE user_sessions SET ${updateFields.join(', ')} WHERE session_id = ?`
     const result = await c.env.DB.prepare(sql).bind(...updateValues).run()
+
+    // 记录session更新日志
+    if (result.success) {
+      try {
+        await c.env.DB.prepare(`
+          INSERT INTO session_logs 
+          (session_id, process_status, login_status, total_reposts_found, reposts_removed, reposts_skipped) 
+          VALUES (?, ?, ?, ?, ?, ?)
+        `).bind(
+          session_id,
+          updateData.process_status || null,
+          updateData.login_status || null,
+          updateData.total_reposts_found || null,
+          updateData.reposts_removed || null,
+          updateData.reposts_skipped || null
+        ).run()
+      } catch (logError) {
+        console.error('Failed to log session update:', logError)
+        // 不影响主要的session更新操作
+      }
+    }
 
     return c.json({ 
       success: result.success,

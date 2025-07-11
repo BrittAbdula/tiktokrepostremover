@@ -4,7 +4,7 @@
   "name": "ClearTok - Repost Remover",
   "description": "A modern Chrome extension to remove all reposted videos on TikTok with real-time progress tracking.",
   "version": "1.1.0",
-  "permissions": ["scripting", "tabs", "activeTab", "sidePanel"],
+  "permissions": ["scripting", "tabs", "activeTab", "sidePanel", "storage"],
   "host_permissions": [
     "https://*.tiktok.com/*",
     "https://api.tiktokrepostremover.com/*"
