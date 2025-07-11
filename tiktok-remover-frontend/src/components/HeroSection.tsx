@@ -22,11 +22,11 @@ const HeroSection = () => {
                                            shadow-lg animate-pulse">
           Free Chrome Extension
         </Badge>
-        <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
-          ClearTok
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+          TikTok Repost Remover - Delete ALL Your Reposts in One Click
         </h1>
         <p className="text-xl text-gray-300 mb-4 max-w-2xl mx-auto">
-          <strong className="text-[#FE2C55]">The Ultimate TikTok Repost Remover</strong>
+          <strong className="text-[#FE2C55]">ClearTok - The Ultimate TikTok Repost Remover</strong>
         </p>
         <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
           Delete every reposted TikTok video in one click. Clean up your profile, fix accidental shares, and keep your brand on point.

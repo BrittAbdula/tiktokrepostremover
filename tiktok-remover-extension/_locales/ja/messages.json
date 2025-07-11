@@ -1,0 +1,281 @@
+{
+  "appTitle": {
+    "message": "ClearTok - リポスト削除ツール"
+  },
+  "step1Title": {
+    "message": "ステップ1: TikTok.comにログイン"
+  },
+  "step1Description": {
+    "message": "こちらをクリックしてTikTok.comを開き、アカウントにログインしてください。"
+  },
+  "step1Status": {
+    "message": "TikTok.comを開くにはクリック"
+  },
+  "step2Title": {
+    "message": "ステップ2: 削除を開始"
+  },
+  "startButton": {
+    "message": "🧹 リポスト削除を開始"
+  },
+  "statusLabel": {
+    "message": "🧹 ステータス:"
+  },
+  "progressLabel": {
+    "message": "📊 進捗:"
+  },
+  "pauseButton": {
+    "message": "⏸️ 一時停止"
+  },
+  "resumeButton": {
+    "message": "▶️ 再開"
+  },
+  "viewLogButton": {
+    "message": "🧾 ログを表示"
+  },
+  "removedVideosTitle": {
+    "message": "🗑️ 削除済み動画"
+  },
+  "allDoneTitle": {
+    "message": "完了！"
+  },
+  "completionMessage": {
+    "message": "プロフィールから{count}個のリポスト動画を正常に削除しました。"
+  },
+  "copyRemovedButton": {
+    "message": "📋 削除リストをコピー"
+  },
+  "restartButton": {
+    "message": "🔄 新しいセッションを開始"
+  },
+  "errorTitle": {
+    "message": "エラーが発生しました"
+  },
+  "errorMessage": {
+    "message": "再度お試しいただくか、コンソールで詳細を確認してください。"
+  },
+  "retryButton": {
+    "message": "🔄 再試行"
+  },
+  "howItWorksTitle": {
+    "message": "📖 仕組み"
+  },
+  "howItWorks1": {
+    "message": "TikTokプロフィールに移動"
+  },
+  "howItWorks2": {
+    "message": "リポストタブを見つけて開く"
+  },
+  "howItWorks3": {
+    "message": "すべてのリポスト動画を自動削除"
+  },
+  "howItWorks4": {
+    "message": "リアルタイム進捗追跡"
+  },
+  "importantNotesTitle": {
+    "message": "⚠️ 重要な注意事項"
+  },
+  "note1Title": {
+    "message": "ログイン状態を保つ:"
+  },
+  "note1Description": {
+    "message": "TikTok.comを開いてログイン状態を保つ"
+  },
+  "note2Title": {
+    "message": "中断しない:"
+  },
+  "note2Description": {
+    "message": "プロセスが自然に完了するまで待つ"
+  },
+  "note3Title": {
+    "message": "ネットワーク速度:"
+  },
+  "note3Description": {
+    "message": "プロセス速度は接続状況に依存"
+  },
+  "note4Title": {
+    "message": "安全な操作:"
+  },
+  "note4Description": {
+    "message": "リポストのみ削除、元の動画は安全"
+  },
+  "privacySecurityTitle": {
+    "message": "🔒 プライバシーとセキュリティ"
+  },
+  "privacy1": {
+    "message": "✅ パスワードは保存されません"
+  },
+  "privacy2": {
+    "message": "✅ データは収集されません"
+  },
+  "privacy3": {
+    "message": "✅ ブラウザ内でローカルに動作"
+  },
+  "privacy4": {
+    "message": "✅ オープンソースで透明"
+  },
+  "documentationLink": {
+    "message": "📖 ドキュメント"
+  },
+  "reportIssueLink": {
+    "message": "🐛 問題を報告"
+  },
+  "languageSelector": {
+    "message": "🌐 言語"
+  },
+  "loginStatusLoggedIn": {
+    "message": "ログイン済み - 開始準備完了！"
+  },
+  "loginStatusNotLoggedIn": {
+    "message": "まずTikTokにログインしてください"
+  },
+  "loginStatusReady": {
+    "message": "TikTok.comが開いています - 開始準備完了！"
+  },
+  "loginStatusOpening": {
+    "message": "TikTok.comを開いています..."
+  },
+  "loginStatusError": {
+    "message": "TikTokを開くエラー - 再試行してください"
+  },
+  "loginStatusDefault": {
+    "message": "TikTok.comを開くにはクリック"
+  },
+  "alertOpenTikTokFirst": {
+    "message": "まずステップ1をクリックしてTikTok.comを開いてください"
+  },
+  "statusInitializing": {
+    "message": "初期化中..."
+  },
+  "logStartingProcess": {
+    "message": "🚀 リポスト削除プロセスを開始しています..."
+  },
+  "logProcessPaused": {
+    "message": "ユーザーによってプロセスが一時停止されました"
+  },
+  "logProcessResumed": {
+    "message": "プロセスが再開されました"
+  },
+  "logVideoRemoved": {
+    "message": "リポスト #{number} を削除しました"
+  },
+  "logVideoRemovedWithTitle": {
+    "message": "削除済み: \"{title}\" by {author}"
+  },
+  "logVideoRemovedTitleOnly": {
+    "message": "削除済み: \"{title}\""
+  },
+  "logVideoRemovedAuthorOnly": {
+    "message": "{author}のリポストを削除しました"
+  },
+  "logVideoSkipped": {
+    "message": "#{number} をスキップしました"
+  },
+  "logVideoSkippedWithTitle": {
+    "message": "スキップ: \"{title}\" by {author}"
+  },
+  "logVideoSkippedTitleOnly": {
+    "message": "スキップ: \"{title}\""
+  },
+  "logVideoSkippedAuthorOnly": {
+    "message": "{author}の動画をスキップしました"
+  },
+  "logVideoSkippedWithReason": {
+    "message": "{message} ({reason})"
+  },
+  "logWaitingSeconds": {
+    "message": "{seconds}秒待機中..."
+  },
+  "logWaitingPaused": {
+    "message": "プロセスが一時停止されました"
+  },
+  "logError": {
+    "message": "エラー: {message}"
+  },
+  "logProcessCompleted": {
+    "message": "🎉 プロセス完了！{count}個の動画を削除しました{duration}。"
+  },
+  "logRefreshingPage": {
+    "message": "🔄 更新されたコンテンツを表示するためにTikTokページを更新中..."
+  },
+  "logNavigatingToReposts": {
+    "message": "🎯 結果を表示するためにリポストタブに移動中..."
+  },
+  "logPageRefreshed": {
+    "message": "✅ ページが正常に更新されました"
+  },
+  "logUnableToRefresh": {
+    "message": "⚠️ ページを自動更新できませんでした"
+  },
+  "logVideoUrlsCopied": {
+    "message": "📋 動画URLをクリップボードにコピーしました"
+  },
+  "logRemovedListCopied": {
+    "message": "📋 削除済み動画リストをクリップボードにコピーしました"
+  },
+  "logFailedToCopyUrls": {
+    "message": "❌ URLのコピーに失敗しました"
+  },
+  "logFailedToCopyList": {
+    "message": "❌ 削除済み動画リストのコピーに失敗しました"
+  },
+  "logNoRepostsFound": {
+    "message": "✨ リポストが見つかりませんでした - あなたのプロフィールはクリーンです！{duration}"
+  },
+  "notificationPageRefreshed": {
+    "message": "🔄 TikTokページが更新されました、リポストに移動中..."
+  },
+  "notificationUrlsCopied": {
+    "message": "📋 動画URLがクリップボードに正常にコピーされました！"
+  },
+  "notificationListCopied": {
+    "message": "📋 削除済み動画リストが正常にコピーされました！"
+  },
+  "notificationFailedToCopyUrls": {
+    "message": "❌ URLをクリップボードにコピーできませんでした"
+  },
+  "notificationFailedToCopyList": {
+    "message": "❌ リストをクリップボードにコピーできませんでした"
+  },
+  "notificationNoUrls": {
+    "message": "📝 動画URLはまだ利用できません。削除プロセスを開始すると動画URLが表示されます。"
+  },
+  "completionMessageSuccess": {
+    "message": "{count}個のリポスト動画{plural}を正常に削除しました{duration}。"
+  },
+  "completionMessageNoReposts": {
+    "message": "素晴らしい！プロフィールにリポスト動画は見つかりませんでした{duration}。"
+  },
+  "durationMinutes": {
+    "message": " {minutes}分{seconds}秒で"
+  },
+  "durationSeconds": {
+    "message": " {seconds}秒で"
+  },
+  "removedVideosHeader": {
+    "message": "=== 削除済み動画 ({count}個) ==="
+  },
+  "pendingVideosHeader": {
+    "message": "=== 保留中/処理済み動画 ==="
+  },
+  "videoStatusPending": {
+    "message": "ステータス: 保留中/スキップ済み"
+  },
+  "videoRemovedAt": {
+    "message": "削除日時: {timestamp}"
+  },
+  "videoUnknownTitle": {
+    "message": "不明"
+  },
+  "videoUnknownAuthor": {
+    "message": "不明"
+  },
+  "noRemovedVideos": {
+    "message": "まだ削除された動画はありません"
+  },
+  "noRepostsFoundMessage": {
+    "message": "素晴らしい！プロフィールにリポストはありません。"
+  },
+  "notificationNoRepostsFound": {
+    "message": "✨ リポスト動画が見つかりません！"
+  }
+} 

@@ -13,8 +13,63 @@ class ClearTokExtension {
     this.processedMessages = new Set(); // Track processed messages to prevent duplicates
     this.lastMessageTimestamp = 0; // Track last message timestamp
     
+    // 会话追踪
+    this.sessionId = null;
+    this.sessionStartTime = null;
+    
     this.initializeEventListeners();
     this.checkTikTokLogin();
+    this.initializeSession();
+    
+    // Delegated click listener for video link buttons
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.video-link-btn');
+      if (btn && btn.dataset.url) {
+        this.openVideoInNewTab(btn.dataset.url);
+      }
+    });
+  }
+
+  // 初始化会话
+  async initializeSession() {
+    try {
+      this.sessionStartTime = Date.now();
+      const response = await window.apiService.createSession();
+      this.sessionId = response.session_id;
+    } catch (error) {
+      console.warn('Failed to create session:', error);
+    }
+  }
+
+  // 更新会话状态
+  async updateSession(updateData) {
+    if (!this.sessionId) return;
+    
+    try {
+      await window.apiService.updateSession(this.sessionId, updateData);
+    } catch (error) {
+      console.warn('Failed to update session:', error);
+    }
+  }
+
+  // Helper method to get translated text with substitutions
+  getText(key, substitutions = {}) {
+    if (window.i18n && window.i18n.getMessage) {
+      return window.i18n.getMessage(key, substitutions);
+    }
+    // Fallback to Chrome i18n API if available
+    if (chrome && chrome.i18n && chrome.i18n.getMessage) {
+      let message = chrome.i18n.getMessage(key);
+      if (message) {
+        // Handle simple substitutions for Chrome API
+        Object.keys(substitutions).forEach(placeholder => {
+          message = message.replace(new RegExp(`{${placeholder}}`, 'g'), substitutions[placeholder]);
+        });
+        return message;
+      }
+    }
+    // Ultimate fallback
+    return key;
   }
 
   initializeEventListeners() {
@@ -152,37 +207,41 @@ class ClearTokExtension {
         case 'loggedIn':
           loginStatus.innerHTML = `
             <span class="status-indicator">✅</span>
-            <span>Logged in - Ready to start!</span>
+            <span>${this.getText('loginStatusLoggedIn')}</span>
           `;
+          // 更新会话：用户已登录
+          this.updateSession({ login_status: 'logged_in' });
           break;
         case 'notLoggedIn':
           loginStatus.innerHTML = `
             <span class="status-indicator">⚠️</span>
-            <span style="color: var(--color-warning)">Please log in to TikTok first</span>
+            <span style="color: var(--color-warning)">${this.getText('loginStatusNotLoggedIn')}</span>
           `;
+          // 更新会话：用户未登录
+          this.updateSession({ login_status: 'not_logged_in' });
           break;
         case 'ready':
           loginStatus.innerHTML = `
             <span class="status-indicator">✅</span>
-            <span>TikTok.com is open - Ready to start!</span>
+            <span>${this.getText('loginStatusReady')}</span>
           `;
           break;
         case 'opening':
           loginStatus.innerHTML = `
             <span class="status-indicator">🔄</span>
-            <span>Opening TikTok.com...</span>
+            <span>${this.getText('loginStatusOpening')}</span>
           `;
           break;
         case 'error':
           loginStatus.innerHTML = `
             <span class="status-indicator">❌</span>
-            <span>Error opening TikTok - Try again</span>
+            <span>${this.getText('loginStatusError')}</span>
           `;
           break;
         default:
           loginStatus.innerHTML = `
             <span class="status-indicator">👆</span>
-            <span>Click to open TikTok.com</span>
+            <span>${this.getText('loginStatusDefault')}</span>
           `;
       }
     }
@@ -195,7 +254,7 @@ class ClearTokExtension {
     try {
       const tabs = await chrome.tabs.query({ url: "*://www.tiktok.com/*" });
       if (tabs.length === 0) {
-        alert('Please open TikTok.com first by clicking Step 1');
+        alert(this.getText('alertOpenTikTokFirst'));
         return;
       }
       
@@ -211,14 +270,17 @@ class ClearTokExtension {
 
     this.isProcessing = true;
     
+    // 更新会话：开始删除流程
+    this.updateSession({ process_status: 'in_progress' });
+    
     // Clear previous data and switch to processing state
     this.clearProcessingData();
     this.setState('processing');
     
     // Initialize with real starting status
-    this.updateStatus('Initializing...');
+    this.updateStatus(this.getText('statusInitializing'));
     this.updateProgress(0, 1);
-    this.addLogEntry('🚀 Starting repost removal process...', 'info');
+    this.addLogEntry(this.getText('logStartingProcess'), 'info');
     
     try {
       // Send message to background script to start the process
@@ -268,14 +330,14 @@ class ClearTokExtension {
     const pauseButton = document.getElementById('pauseButton');
     
     if (this.isPaused) {
-      pauseButton.textContent = '▶️ Resume';
+      pauseButton.textContent = this.getText('resumeButton');
       pauseButton.className = 'control-button resume';
-      this.addLogEntry('Process paused by user', 'info');
+      this.addLogEntry(this.getText('logProcessPaused'), 'info');
       chrome.runtime.sendMessage({ action: "pauseRemoval" });
     } else {
-      pauseButton.textContent = '⏸️ Pause';
+      pauseButton.textContent = this.getText('pauseButton');
       pauseButton.className = 'control-button pause';
-      this.addLogEntry('Process resumed', 'info');
+      this.addLogEntry(this.getText('logProcessResumed'), 'info');
       chrome.runtime.sendMessage({ action: "resumeRemoval" });
     }
   }
@@ -285,53 +347,53 @@ class ClearTokExtension {
     let logContent = '';
     
     if (this.removedUrls.length > 0) {
-      logContent += '=== REMOVED VIDEOS ===\n';
+      logContent += this.getText('removedVideosHeader', {count: this.removedUrls.length}) + '\n';
       this.removedUrls.forEach((item, index) => {
-        logContent += `${index + 1}. ${item.title || 'Unknown'} by ${item.author || 'Unknown'}\n`;
+        logContent += `${index + 1}. ${item.title || this.getText('videoUnknownTitle')} by ${item.author || this.getText('videoUnknownAuthor')}\n`;
         logContent += `   ${item.url}\n`;
-        logContent += `   Removed at: ${item.timestamp}\n\n`;
+        logContent += `   ${this.getText('videoRemovedAt', {timestamp: item.timestamp})}\n\n`;
       });
     }
     
     if (this.pendingUrls.length > 0) {
-      logContent += '=== PENDING/PROCESSED VIDEOS ===\n';
+      logContent += this.getText('pendingVideosHeader') + '\n';
       this.pendingUrls.forEach((item, index) => {
         // Check if this URL was actually removed
         const wasRemoved = this.removedUrls.find(removed => removed.url === item.url);
         if (!wasRemoved) {
-          logContent += `${index + 1}. ${item.title || 'Unknown'} by ${item.author || 'Unknown'}\n`;
+          logContent += `${index + 1}. ${item.title || this.getText('videoUnknownTitle')} by ${item.author || this.getText('videoUnknownAuthor')}\n`;
           logContent += `   ${item.url}\n`;
-          logContent += `   Status: Pending/Skipped\n\n`;
+          logContent += `   ${this.getText('videoStatusPending')}\n\n`;
         }
       });
     }
     
     if (logContent.trim() === '') {
       // Show notification for empty log
-      this.showNotification('📝 No video URLs available yet. Start the removal process to see video URLs.', 'info');
+      this.showNotification(this.getText('notificationNoUrls'), 'info');
       return;
     }
     
-    // Copy to clipboard
-    navigator.clipboard.writeText(logContent).then(() => {
-      this.addLogEntry('📋 Video URLs copied to clipboard', 'info');
-      this.showNotification('📋 Video URLs copied to clipboard successfully!', 'success');
-    }).catch(() => {
-      // Fallback for browsers that don't support clipboard API
-      const textArea = document.createElement('textarea');
-      textArea.value = logContent;
-      document.body.appendChild(textArea);
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        this.addLogEntry('📋 Video URLs copied to clipboard', 'info');
-        this.showNotification('📋 Video URLs copied to clipboard successfully!', 'success');
-      } catch (err) {
-        this.addLogEntry('❌ Failed to copy URLs', 'error');
-        this.showNotification('❌ Failed to copy URLs to clipboard', 'error');
-      }
-      document.body.removeChild(textArea);
-    });
+          // Copy to clipboard
+      navigator.clipboard.writeText(logContent).then(() => {
+        this.addLogEntry(this.getText('logVideoUrlsCopied'), 'info');
+        this.showNotification(this.getText('notificationUrlsCopied'), 'success');
+      }).catch(() => {
+        // Fallback for browsers that don't support clipboard API
+        const textArea = document.createElement('textarea');
+        textArea.value = logContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          this.addLogEntry(this.getText('logVideoUrlsCopied'), 'info');
+          this.showNotification(this.getText('notificationUrlsCopied'), 'success');
+        } catch (err) {
+          this.addLogEntry(this.getText('logFailedToCopyUrls'), 'error');
+          this.showNotification(this.getText('notificationFailedToCopyUrls'), 'error');
+        }
+        document.body.removeChild(textArea);
+      });
   }
 
   showNotification(message, type = 'info') {
@@ -370,67 +432,68 @@ class ClearTokExtension {
   }
 
   restart() {
-    this.currentState = 'welcome';
     this.isProcessing = false;
     this.isPaused = false;
-    this.totalVideos = 0;
-    this.processedVideos = 0;
-    this.removedVideos = 0;
-    this.actionLog = [];
-    this.removedUrls = [];
-    this.pendingUrls = [];
     
+    // 重新初始化会话
+    this.initializeSession();
+    
+    // Clear all data and reset to welcome state
+    this.clearProcessingData();
     this.setState('welcome');
-    this.checkTikTokLogin();
     
-    // Clear the action log display
-    const actionLog = document.getElementById('actionLog');
-    if (actionLog) {
-      actionLog.innerHTML = '';
+    // Reset pause button
+    const pauseButton = document.getElementById('pauseButton');
+    if (pauseButton) {
+      pauseButton.textContent = this.getText('pauseButton');
+      pauseButton.className = 'control-button pause';
     }
     
-    // Clear removed videos lists
-    this.updateRemovedVideosList('removedVideosList', 'removedCount');
-    this.updateRemovedVideosList('removedVideosListComplete', 'removedCountComplete');
+    // Check login status again
+    this.checkTikTokLogin();
   }
 
   setState(newState) {
-    // Hide all states
-    document.querySelectorAll('.state').forEach(state => {
-      state.classList.add('hidden');
+    this.currentState = newState;
+    
+    // Hide all state containers
+    const states = ['welcome', 'processing', 'complete', 'error'];
+    states.forEach(state => {
+      const element = document.getElementById(`${state}State`);
+      if (element) {
+        element.style.display = 'none';
+      }
     });
     
-    // Show the new state
-    const stateElement = document.getElementById(`${newState}State`);
-    if (stateElement) {
-      stateElement.classList.remove('hidden');
+    // Show current state
+    const currentElement = document.getElementById(`${newState}State`);
+    if (currentElement) {
+      currentElement.style.display = 'block';
     }
-    
-    this.currentState = newState;
   }
 
   updateStatus(message) {
-    const statusElement = document.getElementById('currentStatus');
+    const statusElement = document.getElementById('statusMessage');
     if (statusElement) {
       statusElement.textContent = message;
     }
   }
 
   updateProgress(current, total) {
-    this.processedVideos = current;
-    this.totalVideos = total;
-    
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
     
     if (progressFill && progressText) {
+      const percentage = total > 0 ? (current / total) * 100 : 0;
+      progressFill.style.width = `${percentage}%`;
+      progressText.textContent = `${current} / ${total}`;
+      
+      // 更新会话进度
       if (total > 0) {
-        const percentage = (current / total) * 100;
-        progressFill.style.width = `${percentage}%`;
-        progressText.textContent = `${current} / ${total}`;
-      } else {
-        progressFill.style.width = '0%';
-        progressText.textContent = `${current} / ${total}`;
+        this.updateSession({ 
+          total_reposts_found: total,
+          reposts_removed: current
+        });
       }
     }
   }
@@ -438,96 +501,98 @@ class ClearTokExtension {
   addLogEntry(message, type = 'info', videoInfo = null) {
     const actionLog = document.getElementById('actionLog');
     if (!actionLog) return;
-
-    const logItem = document.createElement('div');
-    logItem.className = `log-item ${type}`;
     
-    // Create timestamp
+    const logEntry = document.createElement('div');
+    logEntry.className = `log-entry log-${type}`;
+    
     const timestamp = new Date().toLocaleTimeString();
+    const icon = this.getLogIcon(type);
     
-    let icon = '';
-    switch (type) {
-      case 'success':
-        icon = '✅';
-        break;
-      case 'error':
-        icon = '❌';
-        break;
-      case 'waiting':
-        icon = '⏱️';
-        break;
-      case 'info':
-      default:
-        icon = 'ℹ️';
-        break;
+    let content = `<span class="log-time">${timestamp}</span> <span class="log-icon">${icon}</span> <span class="log-message">${message}</span>`;
+    
+    // Add video info if provided
+    if (videoInfo && videoInfo.url) {
+      content += `<div class="log-video-info">
+        <button class="video-link-btn" onclick="window.extension.openVideoInNewTab('${videoInfo.url}')">
+          🔗 Open Video
+        </button>
+      </div>`;
     }
     
-    logItem.innerHTML = `
-      <div class="log-content">
-        <span class="log-icon">${icon}</span>
-        <span class="log-message">${message}</span>
-      </div>
-      <span class="log-timestamp">${timestamp}</span>
-    `;
+    logEntry.innerHTML = content;
+    actionLog.appendChild(logEntry);
     
-    // Add the new log entry at the top
-    actionLog.insertBefore(logItem, actionLog.firstChild);
+    // Auto-scroll to bottom
+    actionLog.scrollTop = actionLog.scrollHeight;
     
-    // Keep only the last 50 log entries
-    while (actionLog.children.length > 50) {
-      actionLog.removeChild(actionLog.lastChild);
+    // Keep only last 100 entries for performance
+    while (actionLog.children.length > 100) {
+      actionLog.removeChild(actionLog.firstChild);
     }
     
-    // Add fade-in animation
-    logItem.style.opacity = '0';
-    logItem.style.transform = 'translateY(-10px)';
-    requestAnimationFrame(() => {
-      logItem.style.transition = 'all 0.3s ease';
-      logItem.style.opacity = '1';
-      logItem.style.transform = 'translateY(0)';
+    // Track in action log array
+    this.actionLog.push({
+      timestamp: timestamp,
+      type: type,
+      message: message,
+      videoInfo: videoInfo
     });
+    
+    // Keep only last 100 entries in array too
+    if (this.actionLog.length > 100) {
+      this.actionLog = this.actionLog.slice(-100);
+    }
   }
 
-  // Add new method to update removed videos list
+  getLogIcon(type) {
+    switch (type) {
+      case 'success': return '✅';
+      case 'error': return '❌';
+      case 'warning': return '⚠️';
+      case 'waiting': return '⏳';
+      default: return 'ℹ️';
+    }
+  }
+
   addRemovedVideo(videoInfo) {
-    // Add to removedUrls array
     this.removedUrls.push({
       ...videoInfo,
       timestamp: new Date().toLocaleString()
     });
     
-    // Update both processing and complete state lists
+    // Update both lists
     this.updateRemovedVideosList('removedVideosList', 'removedCount');
     this.updateRemovedVideosList('removedVideosListComplete', 'removedCountComplete');
   }
 
   updateRemovedVideosList(listId, countId) {
-    const videosList = document.getElementById(listId);
-    const countElement = document.getElementById(countId);
+    const list = document.getElementById(listId);
+    const count = document.getElementById(countId);
     
-    if (!videosList || !countElement) return;
-    
-    // Update count
-    countElement.textContent = this.removedUrls.length;
-    
-    // Clear existing list
-    videosList.innerHTML = '';
-    
-    // Add each removed video
-    this.removedUrls.forEach((video, index) => {
-      const videoItem = document.createElement('div');
-      videoItem.className = 'removed-video-item';
-      videoItem.onclick = () => this.openVideoInNewTab(video.url);
+    if (list && count) {
+      count.textContent = this.removedUrls.length;
       
-      videoItem.innerHTML = `
-        <div class="video-title">${this.escapeHtml(video.title || 'Unknown Video')}</div>
-        <div class="video-author">${this.escapeHtml(video.author || '@unknown')}</div>
-        <div class="video-timestamp">Removed: ${video.timestamp}</div>
-        <div class="video-url-indicator">🔗 Click to open video</div>
-      `;
-      
-      videosList.appendChild(videoItem);
-    });
+      if (this.removedUrls.length > 0) {
+        list.innerHTML = this.removedUrls.slice(-10).map((video, index) => {
+          const displayTitle = video.title || this.getText('videoUnknownTitle');
+          const displayAuthor = video.author || this.getText('videoUnknownAuthor');
+          
+          return `
+            <div class="removed-video-item">
+              <div class="video-info">
+                <strong>${this.escapeHtml(displayTitle)}</strong>
+                <span class="video-author">by ${this.escapeHtml(displayAuthor)}</span>
+              </div>
+              <button class="video-link-btn" data-url="${video.url}" aria-label="Open video link">
+                🔗
+              </button>
+            </div>
+          `;
+        }).join('');
+      } else {
+        list.innerHTML = `<div class="no-videos">${this.getText('noRemovedVideos')}</div>`;
+      }
+    }
   }
 
   openVideoInNewTab(url) {
@@ -577,13 +642,13 @@ class ClearTokExtension {
         }
         
         // Create detailed log message with video info
-        let removeLogMessage = `Removed repost #${message.index}`;
+        let removeLogMessage = this.getText('logVideoRemoved', {number: message.index});
         if (message.title && message.author) {
-          removeLogMessage = `Removed: "${message.title}" by ${message.author}`;
+          removeLogMessage = this.getText('logVideoRemovedWithTitle', {title: message.title, author: message.author});
         } else if (message.title) {
-          removeLogMessage = `Removed: "${message.title}"`;
+          removeLogMessage = this.getText('logVideoRemovedTitleOnly', {title: message.title});
         } else if (message.author) {
-          removeLogMessage = `Removed repost by ${message.author}`;
+          removeLogMessage = this.getText('logVideoRemovedAuthorOnly', {author: message.author});
         }
         
         this.addLogEntry(removeLogMessage, 'success', {
@@ -595,24 +660,24 @@ class ClearTokExtension {
         
       case 'videoSkipped':
         // Create detailed skip message
-        let skipLogMessage = `Skipped #${message.index}`;
+        let skipLogMessage = this.getText('logVideoSkipped', {number: message.index});
         if (message.title && message.author) {
-          skipLogMessage = `Skipped: "${message.title}" by ${message.author}`;
+          skipLogMessage = this.getText('logVideoSkippedWithTitle', {title: message.title, author: message.author});
         } else if (message.title) {
-          skipLogMessage = `Skipped: "${message.title}"`;
+          skipLogMessage = this.getText('logVideoSkippedTitleOnly', {title: message.title});
         } else if (message.author) {
-          skipLogMessage = `Skipped video by ${message.author}`;
+          skipLogMessage = this.getText('logVideoSkippedAuthorOnly', {author: message.author});
         }
-        skipLogMessage += ` (${message.reason})`;
+        skipLogMessage = this.getText('logVideoSkippedWithReason', {message: skipLogMessage, reason: message.reason});
         this.addLogEntry(skipLogMessage, 'info');
         break;
         
       case 'waiting':
         if (message.seconds === 'paused') {
-          this.addLogEntry('Process paused', 'waiting');
+          this.addLogEntry(this.getText('logWaitingPaused'), 'waiting');
         } else if (typeof message.seconds === 'number') {
           // Show waiting countdown
-          this.addLogEntry(`Waiting ${message.seconds}s...`, 'waiting');
+          this.addLogEntry(this.getText('logWaitingSeconds', {seconds: message.seconds}), 'waiting');
         }
         break;
         
@@ -657,7 +722,13 @@ class ClearTokExtension {
       errorMessage.textContent = message;
     }
     
-    this.addLogEntry(`Error: ${message}`, 'error');
+    // 更新会话：发生错误
+    this.updateSession({ 
+      error_message: message,
+      process_status: 'error'
+    });
+    
+    this.addLogEntry(this.getText('logError', {message: message}), 'error');
     if (error) {
       console.error('Extension error:', error);
     }
@@ -669,20 +740,34 @@ class ClearTokExtension {
     
     const removedCount = message.removedCount || 0;
     const duration = message.duration;
+    let durationText = '';
+    
+    // 计算总耗时
+    const totalDurationSeconds = this.sessionStartTime ? 
+      Math.floor((Date.now() - this.sessionStartTime) / 1000) : 0;
+    
+    // 更新会话：完成
+    this.updateSession({
+      process_status: 'completed',
+      reposts_removed: removedCount,
+      total_duration_seconds: totalDurationSeconds
+    });
     
     const completionMessage = document.getElementById('completionMessage');
     if (completionMessage) {
-      let durationText = '';
       if (duration) {
         if (duration.minutes > 0) {
-          durationText = ` in ${duration.minutes} min ${duration.seconds} seconds`;
+          durationText = this.getText('durationMinutes', {minutes: duration.minutes, seconds: duration.seconds});
         } else {
-          durationText = ` in ${duration.seconds} seconds`;
+          durationText = this.getText('durationSeconds', {seconds: duration.seconds});
         }
       }
       
-      completionMessage.textContent = 
-        `Successfully removed ${removedCount} reposted video${removedCount !== 1 ? 's' : ''}${durationText}.`;
+      completionMessage.textContent = this.getText('completionMessageSuccess', {
+        count: removedCount,
+        plural: removedCount !== 1 ? 's' : '',
+        duration: durationText
+      });
     }
     
     // Update removed videos list for complete state
@@ -700,7 +785,7 @@ class ClearTokExtension {
       }
     }
     
-    this.addLogEntry(`🎉 Process completed! Removed ${removedCount} videos${durationText}.`, 'success');
+    this.addLogEntry(this.getText('logProcessCompleted', {count: removedCount, duration: durationText}), 'success');
     
     // add refresh page function
     if (removedCount > 0) {
@@ -716,8 +801,8 @@ class ClearTokExtension {
         // refresh tiktok page
         await chrome.tabs.reload(tabs[0].id);
         
-        this.addLogEntry('🔄 Refreshing TikTok page to show updated content...', 'info');
-        this.showNotification('🔄 TikTok page refreshed, navigating to reposts...', 'success');
+        this.addLogEntry(this.getText('logRefreshingPage'), 'info');
+        this.showNotification(this.getText('notificationPageRefreshed'), 'success');
         
         // wait for page to load, then navigate to reposts tab
         setTimeout(async () => {
@@ -731,52 +816,45 @@ class ClearTokExtension {
             // Send message to navigate to reposts tab
             setTimeout(() => {
               chrome.tabs.sendMessage(tabs[0].id, { action: 'navigateToReposts' });
-            }, 2000);
-            
-            this.addLogEntry('🎯 Navigating to reposts tab to show results...', 'info');
+            }, 3000);
             
           } catch (error) {
             console.log('Error navigating to reposts:', error);
-            this.addLogEntry('✅ Page refreshed successfully', 'success');
           }
-          
-          // Check login status
-          this.checkTikTokLogin();
-        }, 3000);
+        }, 5000);
       }
     } catch (error) {
-      console.log('Error refreshing TikTok page:', error);
-      this.addLogEntry('⚠️ Unable to refresh page automatically', 'info');
+      console.log('Error refreshing page:', error);
     }
   }
 
   copyRemovedList() {
-    // Create formatted list of removed videos
-    let listContent = `=== REMOVED VIDEOS (${this.removedUrls.length} total) ===\n\n`;
+    if (this.removedUrls.length === 0) {
+      this.showNotification(this.getText('notificationNoUrls'), 'info');
+      return;
+    }
     
-    this.removedUrls.forEach((item, index) => {
-      listContent += `${index + 1}. ${item.title || 'Unknown'} by ${item.author || 'Unknown'}\n`;
-      listContent += `   ${item.url}\n`;
-      listContent += `   Removed at: ${item.timestamp}\n\n`;
-    });
+    const listText = this.removedUrls.map((video, index) => {
+      const title = video.title || this.getText('videoUnknownTitle');
+      const author = video.author || this.getText('videoUnknownAuthor');
+      return `${index + 1}. ${title} by ${author}\n   ${video.url}\n   ${this.getText('videoRemovedAt', {timestamp: video.timestamp})}\n`;
+    }).join('\n');
     
-    // Copy to clipboard
-    navigator.clipboard.writeText(listContent).then(() => {
-      this.addLogEntry('📋 Removed videos list copied to clipboard', 'info');
-      this.showNotification('📋 Removed videos list copied successfully!', 'success');
+    const fullText = this.getText('removedVideosHeader', {count: this.removedUrls.length}) + '\n\n' + listText;
+    
+    navigator.clipboard.writeText(fullText).then(() => {
+      this.showNotification(this.getText('notificationUrlsCopied'), 'success');
     }).catch(() => {
-      // Fallback for browsers that don't support clipboard API
+      // Fallback for older browsers
       const textArea = document.createElement('textarea');
-      textArea.value = listContent;
+      textArea.value = fullText;
       document.body.appendChild(textArea);
       textArea.select();
       try {
         document.execCommand('copy');
-        this.addLogEntry('📋 Removed videos list copied to clipboard', 'info');
-        this.showNotification('📋 Removed videos list copied successfully!', 'success');
+        this.showNotification(this.getText('notificationUrlsCopied'), 'success');
       } catch (err) {
-        this.addLogEntry('❌ Failed to copy removed videos list', 'error');
-        this.showNotification('❌ Failed to copy list to clipboard', 'error');
+        this.showNotification(this.getText('notificationFailedToCopyUrls'), 'error');
       }
       document.body.removeChild(textArea);
     });
@@ -786,43 +864,20 @@ class ClearTokExtension {
     this.isProcessing = false;
     this.setState('complete');
     
-    const duration = message.duration;
-    
+    this.updateSession({ process_status: 'no_reposts', total_reposts_found: 0, reposts_removed: 0 });
     const completionMessage = document.getElementById('completionMessage');
     if (completionMessage) {
-      let durationText = '';
-      if (duration) {
-        if (duration.minutes > 0) {
-          durationText = ` in ${duration.minutes} min ${duration.seconds} seconds`;
-        } else {
-          durationText = ` in ${duration.seconds} seconds`;
-        }
-      }
-      
-      completionMessage.textContent = `Great! No reposted videos found on your profile${durationText}.`;
+      completionMessage.textContent = this.getText('noRepostsFoundMessage');
     }
-    
-    // Hide copy button since no videos were removed
     const copyRemovedButton = document.getElementById('copyRemovedButton');
-    if (copyRemovedButton) {
-      copyRemovedButton.style.display = 'none';
-    }
-    
-    this.addLogEntry(`✨ No reposts found - your profile is clean!${durationText || ''}`, 'success');
+    if (copyRemovedButton) copyRemovedButton.style.display = 'none';
+    this.addLogEntry(this.getText('logNoRepostsFound', {duration: ''}), 'info');
+    this.showNotification(this.getText('notificationNoRepostsFound'), 'info');
   }
-
-
 }
 
-// Initialize the extension when the popup loads
-document.addEventListener("DOMContentLoaded", function () {
-  // Handle internationalization if needed
-  document.querySelectorAll("[data-i18n]").forEach((element) => {
-    const key = element.getAttribute("data-i18n");
-    const message = chrome.i18n.getMessage(key);
-    if (message) element.innerHTML = message;
-  });
-
-  // Initialize the main extension functionality
+document.addEventListener('DOMContentLoaded', async () => {
+  window.i18n = new I18n();
+  await window.i18n.init();
   new ClearTokExtension();
 });

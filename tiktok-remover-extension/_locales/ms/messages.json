@@ -1,44 +1,281 @@
 {
   "appTitle": {
-    "message": "TikTok All Reposted Videos Remover"
+    "message": "ClearTok - Pemadam Repost"
+  },
+  "step1Title": {
+    "message": "Langkah 1: Log masuk ke TikTok.com"
+  },
+  "step1Description": {
+    "message": "Klik di sini untuk membuka TikTok.com dan log masuk ke akaun anda."
+  },
+  "step1Status": {
+    "message": "Klik untuk membuka TikTok.com"
+  },
+  "step2Title": {
+    "message": "Langkah 2: Mula Memadamkan"
   },
   "startButton": {
-    "message": "Mulakan penghapusan repost"
+    "message": "🧹 Mula Memadamkan Repost"
   },
-  "step1": {
-    "message": "Langkah 1: Buka tiktok.com dalam tab baharu dan pastikan anda sudah log masuk ke akaun anda."
+  "statusLabel": {
+    "message": "🧹 Status:"
   },
-  "step2": {
-    "message": "Langkah 2: Kembali ke sini dan klik butang di bawah untuk memulakan."
+  "progressLabel": {
+    "message": "📊 Kemajuan:"
   },
-  "list1": {
-    "message": "Sambungan ini akan membuka profil TikTok anda"
+  "pauseButton": {
+    "message": "⏸️ Jeda"
   },
-  "list2": {
-    "message": "Pergi ke tab \"Repost\""
+  "resumeButton": {
+    "message": "▶️ Sambung"
   },
-  "list3": {
-    "message": "Buka setiap video yang telah di-repost"
+  "viewLogButton": {
+    "message": "🧾 Lihat Log"
   },
-  "list4": {
-    "message": "Alih keluar video daripada repost dan teruskan ke yang seterusnya"
+  "removedVideosTitle": {
+    "message": "🗑️ Video Dipadamkan"
   },
-  "list5": {
-    "message": "Ulangi sehingga semua repost dipadamkan"
+  "allDoneTitle": {
+    "message": "Selesai!"
   },
-  "note": {
-    "message": "Nota: Jika anda mempunyai banyak video repost, proses ini mungkin mengambil masa. TikTok mungkin menyekat tindakan buat sementara waktu jika terlalu banyak dilakukan. Tunggu kira-kira 1 jam dan cuba semula."
+  "completionMessage": {
+    "message": "Berjaya memadamkan {count} video repost dari profil anda."
   },
-  "tip": {
-    "message": "Petua: Setelah proses selesai, segarkan profil TikTok anda untuk memastikan semua repost telah dipadamkan."
+  "copyRemovedButton": {
+    "message": "📋 Salin Senarai Dipadamkan"
   },
-  "linkLiked": {
-    "message": "Padam Semua Video Disukai"
+  "restartButton": {
+    "message": "🔄 Mulakan Sesi Baru"
   },
-  "linkFavorite": {
-    "message": "Padam Semua Video Kegemaran"
+  "errorTitle": {
+    "message": "Sesuatu telah berlaku"
   },
-  "linkGitHub": {
-    "message": "Repositori GitHub"
+  "errorMessage": {
+    "message": "Sila cuba lagi atau semak konsol untuk butiran."
+  },
+  "retryButton": {
+    "message": "🔄 Cuba Lagi"
+  },
+  "howItWorksTitle": {
+    "message": "📖 Bagaimana ia berfungsi"
+  },
+  "howItWorks1": {
+    "message": "Navigasi ke profil TikTok anda"
+  },
+  "howItWorks2": {
+    "message": "Cari dan buka tab Repost"
+  },
+  "howItWorks3": {
+    "message": "Automatik memadamkan semua video repost"
+  },
+  "howItWorks4": {
+    "message": "Penjejakan kemajuan masa nyata"
+  },
+  "importantNotesTitle": {
+    "message": "⚠️ Nota Penting"
+  },
+  "note1Title": {
+    "message": "Kekal log masuk:"
+  },
+  "note1Description": {
+    "message": "Biarkan TikTok.com terbuka dan kekal log masuk"
+  },
+  "note2Title": {
+    "message": "Jangan ganggu:"
+  },
+  "note2Description": {
+    "message": "Biarkan proses selesai secara semula jadi"
+  },
+  "note3Title": {
+    "message": "Kelajuan rangkaian:"
+  },
+  "note3Description": {
+    "message": "Kelajuan proses bergantung pada sambungan anda"
+  },
+  "note4Title": {
+    "message": "Operasi selamat:"
+  },
+  "note4Description": {
+    "message": "Hanya memadamkan repost, video asal selamat"
+  },
+  "privacySecurityTitle": {
+    "message": "🔒 Privasi & Keselamatan"
+  },
+  "privacy1": {
+    "message": "✅ Tiada kata laluan disimpan"
+  },
+  "privacy2": {
+    "message": "✅ Tiada data dikumpul"
+  },
+  "privacy3": {
+    "message": "✅ Berfungsi secara tempatan dalam pelayar anda"
+  },
+  "privacy4": {
+    "message": "✅ Sumber terbuka & telus"
+  },
+  "documentationLink": {
+    "message": "📖 Dokumentasi"
+  },
+  "reportIssueLink": {
+    "message": "🐛 Lapor Masalah"
+  },
+  "languageSelector": {
+    "message": "🌐 Bahasa"
+  },
+  "loginStatusLoggedIn": {
+    "message": "Sudah log masuk - Sedia untuk mula!"
+  },
+  "loginStatusNotLoggedIn": {
+    "message": "Sila log masuk ke TikTok terlebih dahulu"
+  },
+  "loginStatusReady": {
+    "message": "TikTok.com sudah terbuka - Sedia untuk mula!"
+  },
+  "loginStatusOpening": {
+    "message": "Membuka TikTok.com..."
+  },
+  "loginStatusError": {
+    "message": "Ralat membuka TikTok - Cuba lagi"
+  },
+  "loginStatusDefault": {
+    "message": "Klik untuk membuka TikTok.com"
+  },
+  "alertOpenTikTokFirst": {
+    "message": "Sila buka TikTok.com terlebih dahulu dengan mengklik Langkah 1"
+  },
+  "statusInitializing": {
+    "message": "Memulakan..."
+  },
+  "logStartingProcess": {
+    "message": "🚀 Memulakan proses pemadaman repost..."
+  },
+  "logProcessPaused": {
+    "message": "Proses dijeda oleh pengguna"
+  },
+  "logProcessResumed": {
+    "message": "Proses disambung"
+  },
+  "logVideoRemoved": {
+    "message": "Repost #{number} dipadamkan"
+  },
+  "logVideoRemovedWithTitle": {
+    "message": "Dipadamkan: \"{title}\" oleh {author}"
+  },
+  "logVideoRemovedTitleOnly": {
+    "message": "Dipadamkan: \"{title}\""
+  },
+  "logVideoRemovedAuthorOnly": {
+    "message": "Repost dipadamkan oleh {author}"
+  },
+  "logVideoSkipped": {
+    "message": "#{number} dilangkau"
+  },
+  "logVideoSkippedWithTitle": {
+    "message": "Dilangkau: \"{title}\" oleh {author}"
+  },
+  "logVideoSkippedTitleOnly": {
+    "message": "Dilangkau: \"{title}\""
+  },
+  "logVideoSkippedAuthorOnly": {
+    "message": "Video dilangkau oleh {author}"
+  },
+  "logVideoSkippedWithReason": {
+    "message": "{message} ({reason})"
+  },
+  "logWaitingSeconds": {
+    "message": "Menunggu {seconds}s..."
+  },
+  "logWaitingPaused": {
+    "message": "Proses dijeda"
+  },
+  "logError": {
+    "message": "Ralat: {message}"
+  },
+  "logProcessCompleted": {
+    "message": "🎉 Proses selesai! {count} video dipadamkan{duration}."
+  },
+  "logRefreshingPage": {
+    "message": "🔄 Memuat semula halaman TikTok untuk memaparkan kandungan yang dikemas kini..."
+  },
+  "logNavigatingToReposts": {
+    "message": "🎯 Navigasi ke tab repost untuk memaparkan hasil..."
+  },
+  "logPageRefreshed": {
+    "message": "✅ Halaman berjaya dimuat semula"
+  },
+  "logUnableToRefresh": {
+    "message": "⚠️ Tidak dapat memuat semula halaman secara automatik"
+  },
+  "logVideoUrlsCopied": {
+    "message": "📋 URL video disalin ke papan klip"
+  },
+  "logRemovedListCopied": {
+    "message": "📋 Senarai video dipadamkan disalin ke papan klip"
+  },
+  "logFailedToCopyUrls": {
+    "message": "❌ Gagal menyalin URL"
+  },
+  "logFailedToCopyList": {
+    "message": "❌ Gagal menyalin senarai video dipadamkan"
+  },
+  "logNoRepostsFound": {
+    "message": "✨ Tiada repost ditemui - profil anda bersih!{duration}"
+  },
+  "notificationPageRefreshed": {
+    "message": "🔄 Halaman TikTok dimuat semula, navigasi ke repost..."
+  },
+  "notificationUrlsCopied": {
+    "message": "📋 URL video berjaya disalin ke papan klip!"
+  },
+  "notificationListCopied": {
+    "message": "📋 Senarai video dipadamkan berjaya disalin!"
+  },
+  "notificationFailedToCopyUrls": {
+    "message": "❌ Gagal menyalin URL ke papan klip"
+  },
+  "notificationFailedToCopyList": {
+    "message": "❌ Gagal menyalin senarai ke papan klip"
+  },
+  "notificationNoUrls": {
+    "message": "📝 Tiada URL video tersedia lagi. Mulakan proses pemadaman untuk melihat URL video."
+  },
+  "completionMessageSuccess": {
+    "message": "Berjaya memadamkan {count} video repost{plural}{duration}."
+  },
+  "completionMessageNoReposts": {
+    "message": "Bagus! Tiada video repost ditemui di profil anda{duration}."
+  },
+  "durationMinutes": {
+    "message": " dalam {minutes} minit {seconds} saat"
+  },
+  "durationSeconds": {
+    "message": " dalam {seconds} saat"
+  },
+  "removedVideosHeader": {
+    "message": "=== VIDEO DIPADAMKAN ({count} jumlah) ==="
+  },
+  "pendingVideosHeader": {
+    "message": "=== VIDEO TERTUNDA/DIPROSES ==="
+  },
+  "videoStatusPending": {
+    "message": "Status: Tertunda/Dilangkau"
+  },
+  "videoRemovedAt": {
+    "message": "Dipadamkan pada: {timestamp}"
+  },
+  "videoUnknownTitle": {
+    "message": "Tidak diketahui"
+  },
+  "videoUnknownAuthor": {
+    "message": "Tidak diketahui"
+  },
+  "noRemovedVideos": {
+    "message": "Belum ada video dipadamkan"
+  },
+  "noRepostsFoundMessage": {
+    "message": "Hebat! Tiada repost ditemui dalam profil anda."
+  },
+  "notificationNoRepostsFound": {
+    "message": "✨ Tiada video repost ditemui!"
   }
 }

@@ -27,6 +27,41 @@ const BlogList = () => {
         <meta name="twitter:title" content="ClearTok Blog | TikTok Repost Remover Tips & Tutorials" />
         <meta name="twitter:description" content="Stay updated with the latest TikTok tips, tricks, and tutorials for managing your reposts and cleaning up your profile with ClearTok." />
         <meta name="twitter:image" content="https://tiktokrepostremover.com/logo.png" />
+        
+        {/* Structured Data for Blog */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "name": "ClearTok Blog",
+            "description": "Stay updated with the latest TikTok tips, tricks, and tutorials for managing your reposts and cleaning up your profile with ClearTok.",
+            "url": "https://tiktokrepostremover.com/blog",
+            "publisher": {
+              "@type": "Organization",
+              "name": "ClearTok",
+              "url": "https://tiktokrepostremover.com",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://tiktokrepostremover.com/logo.png",
+                "width": 512,
+                "height": 512
+              }
+            },
+            "blogPost": blogPosts.map(post => ({
+              "@type": "BlogPosting",
+              "headline": post.title,
+              "description": post.excerpt,
+              "url": `https://tiktokrepostremover.com/blog/${post.slug}`,
+              "datePublished": post.publishDate,
+              "author": {
+                "@type": "Organization",
+                "name": post.author || "ClearTok Team"
+              },
+              "image": post.image ? `https://tiktokrepostremover.com${post.image}` : "https://tiktokrepostremover.com/logo.png"
+            })),
+            "inLanguage": "en-US"
+          })}
+        </script>
       </Helmet>
       <div className="min-h-screen bg-black">
         <Header />
@@ -50,13 +85,12 @@ const BlogList = () => {
               </Badge>
               <Card className="bg-gradient-to-br from-gray-900 to-black border-gray-800 overflow-hidden">
                 <div className="grid lg:grid-cols-2 gap-0">
-                  <div className="bg-gradient-to-br from-[#FE2C55]/20 to-[#00F2EA]/20 p-8 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="w-24 h-24 bg-gradient-to-r from-[#FE2C55] to-[#FF0050] rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span className="text-white text-3xl font-bold">T</span>
-                      </div>
-                      <h3 className="text-white text-xl font-semibold">Featured Guide</h3>
-                    </div>
+                  <div className="overflow-hidden">
+                    <img
+                      src={featuredPost.image}
+                      alt={featuredPost.title}
+                      className="w-full object-cover aspect-[3/2]"
+                    />
                   </div>
                   <CardContent className="p-8">
                     <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
@@ -70,8 +104,13 @@ const BlogList = () => {
                       </div>
                     </div>
                     
-                    <h2 className="text-2xl font-bold text-white mb-4 line-clamp-2">
-                      {featuredPost.title}
+                    <h2 className="text-2xl font-bold mb-4 line-clamp-2">
+                      <Link
+                        to={`/blog/${featuredPost.slug}`}
+                        className="text-white hover:text-[#FE2C55] transition-colors"
+                      >
+                        {featuredPost.title}
+                      </Link>
                     </h2>
                     
                     <p className="text-gray-300 mb-6 line-clamp-3">
@@ -106,6 +145,13 @@ const BlogList = () => {
                 {otherPosts.map((post) => (
                   <Card key={post.id} className="bg-gradient-to-br from-gray-900 to-black border-gray-800 hover:border-[#FE2C55]/50 transition-all duration-300 group">
                     <CardHeader>
+                      {post.image && (
+                        <img
+                          src={post.image}
+                          alt={post.title}
+                          className="w-full object-cover aspect-[3/2] rounded-md mb-4"
+                        />
+                      )}
                       <div className="flex items-center gap-4 text-sm text-gray-400 mb-2">
                         <div className="flex items-center gap-1">
                           <CalendarDays className="w-4 h-4" />
@@ -117,8 +163,13 @@ const BlogList = () => {
                         </div>
                       </div>
                       
-                      <CardTitle className="text-white group-hover:text-[#FE2C55] transition-colors duration-300 line-clamp-2">
-                        {post.title}
+                      <CardTitle className="line-clamp-2">
+                        <Link
+                          to={`/blog/${post.slug}`}
+                          className="text-white group-hover:text-[#FE2C55] transition-colors duration-300"
+                        >
+                          {post.title}
+                        </Link>
                       </CardTitle>
                       
                       <CardDescription className="text-gray-300 line-clamp-3">
@@ -135,9 +186,9 @@ const BlogList = () => {
                         ))}
                       </div>
                       
-                      <Button asChild variant="outline" className="border-gray-600 text-gray-300 hover:bg-[#FE2C55] hover:border-[#FE2C55] hover:text-white">
+                      <Button asChild className="bg-gradient-to-r from-[#FE2C55] to-[#FF0050] hover:from-[#FF0050] hover:to-[#FE2C55] text-white">
                         <Link to={`/blog/${post.slug}`} className="flex items-center gap-2">
-                          Read More
+                          Read Article
                           <ArrowRight className="w-4 h-4" />
                         </Link>
                       </Button>

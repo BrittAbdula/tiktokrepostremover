@@ -7,21 +7,27 @@ const TimeEstimatorSection = () => {
   const [count, setCount] = useState<number | ''>('');
   const [estimatedTime, setEstimatedTime] = useState('—');
   const [manualEstimatedTime, setManualEstimatedTime] = useState('—'); // New state for manual estimation
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const displayTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const apiTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Calculate time estimation with debounce
   useEffect(() => {
     if (count === '' || count <= 0) {
       setEstimatedTime('—');
       setManualEstimatedTime('—');
+      // Clear API timer if count is invalid
+      if (apiTimerRef.current) {
+        clearTimeout(apiTimerRef.current);
+        apiTimerRef.current = null;
+      }
       return;
     }
     
-    // Clear previous timer
-    if (timerRef.current) clearTimeout(timerRef.current);
+    // Clear previous display timer
+    if (displayTimerRef.current) clearTimeout(displayTimerRef.current);
     
-    // Set new timer for calculation (500ms debounce)
-    timerRef.current = setTimeout(() => {
+    // Set timer for display calculation (300ms debounce for immediate feedback)
+    displayTimerRef.current = setTimeout(() => {
       // Extension time
       const totalSeconds = Math.ceil(count * AVG_SECONDS_PER_VIDEO);
       const minutes = Math.floor(totalSeconds / 60);
@@ -33,13 +39,19 @@ const TimeEstimatorSection = () => {
       const manualMinutes = Math.floor(manualTotalSeconds / 60);
       const manualSeconds = manualTotalSeconds % 60;
       setManualEstimatedTime(`${manualMinutes} min ${manualSeconds} sec`);
-      
-      // Record count to DB after calculation
+    }, 300);
+    
+    // Clear previous API timer
+    if (apiTimerRef.current) clearTimeout(apiTimerRef.current);
+    
+    // Set timer for API submission (2000ms debounce to reduce API calls)
+    apiTimerRef.current = setTimeout(() => {
       recordCountToDB(count);
-    }, 500);
+    }, 2000);
     
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (displayTimerRef.current) clearTimeout(displayTimerRef.current);
+      if (apiTimerRef.current) clearTimeout(apiTimerRef.current);
     };
   }, [count]);
 

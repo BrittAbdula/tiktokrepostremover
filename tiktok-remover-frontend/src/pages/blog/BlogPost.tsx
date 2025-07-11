@@ -7,127 +7,114 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getBlogPostBySlug } from "@/data/blogData";
 import { Helmet } from "react-helmet-async";
+import ReactMarkdown, { Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { useMemo, useEffect, useState } from "react";
+
+// Utility to generate slug ids from heading text
+const slugify = (str: string) =>
+  str
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
-  
+
+  const post = slug ? getBlogPostBySlug(slug) : undefined;
+
+  // Extract headings for table of contents (h2 & h3)
+  const headings = useMemo(() => {
+    if (!post) return [] as { level: number; text: string; id: string }[];
+    const regex = /^###?\s+(.*)$/gm;
+    const matches = [...post.content.matchAll(regex)];
+    return matches.map((m) => {
+      const isH3 = m[0].startsWith("###");
+      const text = m[1].trim();
+      return {
+        level: isH3 ? 3 : 2,
+        text,
+        id: slugify(text),
+      };
+    });
+  }, [post?.content]);
+
+  // Track active heading for TOC highlight
+  const [activeId, setActiveId] = useState<string>("");
+
+  useEffect(() => {
+    if (!headings.length) return;
+    const handleScroll = () => {
+      const scrollPos = window.scrollY + 150; // offset for fixed header and scroll-mt
+      let current = "";
+      for (const h of headings) {
+        const el = document.getElementById(h.id);
+        if (el && el.offsetTop <= scrollPos) {
+          current = h.id;
+        }
+      }
+      setActiveId(current);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [headings]);
+
   if (!slug) {
     return <Navigate to="/blog" replace />;
   }
-  
-  const post = getBlogPostBySlug(slug);
-  
+
   if (!post) {
     return <Navigate to="/blog" replace />;
   }
-  
-  // 处理 Markdown 样式的内容渲染
-  const renderContent = (content: string) => {
-    return content.split('\n').map((line, index) => {
-      // 处理标题
-      if (line.startsWith('### ')) {
-        return (
-          <h3 key={index} className="text-xl font-bold text-white mt-6 mb-3">
-            {line.replace('### ', '')}
-          </h3>
-        );
-      }
-      
-      if (line.startsWith('## ')) {
-        return (
-          <h2 key={index} className="text-2xl font-bold text-white mt-8 mb-4">
-            {line.replace('## ', '')}
-          </h2>
-        );
-      }
-      
-      // 处理图片
-      if (line.trim().startsWith('![')) {
-        const match = line.match(/!\[(.*?)\]\((.*?)\)/);
-        if (match) {
-          const [, alt, src] = match;
-          return (
-            <div key={index} className="my-8 text-center">
-              <img 
-                src={src} 
-                alt={alt} 
-                className="max-w-full h-auto mx-auto rounded-lg shadow-lg border border-gray-700"
-              />
-              {alt && (
-                <p className="text-gray-400 text-sm mt-2 italic">{alt}</p>
-              )}
-            </div>
-          );
-        }
-      }
-      
-      // 处理 YouTube 视频链接（特殊格式）
-      if (line.trim().startsWith('[![') && line.includes('youtube.com')) {
-        const match = line.match(/\[!\[(.*?)\]\((.*?)\)\]\((.*?)\)/);
-        if (match) {
-          const [, alt, thumbnail, videoUrl] = match;
-          return (
-            <div key={index} className="my-8">
-              <div className="relative bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
-                <a 
-                  href={videoUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="block relative group"
-                >
-                  <img 
-                    src={thumbnail} 
-                    alt={alt}
-                    className="w-full h-auto transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-                    <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z"/>
-                      </svg>
-                    </div>
-                  </div>
-                </a>
-              </div>
-            </div>
-          );
-        }
-      }
-      
-      // 处理段落
-      if (line.trim() === '') {
-        return <br key={index} />;
-      }
-      
-      // 处理列表项
-      if (line.trim().startsWith('- ')) {
-        return (
-          <li key={index} className="text-gray-300 mb-2 ml-4">
-            {line.replace('- ', '')}
-          </li>
-        );
-      }
-      
-      // 处理数字列表
-      if (/^\d+\./.test(line.trim())) {
-        return (
-          <li key={index} className="text-gray-300 mb-2 ml-4">
-            {line.replace(/^\d+\.\s*/, '')}
-          </li>
-        );
-      }
-      
-      // 处理链接和粗体文本
-      const processedLine = line
-        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#FE2C55] font-semibold">$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-[#00F2EA] hover:text-[#FE2C55] transition-colors underline">$1</a>');
-      
-      // 普通段落
+
+  // 使用 react-markdown 解析并渲染 Markdown
+  const markdownComponents: Components = {
+    h2: ({ node, children, ...props }) => {
+      const text = String(children);
+      const id = slugify(text);
       return (
-        <p key={index} className="text-gray-300 mb-4 leading-relaxed" dangerouslySetInnerHTML={{ __html: processedLine }} />
+        <h2 id={id} className="text-2xl font-bold text-white mt-8 mb-4 scroll-mt-28" {...props}>
+          {children}
+        </h2>
       );
-    });
+    },
+    h3: ({ node, children, ...props }) => {
+      const text = String(children);
+      const id = slugify(text);
+      return (
+        <h3 id={id} className="text-xl font-bold text-white mt-6 mb-3 scroll-mt-28" {...props}>
+          {children}
+        </h3>
+      );
+    },
+    p: ({node, ...props}) => (
+      <p className="text-gray-300 mb-4 leading-relaxed" {...props} />
+    ),
+    li: ({node, ...props}) => (
+      <li
+        className="text-gray-300 mb-2 ml-4 list-disc"
+        {...props}
+      />
+    ),
+    a: ({node, ...props}) => (
+      <a
+        className="text-[#00F2EA] hover:text-[#FE2C55] transition-colors underline"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      />
+    ),
+    img: ({node, ...props}) => (
+      <div className="my-8 text-center">
+        <img
+          className="max-w-full h-auto mx-auto rounded-lg shadow-lg border border-gray-700"
+          {...props}
+        />
+      </div>
+    ),
   };
 
   return (
@@ -145,6 +132,43 @@ const BlogPost = () => {
         <meta name="twitter:title" content={`${post.title} | ClearTok Blog`} />
         <meta name="twitter:description" content={post.excerpt} />
         <meta name="twitter:image" content={`https://tiktokrepostremover.com${post.image || '/logo.png'}`} />
+        
+        {/* Structured Data for Blog Article */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": post.title,
+            "description": post.excerpt,
+            "image": post.image ? `https://tiktokrepostremover.com${post.image}` : "https://tiktokrepostremover.com/logo.png",
+            "author": {
+              "@type": "Organization",
+              "name": post.author || "ClearTok Team",
+              "url": "https://tiktokrepostremover.com"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "ClearTok",
+              "url": "https://tiktokrepostremover.com",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://tiktokrepostremover.com/logo.png",
+                "width": 512,
+                "height": 512
+              }
+            },
+            "datePublished": post.publishDate,
+            "dateModified": post.publishDate,
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://tiktokrepostremover.com/blog/${post.slug}`
+            },
+            "keywords": post.tags?.join(", "),
+            "articleSection": "TikTok Tips",
+            "inLanguage": "en-US",
+            "url": `https://tiktokrepostremover.com/blog/${post.slug}`
+          })}
+        </script>
       </Helmet>
       <div className="min-h-screen bg-black">
         <Header />
@@ -160,9 +184,43 @@ const BlogPost = () => {
             </Button>
           </div>
 
-          {/* 文章头部 */}
-          <article className="max-w-4xl mx-auto">
+          {/* 文章头部 & 内容布局 */}
+          <article className="lg:flex lg:gap-8 max-w-6xl mx-auto">
+            {/* Table of Contents */}
+            {headings.length > 0 && (
+              <aside className="hidden lg:block lg:w-1/4 sticky top-28 max-h-[80vh] overflow-auto pr-4 border-r border-gray-800">
+                <h3 className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-4">
+                  In This Article
+                </h3>
+                <ul className="space-y-2">
+                  {headings.map((h) => (
+                    <li key={h.id} className={h.level === 3 ? "ml-4" : ""}>
+                      <a
+                        href={`#${h.id}`}
+                        className={`text-gray-400 hover:text-white text-sm transition-colors ${activeId === h.id ? 'font-bold' : ''}`}
+                      >
+                        {h.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </aside>
+            )}
+
+            {/* Main Content */}
+            <div className="flex-1">
+
+            {/* 文章头部 */}
             <header className="mb-8">
+              {post.image && (
+                <div className="mb-6 -mx-4 sm:mx-0 overflow-hidden rounded-lg">
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full object-cover aspect-[3/2]"
+                  />
+                </div>
+              )}
               <div className="flex flex-wrap gap-2 mb-4">
                 {post.tags.map((tag, index) => (
                   <Badge key={index} variant="secondary" className="bg-gray-800 text-gray-300">
@@ -199,9 +257,9 @@ const BlogPost = () => {
 
             {/* 文章内容 */}
             <div className="prose prose-lg max-w-none">
-              <div className="space-y-4">
-                {renderContent(post.content)}
-              </div>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                {post.content}
+              </ReactMarkdown>
             </div>
 
             {/* CTA Section */}
@@ -250,6 +308,7 @@ const BlogPost = () => {
                 </Link>
               </Button>
             </div>
+            </div> {/* End of main content wrapper */}
           </article>
         </main>
         

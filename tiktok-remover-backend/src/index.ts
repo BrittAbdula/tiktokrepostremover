@@ -18,7 +18,7 @@ const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('*', cors({
   origin: ['http://localhost:5173','http://localhost:8080','http://localhost:4780','https://tiktokrepostremover.com'],
-  allowMethods: ['GET', 'POST', 'OPTIONS'],
+  allowMethods: ['GET', 'POST', 'PUT', 'OPTIONS'],
   allowHeaders: ['Content-Type'],
 }))
 
@@ -59,6 +59,30 @@ function getLocationInfo(c: Context): LocationInfo {
   }
 }
 
+// 生成唯一会话ID
+function generateSessionId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 9)
+}
+
+// 验证会话创建数据
+const validateSessionCreate = validator('json', (value, c) => {
+  const { session_id } = value
+  if (session_id && typeof session_id !== 'string') {
+    return c.json({ error: 'Invalid session_id' }, 400)
+  }
+  return { session_id }
+})
+
+// 验证会话更新数据
+const validateSessionUpdate = validator('json', (value, c) => {
+  const { session_id } = value
+  if (!session_id || typeof session_id !== 'string') {
+    return c.json({ error: 'session_id is required' }, 400)
+  }
+  return value
+})
+
+// 原有的验证器
 const validateRepostData = validator('json', (value, c) => {
   const { count } = value
   if (typeof count !== 'number' || count <= 0) {
@@ -71,6 +95,178 @@ app.get('/', (c) => {
   return c.json({ message: 'Repost Counter API is running' })
 })
 
+// 新增：创建用户会话
+app.post('/session/create', validateSessionCreate, async (c) => {
+  try {
+    const { session_id } = c.req.valid('json')
+    const locationInfo = getLocationInfo(c)
+    const userAgent = c.req.header('User-Agent') || 'unknown'
+    
+    const finalSessionId = session_id || generateSessionId()
+    
+    const result = await c.env.DB.prepare(`
+      INSERT INTO user_sessions 
+      (session_id, ip_address, country, region, city, timezone, user_agent, process_status) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'started')
+    `).bind(
+      finalSessionId,
+      locationInfo.ip,
+      locationInfo.country,
+      locationInfo.region,
+      locationInfo.city,
+      locationInfo.timezone,
+      userAgent
+    ).run()
+
+    return c.json({ 
+      success: result.success,
+      session_id: finalSessionId
+    })
+    
+  } catch (error) {
+    console.error('Database error:', error)
+    return c.json({ 
+      error: 'Failed to create session' 
+    }, 500)
+  }
+})
+
+// 新增：更新用户会话状态
+app.put('/session/update', validateSessionUpdate, async (c) => {
+  try {
+    const data = c.req.valid('json')
+    const { session_id, ...updateData } = data
+    
+    // 构建动态更新SQL
+    const updateFields = []
+    const updateValues = []
+    
+    // 处理各种更新字段
+    if (updateData.login_status) {
+      updateFields.push('login_status = ?', 'login_check_at = CURRENT_TIMESTAMP')
+      updateValues.push(updateData.login_status)
+    }
+    
+    if (updateData.process_status) {
+      updateFields.push('process_status = ?')
+      updateValues.push(updateData.process_status)
+      
+      // 根据状态设置相应的时间戳
+      if (updateData.process_status === 'in_progress') {
+        updateFields.push('removal_start_at = CURRENT_TIMESTAMP')
+      } else if (updateData.process_status === 'completed') {
+        updateFields.push('removal_complete_at = CURRENT_TIMESTAMP')
+      }
+    }
+    
+    if (updateData.total_reposts_found !== undefined) {
+      updateFields.push('total_reposts_found = ?')
+      updateValues.push(updateData.total_reposts_found)
+    }
+    
+    if (updateData.reposts_removed !== undefined) {
+      updateFields.push('reposts_removed = ?')
+      updateValues.push(updateData.reposts_removed)
+    }
+    
+    if (updateData.reposts_skipped !== undefined) {
+      updateFields.push('reposts_skipped = ?')
+      updateValues.push(updateData.reposts_skipped)
+    }
+    
+    if (updateData.error_message) {
+      updateFields.push('error_message = ?', 'error_occurred_at = CURRENT_TIMESTAMP', 'process_status = ?')
+      updateValues.push(updateData.error_message, 'error')
+    }
+    
+    if (updateData.total_duration_seconds !== undefined) {
+      updateFields.push('total_duration_seconds = ?')
+      updateValues.push(updateData.total_duration_seconds)
+    }
+    
+    // 总是更新 updated_at
+    updateFields.push('updated_at = CURRENT_TIMESTAMP')
+    updateValues.push(session_id) // 用于 WHERE 条件
+    
+    if (updateFields.length === 1) { // 只有 updated_at
+      return c.json({ success: true, message: 'No fields to update' })
+    }
+    
+    const sql = `UPDATE user_sessions SET ${updateFields.join(', ')} WHERE session_id = ?`
+    const result = await c.env.DB.prepare(sql).bind(...updateValues).run()
+
+    return c.json({ 
+      success: result.success,
+      changes: result.meta?.changes || 0
+    })
+    
+  } catch (error) {
+    console.error('Database error:', error)
+    return c.json({ 
+      error: 'Failed to update session' 
+    }, 500)
+  }
+})
+
+// 新增：获取会话统计
+app.get('/api/session-stats', async (c) => {
+  try {
+    // 总体统计
+    const totalStats = await c.env.DB.prepare(`
+      SELECT 
+        COUNT(*) as total_sessions,
+        COUNT(CASE WHEN process_status = 'completed' THEN 1 END) as completed_sessions,
+        COUNT(CASE WHEN process_status = 'error' THEN 1 END) as error_sessions,
+        COUNT(CASE WHEN process_status = 'no_reposts' THEN 1 END) as no_reposts_sessions,
+        AVG(CASE WHEN process_status = 'completed' THEN reposts_removed END) as avg_reposts_removed,
+        AVG(CASE WHEN process_status = 'completed' THEN total_duration_seconds END) as avg_duration_seconds,
+        SUM(CASE WHEN process_status = 'completed' THEN reposts_removed ELSE 0 END) as total_reposts_removed
+      FROM user_sessions
+    `).first()
+
+    // 按日期统计
+    const dailyStats = await c.env.DB.prepare(`
+      SELECT 
+        DATE(session_start_at) as date,
+        COUNT(*) as total_sessions,
+        COUNT(CASE WHEN process_status = 'completed' THEN 1 END) as completed_sessions,
+        COUNT(CASE WHEN process_status = 'error' THEN 1 END) as error_sessions,
+        AVG(CASE WHEN process_status = 'completed' THEN reposts_removed END) as avg_reposts_removed
+      FROM user_sessions 
+      GROUP BY DATE(session_start_at)
+      ORDER BY date DESC 
+      LIMIT 30
+    `).all()
+
+    // 按国家统计
+    const countryStats = await c.env.DB.prepare(`
+      SELECT 
+        country,
+        COUNT(*) as sessions,
+        COUNT(CASE WHEN process_status = 'completed' THEN 1 END) as completed_sessions,
+        SUM(CASE WHEN process_status = 'completed' THEN reposts_removed ELSE 0 END) as total_reposts_removed
+      FROM user_sessions 
+      WHERE country != 'unknown'
+      GROUP BY country 
+      ORDER BY sessions DESC 
+      LIMIT 10
+    `).all()
+
+    return c.json({
+      total_stats: totalStats,
+      daily_stats: dailyStats.results || [],
+      country_stats: countryStats.results || []
+    })
+    
+  } catch (error) {
+    console.error('Database error:', error)
+    return c.json({ 
+      error: 'Failed to fetch session statistics' 
+    }, 500)
+  }
+})
+
+// 保持原有的 record-count 接口向后兼容
 app.post('/record-count', validateRepostData, async (c) => {
   try {
     const { count } = c.req.valid('json')

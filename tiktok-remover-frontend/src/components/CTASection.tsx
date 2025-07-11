@@ -18,7 +18,7 @@ const CTASection = () => {
         <p className="text-xl mb-8 opacity-90">
           Join thousands of users who have already cleaned up their TikTok profiles with ClearTok
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6 px-4">
           <Button 
             size="lg" 
             variant="secondary" 

@@ -12,15 +12,12 @@ interface DeletionRecord {
 const RecentDeletionsScroll = () => {
   const [records, setRecords] = useState<DeletionRecord[]>([]);
 
+  const generateUsername = () =>  `User${Math.floor(1000 + Math.random() * 9000)}`;
   // Generate mock data for demonstration
   const generateMockData = (): DeletionRecord[] => {
-    const usernames = [
-      'alex***', 'sarah***', 'mike***', 'emma***', 'david***', 'lisa***',
-      'john***', 'anna***', 'chris***', 'maya***', 'ryan***', 'sophie***',
-      'lucas***', 'nina***', 'ethan***', 'zoe***', 'oliver***', 'mia***'
-    ];
+    const usernames = Array.from({ length: 10 }, generateUsername);
     
-        const timeOptions = ['3s ago', '12s ago', '28s ago', '45s ago', '1m ago', '2m ago', '3m ago', '5m ago'];
+    const timeOptions = ['3s ago', '12s ago', '28s ago', '45s ago', '1m ago', '2m ago', '3m ago', '5m ago'];
     
     return Array.from({ length: 30 }, (_, i) => {
       const count = Math.floor(Math.random() * 50) + 1;

@@ -1,44 +1,281 @@
 {
   "appTitle": {
-    "message": "TikTok All Reposted Videos Remover"
+    "message": "ClearTok - Repost Temizleyici"
+  },
+  "step1Title": {
+    "message": "Adım 1: TikTok.com'a giriş yapın"
+  },
+  "step1Description": {
+    "message": "TikTok.com'u açmak ve hesabınıza giriş yapmak için burayı tıklayın."
+  },
+  "step1Status": {
+    "message": "TikTok.com'u açmak için tıklayın"
+  },
+  "step2Title": {
+    "message": "Adım 2: Temizlemeyi Başlatın"
   },
   "startButton": {
-    "message": "Yeniden paylaşımları kaldırmaya başla"
+    "message": "🧹 Repost Temizlemeyi Başlat"
   },
-  "step1": {
-    "message": "Adım 1: Yeni bir sekmede tiktok.com'u açın ve hesabınıza giriş yaptığınızdan emin olun."
+  "statusLabel": {
+    "message": "🧹 Durum:"
   },
-  "step2": {
-    "message": "Adım 2: Buraya geri dönün ve başlamak için aşağıdaki butona tıklayın."
+  "progressLabel": {
+    "message": "📊 İlerleme:"
   },
-  "list1": {
-    "message": "Eklenti TikTok profilinizi açacak"
+  "pauseButton": {
+    "message": "⏸️ Duraklat"
   },
-  "list2": {
-    "message": "\"Yeniden Paylaşımlar\" sekmesine gidin"
+  "resumeButton": {
+    "message": "▶️ Devam Et"
   },
-  "list3": {
-    "message": "Her yeniden paylaşılan videoyu açın"
+  "viewLogButton": {
+    "message": "🧾 Günlüğü Görüntüle"
   },
-  "list4": {
-    "message": "Videoyu yeniden paylaşımlardan kaldırın ve bir sonrakine geçin"
+  "removedVideosTitle": {
+    "message": "🗑️ Kaldırılan Videolar"
   },
-  "list5": {
-    "message": "Tüm yeniden paylaşımlar silinene kadar tekrarlayın"
+  "allDoneTitle": {
+    "message": "Tamamlandı!"
   },
-  "note": {
-    "message": "Not: Eğer çok sayıda yeniden paylaşılan videonuz varsa, işlem uzun sürebilir. TikTok çok fazla işlem yapılırsa geçici olarak engelleme uygulayabilir. Yaklaşık 1 saat bekleyip tekrar deneyin."
+  "completionMessage": {
+    "message": "Profilinizden {count} repost videosu başarıyla kaldırıldı."
   },
-  "tip": {
-    "message": "İpucu: İşlem tamamlandığında, tüm yeniden paylaşımların silindiğinden emin olmak için TikTok profilinizi yenileyin."
+  "copyRemovedButton": {
+    "message": "📋 Kaldırılan Listeyi Kopyala"
   },
-  "linkLiked": {
-    "message": "Tüm Beğenilen Videoları Kaldır"
+  "restartButton": {
+    "message": "🔄 Yeni Oturum Başlat"
   },
-  "linkFavorite": {
-    "message": "Tüm Favori Videoları Kaldır"
+  "errorTitle": {
+    "message": "Bir şeyler ters gitti"
   },
-  "linkGitHub": {
-    "message": "GitHub Deposu"
+  "errorMessage": {
+    "message": "Lütfen tekrar deneyin veya ayrıntılar için konsolu kontrol edin."
+  },
+  "retryButton": {
+    "message": "🔄 Tekrar Dene"
+  },
+  "howItWorksTitle": {
+    "message": "📖 Nasıl çalışır"
+  },
+  "howItWorks1": {
+    "message": "TikTok profilinize gidin"
+  },
+  "howItWorks2": {
+    "message": "Repost sekmesini bulun ve açın"
+  },
+  "howItWorks3": {
+    "message": "Tüm repost videoları otomatik olarak kaldırın"
+  },
+  "howItWorks4": {
+    "message": "Gerçek zamanlı ilerleme takibi"
+  },
+  "importantNotesTitle": {
+    "message": "⚠️ Önemli Notlar"
+  },
+  "note1Title": {
+    "message": "Giriş yapın:"
+  },
+  "note1Description": {
+    "message": "TikTok.com'u açık tutun ve giriş yapın"
+  },
+  "note2Title": {
+    "message": "Kesintiye uğratmayın:"
+  },
+  "note2Description": {
+    "message": "Sürecin doğal olarak tamamlanmasını bekleyin"
+  },
+  "note3Title": {
+    "message": "Ağ hızı:"
+  },
+  "note3Description": {
+    "message": "Süreç hızı bağlantınıza bağlıdır"
+  },
+  "note4Title": {
+    "message": "Güvenli işlem:"
+  },
+  "note4Description": {
+    "message": "Yalnızca repostları kaldırır, orijinal videolar güvenlidir"
+  },
+  "privacySecurityTitle": {
+    "message": "🔒 Gizlilik & Güvenlik"
+  },
+  "privacy1": {
+    "message": "✅ Parola saklanmaz"
+  },
+  "privacy2": {
+    "message": "✅ Veri toplanmaz"
+  },
+  "privacy3": {
+    "message": "✅ Tarayıcınızda yerel olarak çalışır"
+  },
+  "privacy4": {
+    "message": "✅ Açık kaynak & şeffaf"
+  },
+  "documentationLink": {
+    "message": "📖 Belgeler"
+  },
+  "reportIssueLink": {
+    "message": "🐛 Sorun Bildir"
+  },
+  "languageSelector": {
+    "message": "🌐 Dil"
+  },
+  "loginStatusLoggedIn": {
+    "message": "Giriş yapıldı - Başlamaya hazır!"
+  },
+  "loginStatusNotLoggedIn": {
+    "message": "Lütfen önce TikTok'a giriş yapın"
+  },
+  "loginStatusReady": {
+    "message": "TikTok.com açık - Başlamaya hazır!"
+  },
+  "loginStatusOpening": {
+    "message": "TikTok.com açılıyor..."
+  },
+  "loginStatusError": {
+    "message": "TikTok açılırken hata - Tekrar deneyin"
+  },
+  "loginStatusDefault": {
+    "message": "TikTok.com'u açmak için tıklayın"
+  },
+  "alertOpenTikTokFirst": {
+    "message": "Lütfen önce Adım 1'i tıklayarak TikTok.com'u açın"
+  },
+  "statusInitializing": {
+    "message": "Başlatılıyor..."
+  },
+  "logStartingProcess": {
+    "message": "🚀 Repost kaldırma süreci başlatılıyor..."
+  },
+  "logProcessPaused": {
+    "message": "Süreç kullanıcı tarafından duraklatıldı"
+  },
+  "logProcessResumed": {
+    "message": "Süreç devam ettirildi"
+  },
+  "logVideoRemoved": {
+    "message": "Repost #{number} kaldırıldı"
+  },
+  "logVideoRemovedWithTitle": {
+    "message": "Kaldırıldı: \"{title}\" ({author})"
+  },
+  "logVideoRemovedTitleOnly": {
+    "message": "Kaldırıldı: \"{title}\""
+  },
+  "logVideoRemovedAuthorOnly": {
+    "message": "{author} tarafından repost kaldırıldı"
+  },
+  "logVideoSkipped": {
+    "message": "#{number} atlandı"
+  },
+  "logVideoSkippedWithTitle": {
+    "message": "Atlandı: \"{title}\" ({author})"
+  },
+  "logVideoSkippedTitleOnly": {
+    "message": "Atlandı: \"{title}\""
+  },
+  "logVideoSkippedAuthorOnly": {
+    "message": "{author} tarafından video atlandı"
+  },
+  "logVideoSkippedWithReason": {
+    "message": "{message} ({reason})"
+  },
+  "logWaitingSeconds": {
+    "message": "{seconds}s bekleniyor..."
+  },
+  "logWaitingPaused": {
+    "message": "Süreç duraklatıldı"
+  },
+  "logError": {
+    "message": "Hata: {message}"
+  },
+  "logProcessCompleted": {
+    "message": "🎉 Süreç tamamlandı! {count} video kaldırıldı{duration}."
+  },
+  "logRefreshingPage": {
+    "message": "🔄 Güncellenmiş içeriği göstermek için TikTok sayfası yenileniyor..."
+  },
+  "logNavigatingToReposts": {
+    "message": "🎯 Sonuçları göstermek için repost sekmesine gitiliyor..."
+  },
+  "logPageRefreshed": {
+    "message": "✅ Sayfa başarıyla yenilendi"
+  },
+  "logUnableToRefresh": {
+    "message": "⚠️ Sayfa otomatik olarak yenilenemedi"
+  },
+  "logVideoUrlsCopied": {
+    "message": "📋 Video URL'leri panoya kopyalandı"
+  },
+  "logRemovedListCopied": {
+    "message": "📋 Kaldırılan video listesi panoya kopyalandı"
+  },
+  "logFailedToCopyUrls": {
+    "message": "❌ URL'leri kopyalama başarısız"
+  },
+  "logFailedToCopyList": {
+    "message": "❌ Kaldırılan video listesini kopyalama başarısız"
+  },
+  "logNoRepostsFound": {
+    "message": "✨ Repost bulunamadı - profiliniz temiz!{duration}"
+  },
+  "notificationPageRefreshed": {
+    "message": "🔄 TikTok sayfası yenilendi, repostlara gidiliyor..."
+  },
+  "notificationUrlsCopied": {
+    "message": "📋 Video URL'leri panoya başarıyla kopyalandı!"
+  },
+  "notificationListCopied": {
+    "message": "📋 Kaldırılan video listesi başarıyla kopyalandı!"
+  },
+  "notificationFailedToCopyUrls": {
+    "message": "❌ URL'leri panoya kopyalama başarısız"
+  },
+  "notificationFailedToCopyList": {
+    "message": "❌ Listeyi panoya kopyalama başarısız"
+  },
+  "notificationNoUrls": {
+    "message": "📝 Henüz video URL'si mevcut değil. Video URL'lerini görmek için kaldırma sürecini başlatın."
+  },
+  "completionMessageSuccess": {
+    "message": "{count} repost video{plural} başarıyla kaldırıldı{duration}."
+  },
+  "completionMessageNoReposts": {
+    "message": "Harika! Profilinizde repost video bulunamadı{duration}."
+  },
+  "durationMinutes": {
+    "message": " {minutes} dakika {seconds} saniyede"
+  },
+  "durationSeconds": {
+    "message": " {seconds} saniyede"
+  },
+  "removedVideosHeader": {
+    "message": "=== KALDIRILAN VİDEOLAR ({count} toplam) ==="
+  },
+  "pendingVideosHeader": {
+    "message": "=== BEKLEYEN/İŞLENEN VİDEOLAR ==="
+  },
+  "videoStatusPending": {
+    "message": "Durum: Bekleyen/Atlandı"
+  },
+  "videoRemovedAt": {
+    "message": "Kaldırıldı: {timestamp}"
+  },
+  "videoUnknownTitle": {
+    "message": "Bilinmeyen"
+  },
+  "videoUnknownAuthor": {
+    "message": "Bilinmeyen"
+  },
+  "noRemovedVideos": {
+    "message": "Henüz kaldırılan video yok"
+  },
+  "noRepostsFoundMessage": {
+    "message": "Harika! Profilinizde repost bulunamadı."
+  },
+  "notificationNoRepostsFound": {
+    "message": "✨ Repost videosu bulunamadı!"
   }
 }

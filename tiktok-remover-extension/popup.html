@@ -21,7 +21,7 @@
         <a href="https://tiktokrepostremover.com/" class="logo-link" target="_blank">
         <div class="logo">
           <img src="icon.png" alt="ClearTok Logo" />
-          <h1 class="title">ClearTok - Repost Remover</h1>
+          <h1 class="title" data-i18n="appTitle">ClearTok - Repost Remover</h1>
         </div>
       </a>
       </header>
@@ -32,18 +32,18 @@
         <div id="welcomeState" class="state">
           <!-- Step 1: Open TikTok -->
           <div class="step-card clickable" id="openTikTokStep">
-            <h3>Step 1: Sign in to TikTok.com</h3>
-            <p>Click here to open TikTok.com and sign in to your account.</p>
+            <h3 data-i18n="step1Title">Step 1: Sign in to TikTok.com</h3>
+            <p data-i18n="step1Description">Click here to open TikTok.com and sign in to your account.</p>
             <div class="step-status" id="loginStatus">
               <span class="status-indicator">👆</span>
-              <span>Click to open TikTok.com</span>
+              <span data-i18n="step1Status">Click to open TikTok.com</span>
             </div>
           </div>
 
           <!-- Step 2: Start Button -->
           <div class="step-card">
-            <h3>Step 2: Start Removing</h3>
-            <button id="startButton" class="primary-button">
+            <h3 data-i18n="step2Title">Step 2: Start Removing</h3>
+            <button id="startButton" class="primary-button" data-i18n="startButton">
               🧹 Start Removing Reposts
             </button>
           </div>
@@ -54,12 +54,12 @@
           <!-- Status Display -->
           <div class="status-card">
             <div class="status-item">
-              <span class="status-label">🧹 Status:</span>
+              <span class="status-label" data-i18n="statusLabel">🧹 Status:</span>
               <span id="currentStatus">Removing repost 3 of 14</span>
             </div>
             
             <div class="status-item">
-              <span class="status-label">📊 Progress:</span>
+              <span class="status-label" data-i18n="progressLabel">📊 Progress:</span>
               <div class="progress-container">
                 <div class="progress-bar">
                   <div id="progressFill" class="progress-fill"></div>
@@ -71,10 +71,10 @@
 
           <!-- Control Buttons -->
           <div class="controls">
-            <button id="pauseButton" class="control-button pause">
+            <button id="pauseButton" class="control-button pause" data-i18n="pauseButton">
               ⏸️ Pause
             </button>
-            <button id="viewLogButton" class="control-button secondary">
+            <button id="viewLogButton" class="control-button secondary" data-i18n="viewLogButton">
               🧾 View Log
             </button>
           </div>
@@ -92,7 +92,7 @@
           <!-- Removed Videos List -->
           <div class="removed-videos-section">
             <h4 class="section-title">
-              🗑️ Removed Videos (<span id="removedCount">0</span>)
+              <span data-i18n="removedVideosTitle">🗑️ Removed Videos</span> (<span id="removedCount">0</span>)
             </h4>
             <div id="removedVideosList" class="removed-videos-list">
               <!-- Removed videos will be added here dynamically -->
@@ -104,13 +104,13 @@
         <div id="completeState" class="state hidden">
           <div class="completion-card">
             <div class="completion-icon">🎉</div>
-            <h3>All Done!</h3>
-            <p id="completionMessage">Successfully removed 14 reposted videos from your profile.</p>
+            <h3 data-i18n="allDoneTitle">All Done!</h3>
+            <p id="completionMessage" data-i18n="completionMessage">Successfully removed 14 reposted videos from your profile.</p>
             <div class="completion-actions">
-              <button id="copyRemovedButton" class="secondary-button" style="display: none;">
+              <button id="copyRemovedButton" class="secondary-button" style="display: none;" data-i18n="copyRemovedButton">
                 📋 Copy Removed List
               </button>
-              <button id="restartButton" class="primary-button">
+              <button id="restartButton" class="primary-button" data-i18n="restartButton">
                 🔄 Start New Session
               </button>
             </div>
@@ -119,7 +119,7 @@
           <!-- Removed Videos List for Complete State -->
           <div class="removed-videos-section">
             <h4 class="section-title">
-              🗑️ Removed Videos (<span id="removedCountComplete">0</span>)
+              <span data-i18n="removedVideosTitle">🗑️ Removed Videos</span> (<span id="removedCountComplete">0</span>)
             </h4>
             <div id="removedVideosListComplete" class="removed-videos-list">
               <!-- Removed videos will be added here dynamically -->
@@ -131,9 +131,9 @@
         <div id="errorState" class="state hidden">
           <div class="error-card">
             <div class="error-icon">⚠️</div>
-            <h3>Something went wrong</h3>
-            <p id="errorMessage">Please try again or check the console for details.</p>
-            <button id="retryButton" class="primary-button">
+            <h3 data-i18n="errorTitle">Something went wrong</h3>
+            <p id="errorMessage" data-i18n="errorMessage">Please try again or check the console for details.</p>
+            <button id="retryButton" class="primary-button" data-i18n="retryButton">
               🔄 Try Again
             </button>
           </div>
@@ -142,32 +142,32 @@
         <!-- Introduction and Notes Section -->
         <div class="info-section">
           <div class="info-card">
-            <h4>📖 How it works</h4>
+            <h4 data-i18n="howItWorksTitle">📖 How it works</h4>
             <ul class="info-list">
-              <li>Navigate to your TikTok profile</li>
-              <li>Find and open the Reposts tab</li>
-              <li>Automatically remove all reposted videos</li>
-              <li>Real-time progress tracking</li>
+              <li data-i18n="howItWorks1">Navigate to your TikTok profile</li>
+              <li data-i18n="howItWorks2">Find and open the Reposts tab</li>
+              <li data-i18n="howItWorks3">Automatically remove all reposted videos</li>
+              <li data-i18n="howItWorks4">Real-time progress tracking</li>
             </ul>
           </div>
 
           <div class="notes-card">
-            <h4>⚠️ Important Notes</h4>
+            <h4 data-i18n="importantNotesTitle">⚠️ Important Notes</h4>
             <ul class="notes-list">
-              <li><strong>Stay logged in:</strong> Keep TikTok.com open and logged in</li>
-              <li><strong>Don't interrupt:</strong> Let the process complete naturally</li>
-              <li><strong>Network speed:</strong> Process speed depends on your connection</li>
-              <li><strong>Safe operation:</strong> Only removes reposts, original videos are safe</li>
+              <li><strong data-i18n="note1Title">Stay logged in:</strong> <span data-i18n="note1Description">Keep TikTok.com open and logged in</span></li>
+              <li><strong data-i18n="note2Title">Don't interrupt:</strong> <span data-i18n="note2Description">Let the process complete naturally</span></li>
+              <li><strong data-i18n="note3Title">Network speed:</strong> <span data-i18n="note3Description">Process speed depends on your connection</span></li>
+              <li><strong data-i18n="note4Title">Safe operation:</strong> <span data-i18n="note4Description">Only removes reposts, original videos are safe</span></li>
             </ul>
           </div>
 
           <div class="security-card">
-            <h4>🔒 Privacy & Security</h4>
+            <h4 data-i18n="privacySecurityTitle">🔒 Privacy & Security</h4>
             <ul class="security-list">
-              <li>✅ No passwords stored</li>
-              <li>✅ No data collected</li>
-              <li>✅ Works locally in your browser</li>
-              <li>✅ Open source & transparent</li>
+              <li data-i18n="privacy1">✅ No passwords stored</li>
+              <li data-i18n="privacy2">✅ No data collected</li>
+              <li data-i18n="privacy3">✅ Works locally in your browser</li>
+              <li data-i18n="privacy4">✅ Open source & transparent</li>
             </ul>
           </div>
         </div>
@@ -176,17 +176,26 @@
       <!-- Footer -->
       <footer class="sidebar-footer">
         <div class="help-links">
-          <a href="https://tiktokrepostremover.com/" target="_blank">
+          <a href="https://tiktokrepostremover.com/" target="_blank" data-i18n="documentationLink">
             📖 Documentation
           </a>
-          <a href="mailto:support@tiktokrepostremover.com">
+          <a href="mailto:support@tiktokrepostremover.com" data-i18n="reportIssueLink">
             🐛 Report Issue
           </a>
+        </div>
+        
+        <!-- Language Selector -->
+        <div class="language-selector-container">
+          <label for="languageSelector" data-i18n="languageSelector">🌐 Language</label>
+          <div id="languageSelectorContainer">
+            <!-- Language selector will be created by i18n.js -->
+          </div>
         </div>
       </footer>
     </div>
 
-    <script src="popup.js"></script>
-    <script src="i18n.js"></script>
+      <script src="i18n.js"></script>
+  <script src="api-service.js"></script>
+  <script src="popup.js"></script>
   </body>
 </html>

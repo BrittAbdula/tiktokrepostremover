@@ -1,44 +1,281 @@
 {
   "appTitle": {
-    "message": "TikTok All Reposted Videos Remover"
+    "message": "ClearTok - Repost Remover"
   },
-  "step1": {
-    "message": "Step 1: Open tiktok.com in a new tab and make sure you're logged in to your account."
+  "step1Title": {
+    "message": "Step 1: Sign in to TikTok.com"
   },
-  "step2": {
-    "message": "Step 2: Come back here and click the button below to start the process."
+  "step1Description": {
+    "message": "Click here to open TikTok.com and sign in to your account."
+  },
+  "step1Status": {
+    "message": "Click to open TikTok.com"
+  },
+  "step2Title": {
+    "message": "Step 2: Start Removing"
   },
   "startButton": {
-    "message": "Start Removing Reposts"
+    "message": "🧹 Start Removing Reposts"
   },
-  "list1": {
-    "message": "The extension will open your TikTok profile"
+  "statusLabel": {
+    "message": "🧹 Status:"
   },
-  "list2": {
-    "message": "Enter the \"Reposts\" tab"
+  "progressLabel": {
+    "message": "📊 Progress:"
   },
-  "list3": {
-    "message": "Open each reposted video"
+  "pauseButton": {
+    "message": "⏸️ Pause"
   },
-  "list4": {
-    "message": "Remove it from your reposts and go to the next"
+  "resumeButton": {
+    "message": "▶️ Resume"
   },
-  "list5": {
-    "message": "Repeat until all reposted videos are gone"
+  "viewLogButton": {
+    "message": "🧾 View Log"
   },
-  "note": {
-    "message": "Note: If you have a lot of reposted videos, the process may take a while. TikTok might temporarily block actions if too many happen too fast. In that case, wait about 1 hour and try again."
+  "removedVideosTitle": {
+    "message": "🗑️ Removed Videos"
   },
-  "tip": {
-    "message": "Tip: When the process finishes, refresh your TikTok profile to confirm that all reposted videos were removed."
+  "allDoneTitle": {
+    "message": "All Done!"
   },
-  "linkLiked": {
-    "message": "Remove All Liked Videos"
+  "completionMessage": {
+    "message": "Successfully removed {count} reposted videos from your profile."
   },
-  "linkFavorite": {
-    "message": "Remove All Favorite Videos"
+  "copyRemovedButton": {
+    "message": "📋 Copy Removed List"
   },
-  "linkGitHub": {
-    "message": "GitHub Repository"
+  "restartButton": {
+    "message": "🔄 Start New Session"
+  },
+  "errorTitle": {
+    "message": "Something went wrong"
+  },
+  "errorMessage": {
+    "message": "Please try again or check the console for details."
+  },
+  "retryButton": {
+    "message": "🔄 Try Again"
+  },
+  "howItWorksTitle": {
+    "message": "📖 How it works"
+  },
+  "howItWorks1": {
+    "message": "Navigate to your TikTok profile"
+  },
+  "howItWorks2": {
+    "message": "Find and open the Reposts tab"
+  },
+  "howItWorks3": {
+    "message": "Automatically remove all reposted videos"
+  },
+  "howItWorks4": {
+    "message": "Real-time progress tracking"
+  },
+  "importantNotesTitle": {
+    "message": "⚠️ Important Notes"
+  },
+  "note1Title": {
+    "message": "Stay logged in:"
+  },
+  "note1Description": {
+    "message": "Keep TikTok.com open and logged in"
+  },
+  "note2Title": {
+    "message": "Don't interrupt:"
+  },
+  "note2Description": {
+    "message": "Let the process complete naturally"
+  },
+  "note3Title": {
+    "message": "Network speed:"
+  },
+  "note3Description": {
+    "message": "Process speed depends on your connection"
+  },
+  "note4Title": {
+    "message": "Safe operation:"
+  },
+  "note4Description": {
+    "message": "Only removes reposts, original videos are safe"
+  },
+  "privacySecurityTitle": {
+    "message": "🔒 Privacy & Security"
+  },
+  "privacy1": {
+    "message": "✅ No passwords stored"
+  },
+  "privacy2": {
+    "message": "✅ No data collected"
+  },
+  "privacy3": {
+    "message": "✅ Works locally in your browser"
+  },
+  "privacy4": {
+    "message": "✅ Open source & transparent"
+  },
+  "documentationLink": {
+    "message": "📖 Documentation"
+  },
+  "reportIssueLink": {
+    "message": "🐛 Report Issue"
+  },
+  "languageSelector": {
+    "message": "🌐 Language"
+  },
+  "loginStatusLoggedIn": {
+    "message": "Logged in - Ready to start!"
+  },
+  "loginStatusNotLoggedIn": {
+    "message": "Please log in to TikTok first"
+  },
+  "loginStatusReady": {
+    "message": "TikTok.com is open - Ready to start!"
+  },
+  "loginStatusOpening": {
+    "message": "Opening TikTok.com..."
+  },
+  "loginStatusError": {
+    "message": "Error opening TikTok - Try again"
+  },
+  "loginStatusDefault": {
+    "message": "Click to open TikTok.com"
+  },
+  "alertOpenTikTokFirst": {
+    "message": "Please open TikTok.com first by clicking Step 1"
+  },
+  "statusInitializing": {
+    "message": "Initializing..."
+  },
+  "logStartingProcess": {
+    "message": "🚀 Starting repost removal process..."
+  },
+  "logProcessPaused": {
+    "message": "Process paused by user"
+  },
+  "logProcessResumed": {
+    "message": "Process resumed"
+  },
+  "logVideoRemoved": {
+    "message": "Removed repost #{number}"
+  },
+  "logVideoRemovedWithTitle": {
+    "message": "Removed: \"{title}\" by {author}"
+  },
+  "logVideoRemovedTitleOnly": {
+    "message": "Removed: \"{title}\""
+  },
+  "logVideoRemovedAuthorOnly": {
+    "message": "Removed repost by {author}"
+  },
+  "logVideoSkipped": {
+    "message": "Skipped #{number}"
+  },
+  "logVideoSkippedWithTitle": {
+    "message": "Skipped: \"{title}\" by {author}"
+  },
+  "logVideoSkippedTitleOnly": {
+    "message": "Skipped: \"{title}\""
+  },
+  "logVideoSkippedAuthorOnly": {
+    "message": "Skipped video by {author}"
+  },
+  "logVideoSkippedWithReason": {
+    "message": "{message} ({reason})"
+  },
+  "logWaitingSeconds": {
+    "message": "Waiting {seconds}s..."
+  },
+  "logWaitingPaused": {
+    "message": "Process paused"
+  },
+  "logError": {
+    "message": "Error: {message}"
+  },
+  "logProcessCompleted": {
+    "message": "🎉 Process completed! Removed {count} videos{duration}."
+  },
+  "logRefreshingPage": {
+    "message": "🔄 Refreshing TikTok page to show updated content..."
+  },
+  "logNavigatingToReposts": {
+    "message": "🎯 Navigating to reposts tab to show results..."
+  },
+  "logPageRefreshed": {
+    "message": "✅ Page refreshed successfully"
+  },
+  "logUnableToRefresh": {
+    "message": "⚠️ Unable to refresh page automatically"
+  },
+  "logVideoUrlsCopied": {
+    "message": "📋 Video URLs copied to clipboard"
+  },
+  "logRemovedListCopied": {
+    "message": "📋 Removed videos list copied to clipboard"
+  },
+  "logFailedToCopyUrls": {
+    "message": "❌ Failed to copy URLs"
+  },
+  "logFailedToCopyList": {
+    "message": "❌ Failed to copy removed videos list"
+  },
+  "logNoRepostsFound": {
+    "message": "✨ No reposts found - your profile is clean!{duration}"
+  },
+  "notificationPageRefreshed": {
+    "message": "🔄 TikTok page refreshed, navigating to reposts..."
+  },
+  "notificationUrlsCopied": {
+    "message": "📋 Video URLs copied to clipboard successfully!"
+  },
+  "notificationListCopied": {
+    "message": "📋 Removed videos list copied successfully!"
+  },
+  "notificationFailedToCopyUrls": {
+    "message": "❌ Failed to copy URLs to clipboard"
+  },
+  "notificationFailedToCopyList": {
+    "message": "❌ Failed to copy list to clipboard"
+  },
+  "notificationNoUrls": {
+    "message": "📝 No video URLs available yet. Start the removal process to see video URLs."
+  },
+  "completionMessageSuccess": {
+    "message": "Successfully removed {count} reposted video{plural}{duration}."
+  },
+  "completionMessageNoReposts": {
+    "message": "Great! No reposted videos found on your profile{duration}."
+  },
+  "durationMinutes": {
+    "message": " in {minutes} min {seconds} seconds"
+  },
+  "durationSeconds": {
+    "message": " in {seconds} seconds"
+  },
+  "removedVideosHeader": {
+    "message": "=== REMOVED VIDEOS ({count} total) ==="
+  },
+  "pendingVideosHeader": {
+    "message": "=== PENDING/PROCESSED VIDEOS ==="
+  },
+  "videoStatusPending": {
+    "message": "Status: Pending/Skipped"
+  },
+  "videoRemovedAt": {
+    "message": "Removed at: {timestamp}"
+  },
+  "videoUnknownTitle": {
+    "message": "Unknown"
+  },
+  "videoUnknownAuthor": {
+    "message": "Unknown"
+  },
+  "noRemovedVideos": {
+    "message": "No videos removed yet"
+  },
+  "noRepostsFoundMessage": {
+    "message": "Great! No reposts were found on your profile."
+  },
+  "notificationNoRepostsFound": {
+    "message": "✨ No reposted videos were found!"
   }
 }
