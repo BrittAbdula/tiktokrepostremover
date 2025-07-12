@@ -277,5 +277,23 @@
   },
   "notificationNoRepostsFound": {
     "message": "✨ Nenhum vídeo repost encontrado!"
+  },
+  "rateUsButton": {
+    "message": "⭐ Avalie-nos"
+  },
+  "rateThisExtension": {
+    "message": "Avalie esta extensão"
+  },
+  "pleaseRateUs": {
+    "message": "Por favor, avalie-nos"
+  },
+  "rateUsActionButton": {
+    "message": "Avaliar"
+  },
+  "alreadyRatedButton": {
+    "message": "Eu já avaliei"
+  },
+  "thankYouForRating": {
+    "message": "Obrigado pelo seu feedback!"
   }
 }

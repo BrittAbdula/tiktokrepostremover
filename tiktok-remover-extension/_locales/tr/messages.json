@@ -277,5 +277,23 @@
   },
   "notificationNoRepostsFound": {
     "message": "✨ Repost videosu bulunamadı!"
+  },
+  "rateUsButton": {
+    "message": "⭐ Bizi Puanla"
+  },
+  "rateThisExtension": {
+    "message": "Bu uzantıyı değerlendir"
+  },
+  "pleaseRateUs": {
+    "message": "Lütfen bizi puanlayın"
+  },
+  "rateUsActionButton": {
+    "message": "Puanla"
+  },
+  "alreadyRatedButton": {
+    "message": "Zaten puanladım"
+  },
+  "thankYouForRating": {
+    "message": "Geri bildiriminiz için teşekkürler!"
   }
 }

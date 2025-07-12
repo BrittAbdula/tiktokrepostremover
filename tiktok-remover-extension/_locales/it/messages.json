@@ -91,5 +91,11 @@
   "videoUnknownAuthor": { "message": "Sconosciuto" },
   "noRemovedVideos": { "message": "Nessun video rimosso finora" },
   "noRepostsFoundMessage": { "message": "Ottimo! Nessun repost trovato nel tuo profilo." },
-  "notificationNoRepostsFound": { "message": "✨ Nessun video repost trovato!" }
+  "notificationNoRepostsFound": { "message": "✨ Nessun video repost trovato!" },
+  "rateUsButton": { "message": "⭐ Valutaci" },
+  "rateThisExtension": { "message": "Valuta questa estensione" },
+  "pleaseRateUs": { "message": "Per favore valutaci" },
+  "rateUsActionButton": { "message": "Valuta" },
+  "alreadyRatedButton": { "message": "Già valutato" },
+  "thankYouForRating": { "message": "Grazie per il tuo feedback!" }
 } 

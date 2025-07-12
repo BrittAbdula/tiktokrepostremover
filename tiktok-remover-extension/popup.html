@@ -110,8 +110,8 @@
               <button id="copyRemovedButton" class="secondary-button" style="display: none;" data-i18n="copyRemovedButton">
                 📋 Copy Removed List
               </button>
-              <button id="restartButton" class="primary-button" data-i18n="restartButton">
-                🔄 Start New Session
+              <button id="rateUsButtonComplete" class="primary-button" data-i18n="rateUsButton">
+                ⭐ Rate Us
               </button>
             </div>
           </div>
@@ -191,7 +191,55 @@
             <!-- Language selector will be created by i18n.js -->
           </div>
         </div>
+
+        <!-- Rating Button -->
+        <div class="rating-button-container">
+          <button id="rateUsButton" class="rate-us-button" data-i18n="rateUsButton">
+            ⭐ Rate Us
+          </button>
+        </div>
       </footer>
+    </div>
+
+    <!-- Rating Modal -->
+    <div id="ratingModal" class="modal-overlay hidden">
+      <div class="rating-modal">
+        <div class="rating-header">
+          <div class="rating-trophy">🏆</div>
+          <h3 data-i18n="rateThisExtension">Rate This Extension</h3>
+        </div>
+        
+        <div class="rating-container">
+          <div class="stars-container">
+            <div class="star" data-rating="1">⭐</div>
+            <div class="star" data-rating="2">⭐</div>
+            <div class="star" data-rating="3">⭐</div>
+            <div class="star" data-rating="4">⭐</div>
+            <div class="star" data-rating="5">⭐</div>
+          </div>
+          
+          <div class="rating-labels">
+            <span class="rating-label" data-rating="1">Bad</span>
+            <span class="rating-label" data-rating="2">Okay</span>
+            <span class="rating-label" data-rating="3">Good</span>
+            <span class="rating-label" data-rating="4">Great</span>
+            <span class="rating-label" data-rating="5">Love it!</span>
+          </div>
+        </div>
+        
+        <div class="rating-message">
+          <p data-i18n="pleaseRateUs">Please Rate Us</p>
+        </div>
+        
+        <div class="rating-actions">
+          <button id="rateUsActionButton" class="rating-action-button" data-i18n="rateUsActionButton">
+            Rate Us
+          </button>
+          <button id="alreadyRatedButton" class="already-rated-button" data-i18n="alreadyRatedButton">
+            I've already done it
+          </button>
+        </div>
+      </div>
     </div>
 
       <script src="i18n.js"></script>

@@ -13,7 +13,9 @@ class I18n {
       'ko': '한국어',
       'ms': 'Bahasa Melayu',
       'pt_BR': 'Português (Brasil)',
-      'tr': 'Türkçe'
+      'tr': 'Türkçe',
+      'ar': 'العربية',
+      'nl': 'Nederlands'
     };
     this.readyPromise = new Promise(res => { this._resolveReady = res; });
   }

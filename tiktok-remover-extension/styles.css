@@ -901,4 +901,222 @@ a {
   }
 }
 
+/* Rating Button */
+.rating-button-container {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.rate-us-button {
+  background: linear-gradient(90deg, var(--color-accent), #FF0050);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(254, 44, 85, 0.3);
+  width: 100%;
+}
+
+.rate-us-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(254, 44, 85, 0.4);
+}
+
+.rate-us-button:active {
+  transform: translateY(0);
+}
+
+/* Rating Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.rating-modal {
+  background: linear-gradient(135deg, 
+    rgba(22, 24, 35, 0.95) 0%, 
+    rgba(26, 26, 46, 0.9) 50%, 
+    rgba(22, 33, 62, 0.95) 100%);
+  border: 1px solid var(--color-accent);
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 320px;
+  box-shadow: 0 8px 32px rgba(254, 44, 85, 0.3);
+  backdrop-filter: blur(10px);
+  text-align: center;
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rating-header {
+  margin-bottom: 20px;
+}
+
+.rating-trophy {
+  font-size: 32px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-alt) 100%);
+  padding: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: trophyPulse 2s infinite;
+}
+
+@keyframes trophyPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.rating-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.rating-container {
+  margin-bottom: 20px;
+}
+
+.stars-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.star {
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  filter: grayscale(100%);
+  opacity: 0.5;
+}
+
+.star:hover,
+.star.active {
+  filter: grayscale(0%);
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.star.active {
+  animation: starGlow 0.5s ease;
+}
+
+@keyframes starGlow {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1.2); }
+}
+
+.rating-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-top: 8px;
+}
+
+.rating-label {
+  transition: all 0.3s ease;
+  opacity: 0.5;
+}
+
+.rating-label.active {
+  color: var(--color-accent-alt);
+  opacity: 1;
+  font-weight: 600;
+}
+
+.rating-message {
+  margin-bottom: 20px;
+}
+
+.rating-message p {
+  font-size: 14px;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.rating-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rating-action-button {
+  background: linear-gradient(90deg, var(--color-accent), #FF0050);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(254, 44, 85, 0.3);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.rating-action-button.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.rating-action-button.active:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(254, 44, 85, 0.4);
+}
+
+.rating-action-button.active:active {
+  transform: translateY(0);
+}
+
+.already-rated-button {
+  background: transparent;
+  color: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: underline;
+}
+
+.already-rated-button:hover {
+  color: var(--color-text);
+  border-color: var(--color-accent);
+}
+
 

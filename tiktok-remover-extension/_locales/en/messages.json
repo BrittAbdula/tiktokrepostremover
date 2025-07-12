@@ -277,5 +277,23 @@
   },
   "notificationNoRepostsFound": {
     "message": "✨ No reposted videos were found!"
+  },
+  "rateUsButton": {
+    "message": "⭐ Rate Us"
+  },
+  "rateThisExtension": {
+    "message": "Rate This Extension"
+  },
+  "pleaseRateUs": {
+    "message": "Please Rate Us"
+  },
+  "rateUsActionButton": {
+    "message": "Rate Us"
+  },
+  "alreadyRatedButton": {
+    "message": "I've already done it"
+  },
+  "thankYouForRating": {
+    "message": "Thank you for your feedback!"
   }
 }

@@ -277,5 +277,23 @@
   },
   "notificationNoRepostsFound": {
     "message": "✨ Tidak ada video repost ditemukan!"
+  },
+  "rateUsButton": {
+    "message": "⭐ Beri Rating"
+  },
+  "rateThisExtension": {
+    "message": "Beri Peringkat Ekstensi Ini"
+  },
+  "pleaseRateUs": {
+    "message": "Silakan Beri Rating"
+  },
+  "rateUsActionButton": {
+    "message": "Beri Rating"
+  },
+  "alreadyRatedButton": {
+    "message": "Saya sudah melakukannya"
+  },
+  "thankYouForRating": {
+    "message": "Terima kasih atas penilaian Anda!"
   }
 }

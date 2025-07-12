@@ -277,5 +277,23 @@
   },
   "notificationNoRepostsFound": {
     "message": "✨ Tiada video repost ditemui!"
+  },
+  "rateUsButton": {
+    "message": "⭐ Nilai Kami"
+  },
+  "rateThisExtension": {
+    "message": "Nilaikan Sambungan ini"
+  },
+  "pleaseRateUs": {
+    "message": "Sila Nilai Kami"
+  },
+  "rateUsActionButton": {
+    "message": "Nilai"
+  },
+  "alreadyRatedButton": {
+    "message": "Saya sudah menilainya"
+  },
+  "thankYouForRating": {
+    "message": "Terima kasih atas maklum balas anda!"
   }
 }

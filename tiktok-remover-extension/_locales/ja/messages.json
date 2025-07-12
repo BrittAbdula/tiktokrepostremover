@@ -277,5 +277,23 @@
   },
   "notificationNoRepostsFound": {
     "message": "✨ リポスト動画が見つかりません！"
+  },
+  "rateUsButton": {
+    "message": "⭐ 評価する"
+  },
+  "rateThisExtension": {
+    "message": "この拡張機能を評価"
+  },
+  "pleaseRateUs": {
+    "message": "評価をお願いします"
+  },
+  "rateUsActionButton": {
+    "message": "評価する"
+  },
+  "alreadyRatedButton": {
+    "message": "すでに評価済み"
+  },
+  "thankYouForRating": {
+    "message": "評価いただきありがとうございます！"
   }
 } 

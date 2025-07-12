@@ -91,5 +91,11 @@
   "videoUnknownAuthor": { "message": "Desconocido" },
   "noRemovedVideos": { "message": "Aún no se ha eliminado ningún video" },
   "noRepostsFoundMessage": { "message": "¡Genial! No se encontraron reposts en tu perfil." },
-  "notificationNoRepostsFound": { "message": "✨ ¡No se encontraron videos repost!" }
+  "notificationNoRepostsFound": { "message": "✨ ¡No se encontraron videos repost!" },
+  "rateUsButton": { "message": "⭐ Califícanos" },
+  "rateThisExtension": { "message": "Calificar esta extensión" },
+  "pleaseRateUs": { "message": "Por favor califícanos" },
+  "rateUsActionButton": { "message": "Calificar" },
+  "alreadyRatedButton": { "message": "Ya califiqué" },
+  "thankYouForRating": { "message": "¡Gracias por tu opinión!" }
 } 

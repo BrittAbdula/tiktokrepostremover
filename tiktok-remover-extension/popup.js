@@ -259,6 +259,14 @@ class ClearTokExtension {
     document.getElementById('restartButton')?.addEventListener('click', () => this.restart());
     document.getElementById('retryButton')?.addEventListener('click', () => this.restart());
 
+    // Rating related buttons
+    document.getElementById('rateUsButton')?.addEventListener('click', () => this.showRatingModal());
+    document.getElementById('rateUsButtonComplete')?.addEventListener('click', () => this.showRatingModal());
+    document.getElementById('rateUsActionButton')?.addEventListener('click', () => this.handleRatingAction());
+    document.getElementById('alreadyRatedButton')?.addEventListener('click', () => this.closeRatingModal());
+    
+    // Rating modal interactions
+    this.initializeRatingModal();
 
     // Listen for messages from content script with deduplication
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -1096,6 +1104,154 @@ class ClearTokExtension {
     if (copyRemovedButton) copyRemovedButton.style.display = 'none';
     this.addLogEntry(this.getText('logNoRepostsFound', {duration: ''}), 'info');
     this.showNotification(this.getText('notificationNoRepostsFound'), 'info');
+  }
+
+  // Rating Modal Functions
+  initializeRatingModal() {
+    this.selectedRating = 0;
+    this.ratingLabels = ['Bad', 'Okay', 'Good', 'Great', 'Love it!'];
+    
+    // Initialize star clicks
+    const stars = document.querySelectorAll('.star');
+    stars.forEach((star, index) => {
+      star.addEventListener('click', () => this.selectRating(index + 1));
+      star.addEventListener('mouseenter', () => this.hoverRating(index + 1));
+    });
+    
+    // Initialize label clicks
+    const labels = document.querySelectorAll('.rating-label');
+    labels.forEach((label, index) => {
+      label.addEventListener('click', () => this.selectRating(index + 1));
+    });
+    
+    // Initialize modal overlay click to close
+    document.getElementById('ratingModal')?.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal-overlay')) {
+        this.closeRatingModal();
+      }
+    });
+    
+    // Reset stars when mouse leaves container
+    document.querySelector('.stars-container')?.addEventListener('mouseleave', () => {
+      this.updateStarDisplay(this.selectedRating);
+    });
+  }
+
+  showRatingModal() {
+    const modal = document.getElementById('ratingModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      this.resetRatingModal();
+    }
+  }
+
+  closeRatingModal() {
+    const modal = document.getElementById('ratingModal');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+  }
+
+  resetRatingModal() {
+    this.selectedRating = 0;
+    this.updateStarDisplay(0);
+    this.updateRatingMessage();
+    this.updateActionButton();
+  }
+
+  selectRating(rating) {
+    this.selectedRating = rating;
+    this.updateStarDisplay(rating);
+    this.updateRatingMessage();
+    this.updateActionButton();
+  }
+
+  hoverRating(rating) {
+    if (this.selectedRating === 0) {
+      this.updateStarDisplay(rating);
+    }
+  }
+
+  updateStarDisplay(rating) {
+    const stars = document.querySelectorAll('.star');
+    const labels = document.querySelectorAll('.rating-label');
+    
+    stars.forEach((star, index) => {
+      if (index < rating) {
+        star.classList.add('active');
+      } else {
+        star.classList.remove('active');
+      }
+    });
+    
+    labels.forEach((label, index) => {
+      if (index === rating - 1) {
+        label.classList.add('active');
+      } else {
+        label.classList.remove('active');
+      }
+    });
+  }
+
+  updateRatingMessage() {
+    const messageElement = document.querySelector('.rating-message p');
+    if (messageElement) {
+      if (this.selectedRating === 0) {
+        messageElement.textContent = this.getText('pleaseRateUs');
+      } else {
+        const selectedLabel = this.ratingLabels[this.selectedRating - 1];
+        messageElement.textContent = selectedLabel + '!';
+      }
+    }
+  }
+
+  updateActionButton() {
+    const actionButton = document.getElementById('rateUsActionButton');
+    if (actionButton) {
+      if (this.selectedRating > 0) {
+        actionButton.classList.add('active');
+      } else {
+        actionButton.classList.remove('active');
+      }
+    }
+  }
+
+  handleRatingAction() {
+    if (this.selectedRating === 0) {
+      return;
+    }
+    
+    // If rating is 3 (Good) or higher, redirect to Chrome Web Store
+    if (this.selectedRating >= 3) {
+      chrome.tabs.create({
+        url: 'https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb/reviews/my-review'
+      });
+    }
+    
+    // Close the modal
+    this.closeRatingModal();
+    
+    // Show a thank you message
+    this.showNotification(this.getText('thankYouForRating'), 'success');
+    
+    // Record the rating (optional - for analytics)
+    this.recordRating(this.selectedRating);
+  }
+
+  recordRating(rating) {
+    // You can implement rating tracking here if needed
+    console.log('User rated:', rating, 'stars');
+    
+    // Save to local storage to prevent showing again
+    try {
+      chrome.storage.local.set({
+        'userRated': true,
+        'ratingValue': rating,
+        'ratingDate': Date.now()
+      });
+    } catch (error) {
+      console.warn('Failed to save rating:', error);
+    }
   }
 }
 
