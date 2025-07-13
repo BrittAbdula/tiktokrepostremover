@@ -380,7 +380,7 @@ if (window.clearTokExtensionLoaded && window.clearTokRemover) {
       try {
         this.sendMessage('statusUpdate', { status: 'Opening first repost...' });
         
-        const firstVideo = await this.waitForElement('[class*="DivPlayerContainer"], [data-e2e="user-post-item"]');
+        const firstVideo = await this.waitForElement('[class*="DivPlayerContainer"], [data-e2e="user-repost-item"]');
         firstVideo.click();
         console.log("Successfully opened the first reposted video.");
         

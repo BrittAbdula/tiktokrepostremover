@@ -19,6 +19,7 @@ Thumbs.db
 # Ignore build outputs and dist
 /dist/
 /build/
+/bak/
 *.zip
 *.tar.gz
 

@@ -32,12 +32,14 @@ const Index = () => {
         <meta property="og:description" content="One-click Extension to bulk delete all TikTok reposts. Maintain a clean feed & brand image. Free download." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://tiktokrepostremover.com" />
-        <meta property="og:image" content="https://tiktokrepostremover.com/logo.png" />
+        <meta property="og:image" content="https://tiktokrepostremover.com/images/og-banner.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="TikTok Repost Remover - Delete ALL Reposts Instantly" />
         <meta name="twitter:description" content="One-click Extension to bulk delete all TikTok reposts. Maintain a clean feed & brand image. Free download." />
-        <meta name="twitter:image" content="https://tiktokrepostremover.com/logo.png" />
+        <meta name="twitter:image" content="https://tiktokrepostremover.com/images/og-banner.png" />
         
         {/* Structured Data for SEO */}
         <script type="application/ld+json">

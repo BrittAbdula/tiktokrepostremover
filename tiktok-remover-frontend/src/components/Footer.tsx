@@ -128,6 +128,16 @@ const Footer = () => {
                   Terms of Service
                 </Link>
               </li>
+              <li>
+                <a
+                  href="/changelog"
+                  className="text-gray-400 hover:text-[#FE2C55] transition-colors"
+                  target="_self"
+                  rel="noopener noreferrer"
+                >
+                  Changelog
+                </a>
+              </li>
             </ul>
           </div>
           <div>
