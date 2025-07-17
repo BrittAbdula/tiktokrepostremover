@@ -4,12 +4,30 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { htmlPrerender } from "vite-plugin-html-prerender";
 import { blogPosts } from "./src/data/blogData";
+import type { ViteDevServer } from "vite";
+import type { IncomingMessage, ServerResponse } from "http";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    // Handle trailing slash redirects in development
+    middlewareMode: false,
+    configure: (server: ViteDevServer) => {
+      server.middlewares.use((req: IncomingMessage, res: ServerResponse, next: () => void) => {
+        const url = req.url;
+        // Skip if it's an asset request or already doesn't have trailing slash
+        if (!url || url.includes('.') || !url.endsWith('/') || url === '/') {
+          return next();
+        }
+        
+        // Redirect trailing slash URLs to non-trailing slash versions
+        const redirectUrl = url.slice(0, -1);
+        res.writeHead(301, { Location: redirectUrl });
+        res.end();
+      });
+    },
   },
   plugins: [
     react(),

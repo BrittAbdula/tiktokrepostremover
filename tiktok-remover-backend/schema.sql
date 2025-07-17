@@ -71,18 +71,6 @@ CREATE TABLE session_logs (
 
 
 SELECT 
-  DATE(created_at) as date,
-  COUNT(*) as daily_count,
-  COUNT(DISTINCT ip_address) as unique_ip_count,
-  MIN(count) as min_count,
-  MAX(count) as max_count,
-  AVG(count) as avg_count
-FROM repost_counts 
-GROUP BY DATE(created_at)
-ORDER BY date DESC;
-
-
-SELECT 
   DATE(session_start_at) as date,
   COUNT(*) as total_sessions,
   COUNT(DISTINCT ip_address) as unique_ip_count,
@@ -101,3 +89,23 @@ SELECT
 FROM user_sessions 
 GROUP BY DATE(session_start_at)
 ORDER BY date DESC;
+
+
+
+SELECT 
+  DATE(session_start_at) as date,
+  count(distinct country) as unique_country_count,
+  count(distinct ip_address) as unique_ip_count,
+  count(distinct tiktok_username) as unique_tiktok_username_count
+FROM user_sessions
+GROUP BY DATE(session_start_at)
+ORDER BY date DESC;
+
+select country,count(distinct ip_address) as unique_ip_count
+from user_sessions
+group by country
+order by unique_ip_count desc
+limit 10;
+
+
+

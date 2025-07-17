@@ -12,14 +12,14 @@ interface DeletionRecord {
 const RecentDeletionsScroll = () => {
   const [records, setRecords] = useState<DeletionRecord[]>([]);
 
-  const generateUsername = () =>  `User${Math.floor(1000 + Math.random() * 9000)}`;
+  const generateUsername = () =>  `Someone`;
   // Generate mock data for demonstration
   const generateMockData = (): DeletionRecord[] => {
     const usernames = Array.from({ length: 10 }, generateUsername);
     
     const timeOptions = ['3s ago', '12s ago', '28s ago', '45s ago', '1m ago', '2m ago', '3m ago', '5m ago'];
     
-    return Array.from({ length: 30 }, (_, i) => {
+    return Array.from({ length:15 }, (_, i) => {
       const count = Math.floor(Math.random() * 50) + 1;
       const durationMultiplier = Math.random() * 2 + 3; // 3-5秒的随机系数
       const duration = Math.round(count * durationMultiplier);
@@ -49,6 +49,9 @@ const RecentDeletionsScroll = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // 根据记录数动态计算滚动时长（每条 2s，可自行微调）
+  const animationDuration = `${Math.max(records.length * 2, 30)}s`;
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
       <div className="relative w-full h-full">
@@ -62,11 +65,11 @@ const RecentDeletionsScroll = () => {
         <div 
           className="h-full flex flex-col justify-start pt-8"
           style={{
-            animation: 'scrollUp 15s linear infinite'
+            animation: `scrollUp ${animationDuration} linear infinite`
           }}
         >
           <div className="space-y-3">
-            {records.concat(records).map((record, index) => (
+            {records.map((record, index) => (
               <div
                 key={`${record.id}-${index}`}
                 className={cn(

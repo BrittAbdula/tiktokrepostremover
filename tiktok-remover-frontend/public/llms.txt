@@ -1,24 +1,29 @@
 # llms.txt
-# For helping AI better understand the service of this website
+# Purpose: Help AI systems and LLMs understand the website's purpose and services for accurate indexing, automation, and interaction.
 
-Website Name: TikTok Repost Remover
+Website Name: ClearTok – TikTok Repost Remover
+Website Url: https://tiktokrepostremover.com/
+Chrome extension Url: https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb
 
-Website Introduction:
-This website provides users with a simple and easy-to-use tool to detect and remove the Repost tag from TikTok videos. Users can simply upload or paste a TikTok video link, and the website will automatically analyze the video and remove the Repost tag, helping users get cleaner video content.
+Website Description:
+ClearTok is a Chrome extension that helps TikTok users quickly and automatically remove all their reposted videos. It simulates the manual "Remove Repost" action on TikTok.com, saving users time and effort. No scrolling, no tapping—just launch the extension and let it clean up your Reposts tab.
 
 Core Features:
-1. Detect whether a TikTok video is a Repost.
-2. Remove the Repost tag from videos.
-3. Support for pasting video links or uploading video files.
-4. Fast, free, and privacy-safe service.
+1. Detect and access the "Reposts" tab on TikTok.com.
+2. Automatically remove all reposted videos.
+3. Safe and visible: All actions are performed locally in the user's browser.
+4. No TikTok login credentials are required; the extension works on the TikTok website session.
+5. Stop or pause at any time by closing the TikTok tab.
 
-Target Users:
-TikTok content creators, video editors, and regular users who need to remove the Repost tag.
+Target Audience:
+- TikTok content creators managing their content  
+- Users who frequently repost and want to clean up their accounts  
+- Social media managers maintaining TikTok profiles  
 
-Privacy Policy:
-This website does not store uploaded video files. All processing is performed temporarily on the server side and files are deleted immediately after processing.
+Privacy & Security:
+ClearTok runs locally in the browser and does not collect or store any user data. All clicks are simulated on-screen, ensuring transparency and control.
 
 Contact:
-For any questions or suggestions, please contact support@tiktokrepostremover.com
+For support or suggestions, email: support@tiktokrepostremover.com
 
-# This file is for LLMs to understand the website's service and positioning, facilitating future automation and intelligent processing.
+# This file helps LLMs and AI systems accurately understand ClearTok's functionality and intended use case for smarter search, recommendation, and automation.

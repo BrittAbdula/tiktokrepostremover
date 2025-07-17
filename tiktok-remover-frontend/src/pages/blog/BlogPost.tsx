@@ -287,7 +287,7 @@ const BlogPost = () => {
                       </a>
                     </Button>
                     <Button asChild variant="outline" size="lg" className="border-[#00F2EA]/50 text-[#00F2EA] hover:bg-[#00F2EA] hover:border-[#00F2EA] hover:text-black font-semibold px-8 py-4 transition-all duration-300 transform hover:scale-105">
-                      <a href="https://tiktokrepostremover.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                      <a href="https://tiktokrepostremover.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
                         </svg>

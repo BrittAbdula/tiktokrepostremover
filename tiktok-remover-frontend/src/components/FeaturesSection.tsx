@@ -16,7 +16,7 @@ import {
 const FeaturesSection = () => {
   const features = [
     {
-      title: "Remove All Reposts",
+      title: "TikTok All Repost Remover",
       description: "Bulk deletion saves hours of manual tapping",
       badge: "Core",
       // 直接引用图标组件
@@ -36,30 +36,30 @@ const FeaturesSection = () => {
     },
     {
       title: "Real-time Monitoring",
-      description: "Watch the deletion process live with detailed progress updates",
+      description: "Watch the repost remover tiktok deletion process live with detailed progress updates and statistics",
       badge: "Live",
       icon: FaEye
     },
     {
       title: "Smart Human-Delay",
-      description: "Mimics natural browsing speed to avoid account flags", 
+      description: "Our all repost remover extension mimics natural browsing speed to avoid account flags and maintain safety", 
       badge: "Safe",
       icon: FaClock
     },
     {
       title: "Open-Source Transparency",
-      description: "Check the code, audit the privacy",
+      description: "Check the repost remover extension code, audit the privacy - our tiktok all repost remover is available on GitHub",
       badge: "Transparent",
       icon: FaGithub
     },
     {
       title: "100% Local",
-      description: "Data never leaves your browser; we never ask for your TikTok password",
+      description: "ClearTok keeps all data in your browser; we never ask for your TikTok password or credentials",
       badge: "Private",
       icon: FaLock
     },
     {
-      title: "Free Forever",
+      title: "Free TikTok All Repost Remover",
       description: "No hidden upgrade wall",
       badge: "Free",
       icon: FaGift
@@ -79,7 +79,7 @@ const FeaturesSection = () => {
           Key Features
         </h2>
         <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-          Everything you need to manage your TikTok reposts efficiently and safely
+        Everything you need in a repost remover tiktok extension to delete all repost on tiktok efficiently and safely
         </p>
       </div>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -1,1 +1,17 @@
+# Redirect trailing slashes to non-trailing slash versions (for SEO consistency)
+# Blog post URLs - redirect /blog/slug/ to /blog/slug
+/blog/*/ /blog/:splat 301
+
+# Blog list page - redirect /blog/ to /blog  
+/blog/ /blog 301
+
+# Legal pages - redirect with trailing slash to without
+/privacy-policy/ /privacy-policy 301
+/terms-of-service/ /terms-of-service 301
+/changelog/ /changelog 301
+
+# Prevent homepage trailing slash - redirect / to root (already handled by default)
+# This is typically handled automatically, but we can be explicit if needed
+
+# Catch-all SPA routing (must be last)
 /* /index.html 200 
