@@ -295,5 +295,20 @@
   },
   "thankYouForRating": {
     "message": "評価いただきありがとうございます！"
+  },
+  "feedbackTitle": {
+    "message": "改善にご協力ください！💡"
+  },
+  "feedbackDescription": {
+    "message": "ClearTokをより良くするためのご提案をお聞かせください。"
+  },
+  "feedbackPlaceholder": {
+    "message": "ご意見やご提案をお聞かせください..."
+  },
+  "submitFeedbackButton": {
+    "message": "フィードバックを送信"
+  },
+  "thankYouForFeedback": {
+    "message": "{rating}つ星の評価とフィードバックをありがとうございます！"
   }
 } 

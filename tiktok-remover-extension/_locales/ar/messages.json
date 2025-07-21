@@ -97,5 +97,10 @@
   "pleaseRateUs": { "message": "يرجى تقييمنا" },
   "rateUsActionButton": { "message": "قيّم" },
   "alreadyRatedButton": { "message": "لقد قمت بالتقييم" },
-  "thankYouForRating": { "message": "شكراً لملاحظاتك!" }
+  "thankYouForRating": { "message": "شكراً لملاحظاتك!" },
+  "feedbackTitle": { "message": "ساعدنا في التحسين! 💡" },
+  "feedbackDescription": { "message": "نود سماع اقتراحاتك لجعل ClearTok أفضل." },
+  "feedbackPlaceholder": { "message": "شارك أفكارك واقتراحاتك..." },
+  "submitFeedbackButton": { "message": "إرسال الملاحظات" },
+  "thankYouForFeedback": { "message": "شكراً لتقييمك بـ {rating} نجوم وملاحظاتك!" }
 } 

@@ -97,5 +97,10 @@
   "pleaseRateUs": { "message": "평가를 부탁드립니다" },
   "rateUsActionButton": { "message": "평가하기" },
   "alreadyRatedButton": { "message": "이미 평가했습니다" },
-  "thankYouForRating": { "message": "평가해주셔서 감사합니다!" }
+  "thankYouForRating": { "message": "평가해주셔서 감사합니다!" },
+  "feedbackTitle": { "message": "개선에 도움을 주세요! 💡" },
+  "feedbackDescription": { "message": "ClearTok을 더 좋게 만들기 위한 제안을 듣고 싶습니다." },
+  "feedbackPlaceholder": { "message": "생각과 제안을 공유해 주세요..." },
+  "submitFeedbackButton": { "message": "피드백 제출" },
+  "thankYouForFeedback": { "message": "{rating}별 평가와 피드백을 주셔서 감사합니다!" }
 } 

@@ -33,6 +33,10 @@ Clean your profile in seconds. Start fresh—install ClearTok now.
 
 ## Recent Updates
 
+### v1.1.3(2025-07-14)
+- add Help us improve! Enviar comentarios	
+- Optimize processing logic
+
 ### v1.1.2 (2025-07-12)
 - Added multi-language support (Franch, Arabic, Japanese, Spanish, and more)
 

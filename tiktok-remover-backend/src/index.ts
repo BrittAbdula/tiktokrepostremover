@@ -2,436 +2,314 @@ import { Context, Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { validator } from 'hono/validator'
 
+// 定义 Cloudflare Worker 的绑定类型
 type Bindings = {
   DB: D1Database;
 }
 
+// 定义地理位置信息接口
 interface LocationInfo {
   ip: string
   country?: string
-  region?: string
-  city?: string
-  timezone?: string
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
 
+// --- 中间件和辅助函数 (Middleware and Helpers) ---
+
+// 配置 CORS，允许来自特定源的请求
 app.use('*', cors({
-  origin: ['http://localhost:5173','http://localhost:8080','http://localhost:4780','https://tiktokrepostremover.com'],
+  origin: [
+    '127.0.0.1:7890', 
+    'http://localhost:4780',
+    'http://localhost:7890',
+    'https://tiktokrepostremover.com', 
+    'chrome-extension://kmellgkfemijicfcpndnndiebmkdginb', // 允许你的 Chrome 扩展直接访问
+    'chrome-extension://hmmoeamiibmgplmjeioeclpcabdbeinj'
+  ],
   allowMethods: ['GET', 'POST', 'PUT', 'OPTIONS'],
   allowHeaders: ['Content-Type'],
 }))
 
-// 获取客户端IP地址
+// 获取客户端真实 IP 地址
 function getClientIP(c: Context): string {
-  // Cloudflare 提供的真实IP
-  const cfConnectingIP = c.req.header('CF-Connecting-IP')
-  if (cfConnectingIP) return cfConnectingIP
-  
-  // 其他常见的IP头
-  const xForwardedFor = c.req.header('X-Forwarded-For')
-  if (xForwardedFor) {
-    return xForwardedFor.split(',')[0].trim()
-  }
-  
-  const xRealIP = c.req.header('X-Real-IP')
-  if (xRealIP) return xRealIP
-  
-  return 'unknown'
+  return c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For')?.split(',')[0].trim() || 'unknown'
 }
 
-// 从Cloudflare获取地理位置信息
+// 获取地理位置信息
 function getLocationInfo(c: Context): LocationInfo {
-  const ip = getClientIP(c)
-  
-  // Cloudflare 自动提供的地理位置信息
-  const country = c.req.header('CF-IPCountry') || 'unknown'
-  const region = c.req.header('CF-Region') || 'unknown'
-  const city = c.req.header('CF-IPCity') || 'unknown'
-  const timezone = c.req.header('CF-Timezone') || 'unknown'
-  
   return {
-    ip,
-    country,
-    region,
-    city,
-    timezone
+    ip: getClientIP(c),
+    country: c.req.header('CF-IPCountry') || 'unknown',
   }
 }
 
-// 生成唯一会话ID
+// 生成全局唯一的会话 ID
 function generateSessionId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2, 9)
+  return crypto.randomUUID();
 }
 
-// 验证会话创建数据
-const validateSessionCreate = validator('json', (value, c) => {
-  const { session_id } = value
-  if (session_id && typeof session_id !== 'string') {
-    return c.json({ error: 'Invalid session_id' }, 400)
-  }
-  return { session_id }
-})
 
-// 验证会话更新数据
-const validateSessionUpdate = validator('json', (value, c) => {
-  const { session_id } = value
-  if (!session_id || typeof session_id !== 'string') {
-    return c.json({ error: 'session_id is required' }, 400)
-  }
-  return value
-})
-
-// 原有的验证器
-const validateRepostData = validator('json', (value, c) => {
-  const { count } = value
-  if (typeof count !== 'number' || count <= 0) {
-    return c.json({ error: 'Invalid count value' }, 400)
-  }
-  return { count }
-})
+// --- API 路由 (API Routes) ---
 
 app.get('/', (c) => {
-  return c.json({ message: 'Repost Counter API is running' })
+  return c.json({ message: 'ClearTok Event Tracking API is running' })
 })
 
-// 新增：创建用户会话
-app.post('/session/create', validateSessionCreate, async (c) => {
+/**
+ * @description 创建一个新的用户会话。
+ * 这是用户与扩展程序交互的起点。
+ */
+app.post('/session/create', async (c) => {
   try {
-    const { session_id } = c.req.valid('json')
-    const locationInfo = getLocationInfo(c)
-    const userAgent = c.req.header('User-Agent') || 'unknown'
+    const locationInfo = getLocationInfo(c);
+    const userAgent = c.req.header('User-Agent') || 'unknown';
+    const sessionId = generateSessionId();
     
-    const finalSessionId = session_id || generateSessionId()
-    
+    // 在 user_sessions 表中插入一条新记录，状态为 'started'
     const result = await c.env.DB.prepare(`
-      INSERT INTO user_sessions 
-      (session_id, ip_address, country, user_agent, process_status) 
+      INSERT INTO user_sessions (session_id, ip_address, country, user_agent, process_status) 
       VALUES (?, ?, ?, ?, 'started')
     `).bind(
-      finalSessionId,
+      sessionId,
       locationInfo.ip,
       locationInfo.country,
       userAgent
-    ).run()
+    ).run();
 
     return c.json({ 
       success: result.success,
-      session_id: finalSessionId
-    })
+      session_id: sessionId
+    });
     
   } catch (error) {
-    console.error('Database error:', error)
-    return c.json({ 
-      error: 'Failed to create session' 
-    }, 500)
+    console.error('Database error in /session/create:', error);
+    return c.json({ error: 'Failed to create session' }, 500);
   }
-})
+});
 
-// 新增：更新用户会话状态
-app.put('/session/update', validateSessionUpdate, async (c) => {
-  try {
-    const data = c.req.valid('json')
-    const { session_id, ...updateData } = data
-    
-    // 构建动态更新SQL
-    const updateFields = []
-    const updateValues = []
-    
-    // 处理各种更新字段
-    if (updateData.login_status) {
-      updateFields.push('login_status = ?', 'login_check_at = CURRENT_TIMESTAMP')
-      updateValues.push(updateData.login_status)
+
+/**
+ * @description [新增] 接收并处理新版本扩展发送的所有事件。
+ */
+app.put(
+  '/session/track-event',
+  validator('json', (value, c) => {
+    const { session_id, event_name } = value;
+    if (!session_id || typeof session_id !== 'string') return c.text('Invalid or missing session_id', 400);
+    if (!event_name || typeof event_name !== 'string') return c.text('Invalid or missing event_name', 400);
+    return value;
+  }),
+  async (c) => {
+    try {
+      const { session_id, event_name, ...event_data } = c.req.valid('json');
+
+      // 1. 记录日志
+      await c.env.DB.prepare(`
+        INSERT INTO session_logs (session_id, process_status, login_status, raw_data) 
+        VALUES (?, ?, ?, ?)
+      `).bind(
+        session_id,
+        event_data.process_status || null, // 从事件数据中获取状态
+        event_data.login_status || null,
+        JSON.stringify({ event_name, ...event_data }) // 将事件名和数据都存入raw_data
+      ).run();
+
+      // 2. 更新主表
+      let sql = '';
+      const params: (string | number | null)[] = [];
+
+      switch (event_name) {
+        case 'user_logged_in':
+          sql = 'UPDATE user_sessions SET login_status = ?, tiktok_username = ?, login_check_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE session_id = ?';
+          params.push('logged_in', event_data.tiktok_username || null, session_id);
+          break;
+        case 'process_started':
+          sql = "UPDATE user_sessions SET process_status = 'in_progress', removal_start_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE session_id = ?";
+          params.push(session_id);
+          break;
+        case 'total_reposts_found':
+          sql = 'UPDATE user_sessions SET total_reposts_found = ?, updated_at = CURRENT_TIMESTAMP WHERE session_id = ?';
+          params.push(event_data.total_reposts_found ?? 0, session_id);
+          break;
+        case 'process_completed':
+          sql = 'UPDATE user_sessions SET process_status = ?, reposts_removed = ?, total_duration_seconds = ?, removal_complete_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE session_id = ?';
+          params.push('completed', event_data.reposts_removed ?? 0, event_data.total_duration_seconds ?? null, session_id);
+          break;
+        case 'no_reposts_found':
+          sql = "UPDATE user_sessions SET process_status = 'no_reposts', removal_complete_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE session_id = ?";
+          params.push(session_id);
+          break;
+        case 'process_error':
+          sql = "UPDATE user_sessions SET process_status = 'error', error_message = ?, error_occurred_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE session_id = ?";
+          params.push(event_data.error_message || 'Unknown error', session_id);
+          break;
+      }
+
+      if (sql) {
+        await c.env.DB.prepare(sql).bind(...params).run();
+      }
+
+      return c.json({ success: true, message: `Event '${event_name}' processed and logged.` });
+
+    } catch (error) {
+      const eventName = (c.req.valid('json') as any)?.event_name || 'unknown event';
+      console.error(`Database error in /session/track-event for event: ${eventName}`, error);
+      return c.json({ error: 'Failed to track event' }, 500);
     }
-    
-    if (updateData.process_status) {
-      updateFields.push('process_status = ?')
-      updateValues.push(updateData.process_status)
+  }
+);
+
+
+/**
+ * @description [旧版兼容] 更新用户会话状态。这是处理所有更新的核心接口。
+ */
+app.put(
+  '/session/update',
+  validator('json', (value, c) => {
+    const { session_id } = value;
+    if (!session_id || typeof session_id !== 'string') return c.text('Invalid or missing session_id', 400);
+    return value;
+  }),
+  async (c) => {
+    try {
+      const data = c.req.valid('json');
+      const { session_id, ...updateData } = data;
       
-      // 根据状态设置相应的时间戳
-      if (updateData.process_status === 'in_progress') {
-        updateFields.push('removal_start_at = CURRENT_TIMESTAMP')
-      } else if (updateData.process_status === 'completed') {
-        updateFields.push('removal_complete_at = CURRENT_TIMESTAMP')
+      const updateFields: string[] = [];
+      const updateValues: (string | number | null)[] = [];
+      
+      if (updateData.login_status) {
+        updateFields.push('login_status = ?', 'login_check_at = CURRENT_TIMESTAMP');
+        updateValues.push(updateData.login_status);
       }
-    }
-    
-    if (updateData.total_reposts_found !== undefined) {
-      updateFields.push('total_reposts_found = ?')
-      updateValues.push(updateData.total_reposts_found)
-    }
-    
-    if (updateData.reposts_removed !== undefined) {
-      updateFields.push('reposts_removed = ?')
-      updateValues.push(updateData.reposts_removed)
-    }
-    
-    if (updateData.reposts_skipped !== undefined) {
-      updateFields.push('reposts_skipped = ?')
-      updateValues.push(updateData.reposts_skipped)
-    }
-    
-    if (updateData.error_message) {
-      updateFields.push('error_message = ?', 'error_occurred_at = CURRENT_TIMESTAMP', 'process_status = ?')
-      updateValues.push(updateData.error_message, 'error')
-    }
-    
-    if (updateData.total_duration_seconds !== undefined) {
-      updateFields.push('total_duration_seconds = ?')
-      updateValues.push(updateData.total_duration_seconds)
-    }
-    
-    if (updateData.tiktok_username) {
-      updateFields.push('tiktok_username = ?')
-      updateValues.push(updateData.tiktok_username)
-    }
-    
-    // 总是更新 updated_at
-    updateFields.push('updated_at = CURRENT_TIMESTAMP')
-    updateValues.push(session_id) // 用于 WHERE 条件
-    
-    if (updateFields.length === 1) { // 只有 updated_at
-      return c.json({ success: true, message: 'No fields to update' })
-    }
-    
-    const sql = `UPDATE user_sessions SET ${updateFields.join(', ')} WHERE session_id = ?`
-    const result = await c.env.DB.prepare(sql).bind(...updateValues).run()
-
-    // 记录session更新日志
-    if (result.success) {
-      try {
-        await c.env.DB.prepare(`
-          INSERT INTO session_logs 
-          (session_id, process_status, login_status, total_reposts_found, reposts_removed, reposts_skipped) 
-          VALUES (?, ?, ?, ?, ?, ?)
-        `).bind(
-          session_id,
-          updateData.process_status || null,
-          updateData.login_status || null,
-          updateData.total_reposts_found || null,
-          updateData.reposts_removed || null,
-          updateData.reposts_skipped || null
-        ).run()
-      } catch (logError) {
-        console.error('Failed to log session update:', logError)
-        // 不影响主要的session更新操作
+      if (updateData.process_status) {
+        updateFields.push('process_status = ?');
+        updateValues.push(updateData.process_status);
+        if (updateData.process_status === 'in_progress') {
+          updateFields.push('removal_start_at = CURRENT_TIMESTAMP');
+        } else if (updateData.process_status === 'completed') {
+          updateFields.push('removal_complete_at = CURRENT_TIMESTAMP');
+        }
       }
+      if (updateData.total_reposts_found !== undefined) {
+        updateFields.push('total_reposts_found = ?');
+        updateValues.push(updateData.total_reposts_found);
+      }
+      if (updateData.reposts_removed !== undefined) {
+        updateFields.push('reposts_removed = ?');
+        updateValues.push(updateData.reposts_removed);
+      }
+      if (updateData.reposts_skipped !== undefined) {
+        updateFields.push('reposts_skipped = ?');
+        updateValues.push(updateData.reposts_skipped);
+      }
+      if (updateData.error_message) {
+        updateFields.push('error_message = ?', "process_status = 'error'", 'error_occurred_at = CURRENT_TIMESTAMP');
+        updateValues.push(updateData.error_message);
+      }
+      if (updateData.total_duration_seconds !== undefined) {
+        updateFields.push('total_duration_seconds = ?');
+        updateValues.push(updateData.total_duration_seconds);
+      }
+      if (updateData.tiktok_username) {
+        updateFields.push('tiktok_username = ?');
+        updateValues.push(updateData.tiktok_username);
+      }
+      
+      if (updateFields.length === 0) {
+        return c.json({ success: true, message: 'No valid fields to update.' });
+      }
+      
+      updateFields.push('updated_at = CURRENT_TIMESTAMP');
+      updateValues.push(session_id);
+      
+      const sql = `UPDATE user_sessions SET ${updateFields.join(', ')} WHERE session_id = ?`;
+      const result = await c.env.DB.prepare(sql).bind(...updateValues).run();
+
+      if (result.success) {
+         try {
+            await c.env.DB.prepare(`
+              INSERT INTO session_logs 
+              (session_id, process_status, login_status, total_reposts_found, reposts_removed, reposts_skipped, raw_data) 
+              VALUES (?, ?, ?, ?, ?, ?, ?)
+            `).bind(
+              session_id,
+              updateData.process_status || null,
+              updateData.login_status || null,
+              updateData.total_reposts_found || null,
+              updateData.reposts_removed || null,
+              updateData.reposts_skipped || null,
+              JSON.stringify(updateData)
+            ).run();
+         } catch (logError) {
+            console.error('Failed to write to session_logs:', logError);
+         }
+      }
+
+      return c.json({ 
+        success: result.success,
+        changes: result.meta?.changes || 0
+      });
+      
+    } catch (error) {
+      console.error('Database error in /session/update:', error);
+      return c.json({ error: 'Failed to update session' }, 500);
     }
-
-    return c.json({ 
-      success: result.success,
-      changes: result.meta?.changes || 0
-    })
-    
-  } catch (error) {
-    console.error('Database error:', error)
-    return c.json({ 
-      error: 'Failed to update session' 
-    }, 500)
   }
-})
+);
 
-// 新增：获取会话统计
-app.get('/api/session-stats', async (c) => {
-  try {
-    // 总体统计
-    const totalStats = await c.env.DB.prepare(`
-      SELECT 
-        COUNT(*) as total_sessions,
-        COUNT(CASE WHEN process_status = 'completed' THEN 1 END) as completed_sessions,
-        COUNT(CASE WHEN process_status = 'error' THEN 1 END) as error_sessions,
-        COUNT(CASE WHEN process_status = 'no_reposts' THEN 1 END) as no_reposts_sessions,
-        AVG(CASE WHEN process_status = 'completed' THEN reposts_removed END) as avg_reposts_removed,
-        AVG(CASE WHEN process_status = 'completed' THEN total_duration_seconds END) as avg_duration_seconds,
-        SUM(CASE WHEN process_status = 'completed' THEN reposts_removed ELSE 0 END) as total_reposts_removed
-      FROM user_sessions
-    `).first()
+/**
+ * @description 提交用户反馈（评分和建议）
+ */
+app.post(
+  '/feedback/submit',
+  validator('json', (value, c) => {
+    const { session_id, rating_score } = value;
+    if (!session_id || typeof session_id !== 'string') return c.text('Invalid or missing session_id', 400);
+    if (!rating_score || typeof rating_score !== 'number' || rating_score < 1 || rating_score > 5) {
+      return c.text('Invalid rating_score, must be a number between 1-5', 400);
+    }
+    return value;
+  }),
+  async (c) => {
+    try {
+      const { session_id, rating_score, feedback_text } = c.req.valid('json');
+      const locationInfo = getLocationInfo(c);
+      const userAgent = c.req.header('User-Agent') || 'unknown';
+      
+      // 插入反馈数据到数据库
+      const result = await c.env.DB.prepare(`
+        INSERT INTO user_feedback (session_id, rating_score, feedback_text, ip_address, country, user_agent) 
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).bind(
+        session_id,
+        rating_score,
+        feedback_text || null,
+        locationInfo.ip,
+        locationInfo.country,
+        userAgent
+      ).run();
 
-    // 按日期统计
-    const dailyStats = await c.env.DB.prepare(`
-      SELECT 
-        DATE(session_start_at) as date,
-        COUNT(*) as total_sessions,
-        COUNT(CASE WHEN process_status = 'completed' THEN 1 END) as completed_sessions,
-        COUNT(CASE WHEN process_status = 'error' THEN 1 END) as error_sessions,
-        AVG(CASE WHEN process_status = 'completed' THEN reposts_removed END) as avg_reposts_removed
-      FROM user_sessions 
-      GROUP BY DATE(session_start_at)
-      ORDER BY date DESC 
-      LIMIT 30
-    `).all()
-
-    // 按国家统计
-    const countryStats = await c.env.DB.prepare(`
-      SELECT 
-        country,
-        COUNT(*) as sessions,
-        COUNT(CASE WHEN process_status = 'completed' THEN 1 END) as completed_sessions,
-        SUM(CASE WHEN process_status = 'completed' THEN reposts_removed ELSE 0 END) as total_reposts_removed
-      FROM user_sessions 
-      WHERE country != 'unknown'
-      GROUP BY country 
-      ORDER BY sessions DESC 
-      LIMIT 10
-    `).all()
-
-    return c.json({
-      total_stats: totalStats,
-      daily_stats: dailyStats.results || [],
-      country_stats: countryStats.results || []
-    })
-    
-  } catch (error) {
-    console.error('Database error:', error)
-    return c.json({ 
-      error: 'Failed to fetch session statistics' 
-    }, 500)
+      if (result.success) {
+        console.log(`Feedback submitted: Session ${session_id}, Rating: ${rating_score}, Has feedback: ${!!feedback_text}`);
+        return c.json({ 
+          success: true, 
+          message: 'Feedback submitted successfully',
+          feedback_id: result.meta?.last_row_id
+        });
+      } else {
+        throw new Error('Failed to insert feedback into database');
+      }
+      
+    } catch (error) {
+      console.error('Database error in /feedback/submit:', error);
+      return c.json({ error: 'Failed to submit feedback' }, 500);
+    }
   }
-})
+);
 
-// 保持原有的 record-count 接口向后兼容
-app.post('/record-count', validateRepostData, async (c) => {
-  try {
-    const { count } = c.req.valid('json')
-    const locationInfo = getLocationInfo(c)
-    const userAgent = c.req.header('User-Agent') || 'unknown'
-    
-    // 插入数据到 D1 数据库
-    const result = await c.env.DB.prepare(`
-      INSERT INTO repost_counts 
-      (count, ip_address, country, region, city, timezone, user_agent) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      count,
-      locationInfo.ip,
-      locationInfo.country,
-      locationInfo.region,
-      locationInfo.city,
-      locationInfo.timezone,
-      userAgent
-    ).run()
-
-    return c.json({ 
-      success: result.success
-    })
-    
-  } catch (error) {
-    console.error('Database error:', error)
-    return c.json({ 
-      error: 'Failed to record repost count' 
-    }, 500)
-  }
-})
-
-// 获取转发统计（包含地理位置统计）
-app.get('/api/stats', async (c) => {
-  try {
-    // 总体统计
-    const totalResult = await c.env.DB.prepare(`
-      SELECT 
-        COUNT(*) as total, 
-        SUM(count) as total_reposts 
-      FROM repost_counts
-    `).first()
-
-    // 按国家统计
-    const countryStats = await c.env.DB.prepare(`
-      SELECT 
-        country, 
-        COUNT(*) as records, 
-        SUM(count) as total_count 
-      FROM repost_counts 
-      WHERE country != 'unknown'
-      GROUP BY country 
-      ORDER BY total_count DESC 
-      LIMIT 10
-    `).all()
-
-    // 按地区统计
-    const regionStats = await c.env.DB.prepare(`
-      SELECT 
-        country,
-        region, 
-        COUNT(*) as records, 
-        SUM(count) as total_count 
-      FROM repost_counts 
-      WHERE region != 'unknown'
-      GROUP BY country, region 
-      ORDER BY total_count DESC 
-      LIMIT 10
-    `).all()
-
-    // 最近记录
-    const recentResult = await c.env.DB.prepare(`
-      SELECT 
-        id, count, country, region, city, timezone, created_at
-      FROM repost_counts 
-      ORDER BY created_at DESC 
-      LIMIT 10
-    `).all()
-
-    return c.json({
-      total_records: totalResult?.total || 0,
-      total_reposts: totalResult?.total_reposts || 0,
-      country_stats: countryStats.results || [],
-      region_stats: regionStats.results || [],
-      recent_records: recentResult.results || []
-    })
-    
-  } catch (error) {
-    console.error('Database error:', error)
-    return c.json({ 
-      error: 'Failed to fetch statistics' 
-    }, 500)
-  }
-})
-
-// 获取特定国家的统计
-app.get('/api/stats/:country', async (c) => {
-  try {
-    const country = c.req.param('country')
-    
-    const countryResult = await c.env.DB.prepare(`
-      SELECT 
-        COUNT(*) as total,
-        SUM(count) as total_reposts,
-        region,
-        COUNT(*) as region_records
-      FROM repost_counts 
-      WHERE country = ? AND region != 'unknown'
-      GROUP BY region
-      ORDER BY region_records DESC
-    `).bind(country).all()
-
-    return c.json({
-      country,
-      regions: countryResult.results || []
-    })
-    
-  } catch (error) {
-    console.error('Database error:', error)
-    return c.json({ 
-      error: 'Failed to fetch country statistics' 
-    }, 500)
-  }
-})
-
-// 获取客户端信息（用于调试）
-app.get('/api/client-info', (c) => {
-  const locationInfo = getLocationInfo(c)
-  const userAgent = c.req.header('User-Agent')
-  
-  return c.json({
-    ip: locationInfo.ip,
-    country: locationInfo.country,
-    region: locationInfo.region,
-    city: locationInfo.city,
-    timezone: locationInfo.timezone,
-    user_agent: userAgent,
-    all_headers: Object.fromEntries(c.req.raw.headers.entries())
-  })
-})
-
+// --- 错误处理 (Error Handling) ---
 app.notFound((c) => {
   return c.json({ error: 'Not Found' }, 404)
 })

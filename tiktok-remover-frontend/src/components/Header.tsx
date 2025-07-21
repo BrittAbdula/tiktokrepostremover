@@ -139,7 +139,7 @@ const Header = () => {
                                    text-white font-bold shadow-lg hover:shadow-xl hover:shadow-[#FE2C55]/50 transition-all duration-300
                                    transform hover:scale-105">
             <a 
-              href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb"
+              href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb?utm_source=cleartok_website"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -225,7 +225,7 @@ const Header = () => {
                                    text-white font-bold shadow-lg hover:shadow-xl hover:shadow-[#FE2C55]/50 transition-all duration-300
                                    mt-4">
             <a 
-              href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb"
+              href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb?utm_source=cleartok_website"
               className="flex items-center justify-center" 
               target="_blank"
               rel="noopener noreferrer"

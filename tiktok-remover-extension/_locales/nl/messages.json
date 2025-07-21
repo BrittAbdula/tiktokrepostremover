@@ -97,5 +97,10 @@
   "pleaseRateUs": { "message": "Beoordeel ons alsjeblieft" },
   "rateUsActionButton": { "message": "Beoordeel" },
   "alreadyRatedButton": { "message": "Ik heb al beoordeeld" },
-  "thankYouForRating": { "message": "Bedankt voor je feedback!" }
+  "thankYouForRating": { "message": "Bedankt voor je feedback!" },
+  "feedbackTitle": { "message": "Help ons verbeteren! 💡" },
+  "feedbackDescription": { "message": "We horen graag je suggesties om ClearTok beter te maken." },
+  "feedbackPlaceholder": { "message": "Deel je gedachten en suggesties..." },
+  "submitFeedbackButton": { "message": "Feedback versturen" },
+  "thankYouForFeedback": { "message": "Bedankt voor je {rating}-sterren beoordeling en feedback!" }
 } 

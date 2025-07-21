@@ -295,5 +295,20 @@
   },
   "thankYouForRating": {
     "message": "Obrigado pelo seu feedback!"
+  },
+  "feedbackTitle": {
+    "message": "Ajude-nos a melhorar! 💡"
+  },
+  "feedbackDescription": {
+    "message": "Gostaríamos de ouvir suas sugestões para tornar o ClearTok melhor."
+  },
+  "feedbackPlaceholder": {
+    "message": "Compartilhe seus pensamentos e sugestões..."
+  },
+  "submitFeedbackButton": {
+    "message": "Enviar feedback"
+  },
+  "thankYouForFeedback": {
+    "message": "Obrigado pela sua avaliação de {rating} estrelas e feedback!"
   }
 }

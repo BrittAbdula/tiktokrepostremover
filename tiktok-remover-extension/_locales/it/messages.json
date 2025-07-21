@@ -97,5 +97,10 @@
   "pleaseRateUs": { "message": "Per favore valutaci" },
   "rateUsActionButton": { "message": "Valuta" },
   "alreadyRatedButton": { "message": "Già valutato" },
-  "thankYouForRating": { "message": "Grazie per il tuo feedback!" }
+  "thankYouForRating": { "message": "Grazie per il tuo feedback!" },
+  "feedbackTitle": { "message": "Aiutaci a migliorare! 💡" },
+  "feedbackDescription": { "message": "Ci piacerebbe sentire i tuoi suggerimenti per migliorare ClearTok." },
+  "feedbackPlaceholder": { "message": "Condividi i tuoi pensieri e suggerimenti..." },
+  "submitFeedbackButton": { "message": "Invia feedback" },
+  "thankYouForFeedback": { "message": "Grazie per la tua valutazione di {rating} stelle e il feedback!" }
 } 

@@ -40,7 +40,7 @@ const HeroSection = () => {
             asChild
           >
             <a
-              href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb"
+              href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb?utm_source=cleartok_website"
               className="flex items-center justify-center"
               target="_blank"
               rel="noopener noreferrer"

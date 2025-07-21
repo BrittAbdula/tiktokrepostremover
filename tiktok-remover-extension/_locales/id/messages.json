@@ -295,5 +295,20 @@
   },
   "thankYouForRating": {
     "message": "Terima kasih atas penilaian Anda!"
+  },
+  "feedbackTitle": {
+    "message": "Bantu kami berkembang! 💡"
+  },
+  "feedbackDescription": {
+    "message": "Kami ingin mendengar saran Anda untuk membuat ClearTok lebih baik."
+  },
+  "feedbackPlaceholder": {
+    "message": "Bagikan pemikiran dan saran Anda..."
+  },
+  "submitFeedbackButton": {
+    "message": "Kirim masukan"
+  },
+  "thankYouForFeedback": {
+    "message": "Terima kasih atas penilaian {rating} bintang dan masukan Anda!"
   }
 }

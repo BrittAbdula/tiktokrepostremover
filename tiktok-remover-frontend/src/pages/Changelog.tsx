@@ -6,6 +6,14 @@ import { Helmet } from "react-helmet-async";
 
 const changelog = [
   {
+    version: "v1.1.3",
+    date: "2025-07-14",
+    changes: [
+      "Add Help us improve! Enviar comentarios",
+      "Optimize processing logic",
+    ],
+  },
+  {
     version: "v1.1.2",
     date: "2025-07-12",
     changes: [
@@ -30,7 +38,6 @@ const changelog = [
     ],
   },
 ];
-
 const Changelog = () => {
   return (
     <>

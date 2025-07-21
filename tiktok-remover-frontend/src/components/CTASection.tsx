@@ -29,7 +29,7 @@ const CTASection = () => {
                        shadow-[0_0_20px_rgba(254,44,85,0.5)] hover:shadow-[0_0_30px_rgba(254,44,85,0.8)]" 
             asChild
           >
-            <a href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb" className="flex items-center justify-center relative z-10" target="_blank">
+            <a href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb?utm_source=cleartok_website" className="flex items-center justify-center relative z-10" target="_blank">
               {/* 渲染引入的 Font Awesome Chrome 图标 */}
               <FaChrome className="w-5 h-5 mr-2 text-black" /> {/* Chrome 按钮是白色背景，所以图标用黑色 */}
               Add ClearTok to Chrome – It's Free

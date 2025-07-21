@@ -295,5 +295,20 @@
   },
   "thankYouForRating": {
     "message": "Geri bildiriminiz için teşekkürler!"
+  },
+  "feedbackTitle": {
+    "message": "Gelişmemize yardım edin! 💡"
+  },
+  "feedbackDescription": {
+    "message": "ClearTok'u daha iyi hale getirmek için önerilerinizi duymak isteriz."
+  },
+  "feedbackPlaceholder": {
+    "message": "Düşüncelerinizi ve önerilerinizi paylaşın..."
+  },
+  "submitFeedbackButton": {
+    "message": "Geri bildirim gönder"
+  },
+  "thankYouForFeedback": {
+    "message": "{rating} yıldızlı değerlendirmeniz ve geri bildiriminiz için teşekkürler!"
   }
 }

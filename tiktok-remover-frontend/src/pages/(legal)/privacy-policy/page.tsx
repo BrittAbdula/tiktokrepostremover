@@ -42,7 +42,7 @@ export default function PrivacyPolicy() {
               <section className="mb-8">
                   <h2 className="mb-4 text-2xl font-bold text-white">Data We Do NOT Collect</h2>
                   <ul className="list-disc space-y-2 pl-6 text-gray-300">
-                      <li>Your TikTok username or password</li>
+                      <li>Your TikTok email or password</li>
                       <li>Your TikTok videos or reposts</li>
                       <li>Personal information from your TikTok profile</li>
                       <li>Your browsing history outside of our extension</li>
