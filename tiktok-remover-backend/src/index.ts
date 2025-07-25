@@ -1,6 +1,7 @@
 import { Context, Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { validator } from 'hono/validator'
+import statsRouter from './routes/stats'
 
 // 定义 Cloudflare Worker 的绑定类型
 type Bindings = {
@@ -23,6 +24,8 @@ app.use('*', cors({
     '127.0.0.1:7890', 
     'http://localhost:4780',
     'http://localhost:7890',
+    'http://localhost:8080',
+    'http://localhost:5173',
     'https://tiktokrepostremover.com', 
     'chrome-extension://kmellgkfemijicfcpndnndiebmkdginb', // 允许你的 Chrome 扩展直接访问
     'chrome-extension://hmmoeamiibmgplmjeioeclpcabdbeinj'
@@ -308,6 +311,9 @@ app.post(
     }
   }
 );
+
+// --- 统计路由 (Stats Routes) ---
+app.route('/stats', statsRouter)
 
 // --- 错误处理 (Error Handling) ---
 app.notFound((c) => {

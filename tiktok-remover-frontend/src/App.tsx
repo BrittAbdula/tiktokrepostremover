@@ -12,6 +12,7 @@ import BlogPost from "./pages/blog/BlogPost";
 import ScrollToTop from "@/components/ScrollToTop";
 import { HelmetProvider } from "react-helmet-async";
 import Changelog from "./pages/Changelog";
+import StatsPage from "./pages/stats/page";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/changelog" element={<Changelog />} />
+            <Route path="/stats" element={<StatsPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -1,0 +1,247 @@
+/* 统计页面移动端优化样式 */
+
+/* 移动端图表优化 */
+@media (max-width: 768px) {
+  .recharts-wrapper {
+    font-size: 12px !important;
+  }
+  
+  .recharts-legend-wrapper {
+    font-size: 11px !important;
+  }
+  
+  .recharts-tooltip-wrapper {
+    font-size: 12px !important;
+  }
+}
+
+/* 移动端卡片优化 */
+@media (max-width: 640px) {
+  .stats-card {
+    margin-bottom: 1rem;
+  }
+  
+  .stats-card .card-header {
+    padding: 1rem;
+  }
+  
+  .stats-card .card-content {
+    padding: 1rem;
+  }
+}
+
+/* 移动端标签页优化 */
+@media (max-width: 768px) {
+  .stats-tabs .tabs-list {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem;
+  }
+  
+  .stats-tabs .tabs-trigger {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* 移动端图表容器优化 */
+@media (max-width: 1024px) {
+  .chart-container {
+    height: 250px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    height: 200px !important;
+  }
+}
+
+/* 移动端反馈卡片优化 */
+@media (max-width: 768px) {
+  .feedback-card {
+    margin-bottom: 1rem;
+  }
+  
+  .feedback-card .feedback-content {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  
+  .feedback-card .feedback-meta {
+    font-size: 0.75rem;
+  }
+}
+
+/* 移动端概览卡片优化 */
+@media (max-width: 640px) {
+  .overview-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+  
+  .overview-card {
+    padding: 0.75rem !important;
+  }
+  
+  .overview-card .card-title {
+    font-size: 0.75rem !important;
+  }
+  
+  .overview-card .card-value {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* 移动端错误卡片优化 */
+@media (max-width: 768px) {
+  .error-card {
+    margin-bottom: 0.75rem;
+  }
+  
+  .error-card .error-message {
+    font-size: 0.875rem;
+    word-break: break-word;
+  }
+}
+
+/* 移动端国家列表优化 */
+@media (max-width: 768px) {
+  .country-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .country-item {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* 移动端加载状态优化 */
+@media (max-width: 768px) {
+  .loading-skeleton {
+    height: 200px;
+  }
+  
+  .loading-skeleton .skeleton-item {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* 移动端空状态优化 */
+@media (max-width: 768px) {
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+  
+  .empty-state .empty-icon {
+    font-size: 3rem;
+  }
+  
+  .empty-state .empty-text {
+    font-size: 1rem;
+  }
+}
+
+/* 移动端工具提示优化 */
+@media (max-width: 768px) {
+  .recharts-tooltip-content {
+    font-size: 0.75rem !important;
+    padding: 0.5rem !important;
+  }
+}
+
+/* 移动端图例优化 */
+@media (max-width: 768px) {
+  .recharts-legend-item {
+    margin-right: 0.5rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+  
+  .recharts-legend-item-text {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* 移动端轴标签优化 */
+@media (max-width: 768px) {
+  .recharts-xAxis .recharts-cartesian-axis-tick-value,
+  .recharts-yAxis .recharts-cartesian-axis-tick-value {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* 移动端响应式容器优化 */
+@media (max-width: 768px) {
+  .responsive-chart {
+    min-height: 200px;
+  }
+}
+
+/* 移动端标签页内容优化 */
+@media (max-width: 768px) {
+  .tab-content {
+    padding: 0.5rem;
+  }
+  
+  .tab-content .card {
+    margin-bottom: 1rem;
+  }
+}
+
+/* 移动端徽章优化 */
+@media (max-width: 768px) {
+  .stats-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* 移动端表格优化 */
+@media (max-width: 768px) {
+  .stats-table {
+    font-size: 0.875rem;
+  }
+  
+  .stats-table th,
+  .stats-table td {
+    padding: 0.5rem 0.25rem;
+  }
+}
+
+/* 移动端网格布局优化 */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    gap: 1rem !important;
+  }
+}
+
+/* 移动端标题优化 */
+@media (max-width: 768px) {
+  .stats-title {
+    font-size: 1.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .stats-subtitle {
+    font-size: 1rem !important;
+  }
+}
+
+/* 移动端间距优化 */
+@media (max-width: 768px) {
+  .stats-container {
+    padding: 1rem !important;
+  }
+  
+  .stats-section {
+    margin-bottom: 1.5rem !important;
+  }
+} 
