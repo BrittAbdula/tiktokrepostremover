@@ -109,12 +109,13 @@ app.put(
 
       // 1. 记录日志
       await c.env.DB.prepare(`
-        INSERT INTO session_logs (session_id, process_status, login_status, raw_data) 
-        VALUES (?, ?, ?, ?)
+        INSERT INTO session_logs (session_id, process_status, total_reposts_found, reposts_removed, raw_data) 
+        VALUES (?, ?, ?, ?, ?)
       `).bind(
         session_id,
-        event_data.event_name || null, // 从事件数据中获取状态
-        event_data.login_status || null,
+        event_name || null, 
+        event_data.total_reposts_found || null,
+        event_data.reposts_removed || null,
         JSON.stringify({ event_name, ...event_data }) // 将事件名和数据都存入raw_data
       ).run();
 

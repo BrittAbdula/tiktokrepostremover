@@ -100,7 +100,7 @@ async function handleRemoveRepostedVideos(message) {
       }, 3000);
     } else {
       // Use existing TikTok tab
-      const tab = tabs[0];
+      const tab = tabs[tabs.length - 1];
       
       // Ensure the tab is active
       await chrome.tabs.update(tab.id, { active: true });

@@ -1,3 +1,796 @@
-(() => {
-  const e={navigation:{profileButton:'[data-e2e="nav-profile"]',repostTab:['[class*="PRepost"]','[data-e2e="profile-repost-tab"]','a[href*="repost"]','button[data-testid="repost-tab"]'],repostTabFallback:'a, button, div[role="tab"]'},loginStatus:{profileLink:'[data-e2e="nav-profile"]',avatarImage:"img",svgIcon:"svg"},video:{containers:['[class*="DivPlayerContainer"]','[data-e2e="user-post-item"]'],title:['[data-e2e="video-desc"]','[data-e2e="browse-video-desc"]',".video-meta-title",".tt-video-meta-caption",'h1[data-e2e="video-title"]',".video-description",".tt-video-title",'[data-testid="video-desc"]'],author:['[data-e2e="video-author-uniqueid"]','[data-e2e="browse-username"]','[data-e2e="video-author-nickname"]',".author-uniqueid",".username",".user-uniqueid",'[data-testid="video-author"]'],repostButton:['[data-e2e="video-share-repost"]','[class*="repost"]','button[aria-label*="repost" i]'],nextButton:['[data-e2e="arrow-right"]','[class*="arrow-right"]','button[aria-label*="next" i]'],closeButton:['[data-e2e="browse-close"]','[class*="close"]','button[aria-label*="close" i]']},repostStatus:{activeClasses:["reposted","active"],pressedAttribute:"aria-pressed",svgFillSelector:'svg [fill]:not([fill="none"])'}},t={findElement:function(e,t=document){if("string"==typeof e)return t.querySelector(e);if(Array.isArray(e))for(const s of e){const e=t.querySelector(s);if(e)return e}return null},findByText:function(e,t,s=!1){const o=document.querySelectorAll(e);for(const e of o){const o=e.textContent?.trim();if(o)if(s){if(o===t||o.includes(t))return e}else{const s=o.toLowerCase(),i=t.toLowerCase();if(s===i||s.includes(i))return e}}return null},waitForElement:function(e,t=1e4,s=200){const o=Date.now();return new Promise((i,n)=>{const a=()=>{const r=this.findElement(e);return r?i(r):Date.now()-o>=t?n(new Error("Timeout: Element not found")):void setTimeout(a,s)};a()})}};if(window.clearTokExtensionLoaded&&window.clearTokRemover)console.log("ClearTok script already loaded and instance exists, skipping...");else{window.clearTokExtensionLoaded=!0;class s{constructor(){this.selectors=e,this.utils=t,this.isPaused=!1,this.isRunning=!1,this.removedCount=0,this.totalReposts=0,this.currentIndex=0,this.pauseMessageSent=!1,this.messageListenerAdded=!1,this.startTime=null,chrome.runtime.onMessage.hasListeners()&&chrome.runtime.onMessage.removeListener(this.handleMessage.bind(this)),this.messageListenerAdded||(chrome.runtime.onMessage.addListener(this.handleMessage.bind(this)),this.messageListenerAdded=!0)}handleMessage=(e,t,s)=>{"pauseRemoval"===e.action?(this.isPaused=!0,this.pauseMessageSent=!1):"resumeRemoval"===e.action?(this.isPaused=!1,this.pauseMessageSent=!1,this.sendMessage("statusUpdate",{status:"Resuming process..."}),console.log("Process resumed by user")):"checkLoginStatus"===e.action?this.checkLoginStatus():"startRemoval"===e.action?this.start():"navigateToReposts"===e.action&&this.navigateToRepostsTab()};sendMessage(e,t={}){try{const s={action:e,...t,timestamp:Date.now(),instanceId:this.instanceId||"default"};chrome.runtime.sendMessage(s)}catch(e){console.log("Failed to send message:",e)}}checkLoginStatus(){try{const e=this.utils.findElement(this.selectors.loginStatus.profileLink);if(!e)return this.sendMessage("loginStatusUpdate",{isLoggedIn:!1,hasLoginButton:!1,hasUserAvatar:!1,method:"profile-link-not-found"}),void console.log("Profile link not found");const t=e.getAttribute("href");if(!t||!t.includes("/@"))return this.sendMessage("loginStatusUpdate",{isLoggedIn:!1,hasLoginButton:!1,hasUserAvatar:!1,method:"invalid-href"}),void console.log("Invalid href format:",t);const s=t.split("/@")[1],o=s&&s.trim().length>0,i=null!==e.querySelector(this.selectors.loginStatus.avatarImage),n=null!==e.querySelector(this.selectors.loginStatus.svgIcon);this.sendMessage("loginStatusUpdate",{isLoggedIn:o,hasLoginButton:!1,hasUserAvatar:i,method:"username-check",username:o?s.trim():null,hasAvatar:i,hasSvgIcon:n}),console.log("Login status checked:",{isLoggedIn:o,username:o?s.trim():"none",href:t,hasAvatar:i,hasSvgIcon:n})}catch(e){console.error("Error checking login status:",e),this.sendMessage("loginStatusUpdate",{isLoggedIn:!1,hasLoginButton:!1,hasUserAvatar:!1,method:"error",error:e.toString()})}}async sleep(e){return new Promise(t=>{const s=()=>{this.isPaused?setTimeout(s,200):setTimeout(t,e)};s()})}async waitForElement(e,t=1e4,s=200){const o=Date.now();return new Promise((i,n)=>{const a=()=>{for(;this.isPaused;)return void setTimeout(a,s);const r=this.utils.findElement(e);return r?i(r):Date.now()-o>=t?n(new Error("Timeout: Element not found")):void setTimeout(a,s)};a()})}async waitWithProgress(e,t="Waiting"){for(let t=e;t>0;t--){for(;this.isPaused;)this.pauseMessageSent||(this.sendMessage("waiting",{seconds:"paused"}),this.pauseMessageSent=!0),await this.sleep(500);this.sendMessage("waiting",{seconds:t}),await this.sleep(1e3)}}getVideoInfo(){try{const e={title:"",url:window.location.href,author:""},t=this.utils.findElement(this.selectors.video.title);t&&t.textContent.trim()&&(e.title=t.textContent.trim());const s=this.utils.findElement(this.selectors.video.author);if(s&&s.textContent.trim()){let t=s.textContent.trim();t.startsWith("@")||(t="@"+t),e.author=t}if(!e.author&&e.url.includes("/@")){const t=e.url.split("/@");if(t.length>1){const s=t[1].split("/")[0];s&&(e.author="@"+s)}}if(!e.title&&e.url.includes("/video/")){const t=e.url.split("/video/")[1]?.split("?")[0];t&&(e.title=`Video ${t.substring(0,8)}...`)}return e.title.length>50&&(e.title=e.title.substring(0,50)+"..."),e.title||(e.title="Untitled video"),e.author||(e.author="@unknown"),e}catch(e){return console.log("Error getting video info:",e),{title:"Unknown video",url:window.location.href,author:"@unknown"}}}async clickProfileTab(){try{this.sendMessage("statusUpdate",{status:"Navigating to profile..."}),this.checkLoginStatus(),await this.sleep(1e3);return(await this.waitForElement(this.selectors.navigation.profileButton)).click(),console.log("Successfully clicked the 'Profile' button."),this.sendMessage("statusUpdate",{status:"Loading profile page..."}),await this.waitWithProgress(3,"Loading profile"),!0}catch(e){return this.stopScript("The 'Profile' button was not found. Please make sure you are logged in to TikTok.",e),!1}}async clickRepostTab(){try{this.sendMessage("statusUpdate",{status:"Looking for Reposts tab..."});let e=this.utils.findElement(this.selectors.navigation.repostTab);if(e||(e=this.utils.findByText(this.selectors.navigation.repostTabFallback,"repost")),!e)throw new Error("Reposts tab not found");e.click(),console.log("Successfully clicked the 'Reposts' tab."),this.sendMessage("statusUpdate",{status:"Loading reposts..."}),await this.waitWithProgress(3,"Loading reposts"),await this.sleep(2e3);const t=document.querySelectorAll(this.selectors.video.containers.join(", "));if(this.totalReposts=t.length,0===this.totalReposts){const e=Date.now()-this.startTime,t=Math.floor(e/6e4),s=Math.floor(e%6e4/1e3);return this.sendMessage("noRepostsFound",{duration:{total:e,minutes:t,seconds:s}}),!1}return this.sendMessage("updateProgress",{current:0,total:this.totalReposts}),this.sendMessage("statusUpdate",{status:`Found ${this.totalReposts} repost(s) to process`}),console.log(`Found ${this.totalReposts} reposted videos to remove.`),!0}catch(e){return this.stopScript("Error accessing the 'Reposts' tab. Make sure you have reposted videos.",e),!1}}async clickRepostVideo(){try{this.sendMessage("statusUpdate",{status:"Opening first repost..."});return(await this.waitForElement(this.selectors.video.containers)).click(),console.log("Successfully opened the first reposted video."),await this.waitWithProgress(3,"Opening video"),!0}catch(e){return this.stopScript("No reposted videos found or unable to open",e),!1}}async processRepostVideos(){try{let e=0;for(;this.currentIndex<this.totalReposts;){for(;this.isPaused;)await this.sleep(500);this.currentIndex++;const t=this.getVideoInfo();console.log("Processing video:",t),this.sendMessage("updateProgress",{current:this.currentIndex,total:this.totalReposts,title:t.title,author:t.author,url:t.url}),this.sendMessage("statusUpdate",{status:`Processing repost ${this.currentIndex} of ${this.totalReposts}...`});const s=this.utils.findElement(this.selectors.video.repostButton);if(s){if(this.isVideoReposted(s))try{s.click(),this.removedCount++,e++,this.sendMessage("videoRemoved",{index:this.currentIndex,title:t.title,author:t.author,url:t.url}),console.log(`Removed repost from video #${this.currentIndex}:`,t),await this.waitWithProgress(2+2*Math.random(),"Processing removal")}catch(e){console.log(`Failed to remove repost from video #${this.currentIndex}:`,e),this.sendMessage("videoSkipped",{index:this.currentIndex,reason:"failed to click repost button",title:t.title,author:t.author,url:t.url})}else this.sendMessage("videoSkipped",{index:this.currentIndex,reason:"not currently reposted",title:t.title,author:t.author,url:t.url})}else this.sendMessage("videoSkipped",{index:this.currentIndex,reason:"repost button not found",title:t.title,author:t.author,url:t.url});const o=this.utils.findElement(this.selectors.video.nextButton);if(!o||o.disabled){console.log("No more videos to process");break}try{o.click(),console.log("Moved to next reposted video."),await this.sleep(1e3)}catch(e){console.log("Failed to move to next video:",e);break}}await this.closeVideo();const t=Date.now()-this.startTime,s=Math.floor(t/6e4),o=Math.floor(t%6e4/1e3);this.sendMessage("complete",{removedCount:e,duration:{total:t,minutes:s,seconds:o}})}catch(e){this.stopScript("Error during reposted video removal",e)}}isVideoReposted(e){const t="true"===e.getAttribute(this.selectors.repostStatus.pressedAttribute),s=this.selectors.repostStatus.activeClasses.some(t=>e.classList.contains(t)||e.querySelector(`[class*="${t}"]`)),o=window.getComputedStyle(e),i="rgb(255, 255, 255)"!==o.color&&"rgba(255, 255, 255, 1)"!==o.color,n=null!==e.querySelector(this.selectors.repostStatus.svgFillSelector);return console.log("Repost button analysis:",{isPressed:t,hasRepostedClass:s,hasActiveColor:i,hasFilledIcon:n,finalResult:t||s||i||n}),t||s||i||n}async closeVideo(){try{this.sendMessage("statusUpdate",{status:"Closing video player..."});const e=this.utils.findElement(this.selectors.video.closeButton);if(e)e.click(),console.log("Closed video view."),await this.sleep(1e3);else{const e=new KeyboardEvent("keydown",{key:"Escape"});document.dispatchEvent(e),await this.sleep(1e3)}}catch(e){console.log("Error closing the video:",e)}}stopScript(e,t=""){this.isRunning=!1,this.sendMessage("error",{message:e,error:t.toString()}),console.log(`Script stopped: ${e}`,t)}async navigateToRepostsTab(){try{this.sendMessage("statusUpdate",{status:"Navigating to profile and reposts..."});const e=window.location.href;if(!(e.includes("/@")&&!e.includes("/video/"))){if(!await this.clickProfileTab())return void this.sendMessage("statusUpdate",{status:"Unable to navigate to profile"});await this.waitWithProgress(3,"Loading profile")}this.sendMessage("statusUpdate",{status:"Opening reposts tab..."});let t=this.utils.findElement(this.selectors.navigation.repostTab);t||(t=this.utils.findByText(this.selectors.navigation.repostTabFallback,"repost")),t?(t.click(),console.log("Successfully clicked reposts tab"),this.sendMessage("statusUpdate",{status:"Reposts tab opened - You can see the results!"}),setTimeout(()=>{const e=document.querySelectorAll(this.selectors.video.containers.join(", ")).length;0===e?this.sendMessage("statusUpdate",{status:"🎉 All reposts successfully removed!"}):this.sendMessage("statusUpdate",{status:`${e} repost(s) remaining on your profile`})},2e3)):(this.sendMessage("statusUpdate",{status:"Reposts tab not found - please check manually"}),console.log("Reposts tab not found"))}catch(e){console.error("Error navigating to reposts tab:",e),this.sendMessage("statusUpdate",{status:"Error navigating to reposts - please check manually"})}}async start(){if(this.isRunning)console.log("Script is already running.");else{this.isRunning=!0,this.currentIndex=0,this.removedCount=0,this.startTime=Date.now(),console.log("ClearTok script started..."),this.sendMessage("statusUpdate",{status:"Starting removal process..."});try{if(!await this.clickProfileTab())return;if(!await this.clickRepostTab())return;if(!await this.clickRepostVideo())return;await this.processRepostVideos()}catch(e){this.stopScript("Unexpected error in main flow",e)}}}}window.location.hostname.includes("tiktok.com")?(window.clearTokRemover?console.log("ClearTok remover instance already exists, using existing one"):(window.clearTokRemover=new s,window.clearTokRemover.instanceId=`instance_${Date.now()}`,console.log("ClearTok remover instance created with ID:",window.clearTokRemover.instanceId)),setTimeout(()=>{window.clearTokRemover&&window.clearTokRemover.checkLoginStatus()},3e3)):console.log("This script only works on TikTok.com")}"undefined"!=typeof module&&module.exports?module.exports={SELECTORS:e,SelectorUtils:t}:window.TikTokSelectors={SELECTORS:e,SelectorUtils:t};
-})();
+if (typeof window.SELECTORS === 'undefined') {
+  window.SELECTORS = {
+    // 导航相关
+    navigation: {
+      profileButton: '[data-e2e="nav-profile"]',
+      repostTab: [
+        '[class*="PRepost"]',
+        '[data-e2e="profile-repost-tab"]',
+        'a[href*="repost"]',
+        'button[data-testid="repost-tab"]'
+      ],
+      repostTabFallback: 'a, button, div[role="tab"]' // 用于文本搜索
+    },
+
+    // 登录状态检查
+    loginStatus: {
+      profileLink: '[data-e2e="nav-profile"]',
+      avatarImage: 'img', // 在 profileLink 内部查找
+      svgIcon: 'svg' // 在 profileLink 内部查找
+    },
+
+    // 视频相关
+    video: {
+      // 视频容器
+      containers: [
+        '[class*="DivPlayerContainer"]',
+        '[data-e2e="user-post-item"]'
+      ],
+      
+      // 视频信息
+      title: [
+        '[data-e2e="video-desc"]',
+        '[data-e2e="browse-video-desc"]',
+        '.video-meta-title',
+        '.tt-video-meta-caption',
+        'h1[data-e2e="video-title"]',
+        '.video-description',
+        '.tt-video-title',
+        '[data-testid="video-desc"]'
+      ],
+      
+      // 作者信息
+      author: [
+        '[data-e2e="video-author-uniqueid"]',
+        '[data-e2e="browse-username"]',
+        '[data-e2e="video-author-nickname"]',
+        '.author-uniqueid',
+        '.username',
+        '.user-uniqueid',
+        '[data-testid="video-author"]'
+      ],
+
+      // 转发按钮
+      repostButton: [
+        '[data-e2e="video-share-repost"]',
+        '[class*="repost"]',
+        'button[aria-label*="repost" i]'
+      ],
+
+      // 导航按钮
+      nextButton: [
+        '[data-e2e="arrow-right"]',
+        '[class*="arrow-right"]',
+        'button[aria-label*="next" i]'
+      ],
+
+      // 关闭按钮
+      closeButton: [
+        '[data-e2e="browse-close"]',
+        '[class*="close"]',
+        'button[aria-label*="close" i]'
+      ]
+    },
+
+    // 转发状态检查
+    repostStatus: {
+      // 检查转发状态的类名和属性
+      activeClasses: ['reposted', 'active'],
+      pressedAttribute: 'aria-pressed',
+      svgFillSelector: 'svg [fill]:not([fill="none"])'
+    }
+  };
+}
+
+if (typeof window.SelectorUtils === 'undefined') {
+  window.SelectorUtils = {
+    // 尝试多个选择器，返回第一个找到的元素
+    findElement: function(selectors, parent = document) {
+      if (typeof selectors === 'string') {
+        return parent.querySelector(selectors);
+      }
+      
+      if (Array.isArray(selectors)) {
+        for (const selector of selectors) {
+          const element = parent.querySelector(selector);
+          if (element) return element;
+        }
+      }
+      
+      return null;
+    },
+
+    // 通过文本内容查找元素
+    findByText: function(selector, text, caseSensitive = false) {
+      const elements = document.querySelectorAll(selector);
+      for (const element of elements) {
+        const elementText = element.textContent?.trim();
+        if (!elementText) continue;
+        
+        if (caseSensitive) {
+          if (elementText === text || elementText.includes(text)) {
+            return element;
+          }
+        } else {
+          const lowerText = elementText.toLowerCase();
+          const lowerTarget = text.toLowerCase();
+          if (lowerText === lowerTarget || lowerText.includes(lowerTarget)) {
+            return element;
+          }
+        }
+      }
+      return null;
+    },
+
+    // 等待元素出现
+    waitForElement: function(selectors, timeout = 10000, interval = 200) {
+      const start = Date.now();
+      return new Promise((resolve, reject) => {
+        const check = () => {
+          const element = this.findElement(selectors);
+          if (element) return resolve(element);
+          if (Date.now() - start >= timeout) {
+            return reject(new Error(`Timeout: Element not found`));
+          }
+          setTimeout(check, interval);
+        };
+        check();
+      });
+    }
+  };
+}
+
+
+// Prevent duplicate script execution with stronger checks
+if (window.clearTokExtensionLoaded && window.clearTokRemover) {
+  console.log('ClearTok script already loaded and instance exists, skipping...');
+} else {
+  window.clearTokExtensionLoaded = true;
+
+  class TikTokRepostRemover {
+    constructor() {
+      // 直接使用全局变量
+      this.selectors = window.SELECTORS;
+      this.utils = window.SelectorUtils;
+      this.isPaused = false;
+      this.isRunning = false;
+      this.removedCount = 0;
+      this.totalReposts = 0;
+      this.currentIndex = 0;
+      this.pauseMessageSent = false; // Flag to prevent duplicate pause messages
+      this.messageListenerAdded = false; // Flag to prevent duplicate listeners
+      this.startTime = null; // Track when the removal process started
+      
+      // Remove any existing listener first
+      if (chrome.runtime.onMessage.hasListeners()) {
+        chrome.runtime.onMessage.removeListener(this.handleMessage.bind(this));
+      }
+      
+      // Add message listener only once
+      if (!this.messageListenerAdded) {
+        chrome.runtime.onMessage.addListener(this.handleMessage.bind(this));
+        this.messageListenerAdded = true;
+      }
+    }
+
+    handleMessage = (message, sender, sendResponse) => {
+      if (message.action === 'pauseRemoval') {
+        this.isPaused = true;
+        this.pauseMessageSent = false; // Reset when pausing
+      } else if (message.action === 'resumeRemoval') {
+        this.isPaused = false;
+        this.pauseMessageSent = false; // Reset when resuming
+        this.sendMessage('statusUpdate', { status: 'Resuming process...' });
+        console.log('Process resumed by user');
+      } else if (message.action === 'checkLoginStatus') {
+        this.checkLoginStatus();
+      } else if (message.action === 'startRemoval') {
+        this.start();
+      } else if (message.action === 'navigateToReposts') {
+        this.navigateToRepostsTab();
+      }
+    }
+
+    sendMessage(action, data = {}) {
+      try {
+        // Add a unique identifier to prevent duplicate processing
+        const messageData = { 
+          action, 
+          ...data, 
+          timestamp: Date.now(),
+          instanceId: this.instanceId || 'default'
+        };
+        chrome.runtime.sendMessage(messageData);
+      } catch (error) {
+        console.log('Failed to send message:', error);
+      }
+    }
+
+    checkLoginStatus() {
+      try {
+        // 使用配置的选择器查找个人资料链接
+        const profileLink = this.utils.findElement(this.selectors.loginStatus.profileLink);
+        
+        if (!profileLink) {
+          this.sendMessage('loginStatusUpdate', { 
+            isLoggedIn: false,
+            hasLoginButton: false,
+            hasUserAvatar: false,
+            method: 'profile-link-not-found'
+          });
+          console.log('Profile link not found');
+          return;
+        }
+    
+        const href = profileLink.getAttribute('href');
+        
+        // check if href exists and contains /@
+        if (!href || !href.includes('/@')) {
+          this.sendMessage('loginStatusUpdate', { 
+            isLoggedIn: false,
+            hasLoginButton: false,
+            hasUserAvatar: false,
+            method: 'invalid-href'
+          });
+          console.log('Invalid href format:', href);
+          return;
+        }
+    
+        // extract the part after /@
+        const usernamePart = href.split('/@')[1];
+        
+        // if there is content after @, then the user is logged in
+        const isLoggedIn = usernamePart && usernamePart.trim().length > 0;
+        
+        // 使用配置的选择器检查头像和SVG图标
+        const hasAvatar = profileLink.querySelector(this.selectors.loginStatus.avatarImage) !== null;
+        const hasSvgIcon = profileLink.querySelector(this.selectors.loginStatus.svgIcon) !== null;
+        
+        this.sendMessage('loginStatusUpdate', { 
+          isLoggedIn: isLoggedIn,
+          hasLoginButton: false,
+          hasUserAvatar: hasAvatar,
+          method: 'username-check',
+          username: isLoggedIn ? usernamePart.trim() : null,
+          hasAvatar: hasAvatar,
+          hasSvgIcon: hasSvgIcon
+        });
+    
+        console.log('Login status checked:', { 
+          isLoggedIn, 
+          username: isLoggedIn ? usernamePart.trim() : 'none',
+          href: href,
+          hasAvatar: hasAvatar,
+          hasSvgIcon: hasSvgIcon
+        });
+    
+      } catch (error) {
+        console.error('Error checking login status:', error);
+        this.sendMessage('loginStatusUpdate', { 
+          isLoggedIn: false,
+          hasLoginButton: false,
+          hasUserAvatar: false,
+          method: 'error',
+          error: error.toString()
+        });
+      }
+    }
+
+    async sleep(ms) {
+      return new Promise(resolve => {
+        const checkPause = () => {
+          if (this.isPaused) {
+            // If paused, check again after a short delay
+            setTimeout(checkPause, 200);
+          } else {
+            // If not paused, continue with normal sleep
+            setTimeout(resolve, ms);
+          }
+        };
+        checkPause();
+      });
+    }
+
+    async waitForElement(selector, timeout = 10000, interval = 200) {
+      const start = Date.now();
+      return new Promise((resolve, reject) => {
+        const check = () => {
+          // Check for pause before each element check
+          while (this.isPaused) {
+            setTimeout(check, interval);
+            return;
+          }
+          
+          const element = this.utils.findElement(selector);
+          if (element) return resolve(element);
+          if (Date.now() - start >= timeout) {
+            return reject(new Error(`Timeout: Element not found`));
+          }
+          setTimeout(check, interval);
+        };
+        check();
+      });
+    }
+
+    async waitWithProgress(seconds, message = 'Waiting') {
+      for (let i = seconds; i > 0; i--) {
+        // Check for pause and wait until resumed
+        while (this.isPaused) {
+          // Only send pause message once
+          if (!this.pauseMessageSent) {
+            this.sendMessage('waiting', { seconds: 'paused' });
+            this.pauseMessageSent = true;
+          }
+          await this.sleep(500);
+        }
+        
+        // Send countdown message
+        this.sendMessage('waiting', { seconds: i });
+        await this.sleep(1000);
+      }
+    }
+
+    getVideoInfo() {
+      try {
+        const videoInfo = {
+          title: '',
+          url: window.location.href,
+          author: ''
+        };
+
+        // 使用配置的选择器获取视频标题
+        const titleElement = this.utils.findElement(this.selectors.video.title);
+        if (titleElement && titleElement.textContent.trim()) {
+          videoInfo.title = titleElement.textContent.trim();
+        }
+
+        // 使用配置的选择器获取作者信息
+        const authorElement = this.utils.findElement(this.selectors.video.author);
+        if (authorElement && authorElement.textContent.trim()) {
+          let authorText = authorElement.textContent.trim();
+          // Clean up author text
+          if (!authorText.startsWith('@')) {
+            authorText = '@' + authorText;
+          }
+          videoInfo.author = authorText;
+        }
+
+        // Fallback: try to extract from URL
+        if (!videoInfo.author && videoInfo.url.includes('/@')) {
+          const urlParts = videoInfo.url.split('/@');
+          if (urlParts.length > 1) {
+            const authorPart = urlParts[1].split('/')[0];
+            if (authorPart) {
+              videoInfo.author = '@' + authorPart;
+            }
+          }
+        }
+
+        // Fallback: try to extract from video ID in URL
+        if (!videoInfo.title && videoInfo.url.includes('/video/')) {
+          const videoId = videoInfo.url.split('/video/')[1]?.split('?')[0];
+          if (videoId) {
+            videoInfo.title = `Video ${videoId.substring(0, 8)}...`;
+          }
+        }
+
+        // Truncate long titles
+        if (videoInfo.title.length > 50) {
+          videoInfo.title = videoInfo.title.substring(0, 50) + '...';
+        }
+
+        // Default values if nothing found
+        if (!videoInfo.title) {
+          videoInfo.title = 'Untitled video';
+        }
+        if (!videoInfo.author) {
+          videoInfo.author = '@unknown';
+        }
+
+        return videoInfo;
+      } catch (error) {
+        console.log('Error getting video info:', error);
+        return {
+          title: 'Unknown video',
+          url: window.location.href,
+          author: '@unknown'
+        };
+      }
+    }
+
+    async clickProfileTab() {
+      try {
+        this.sendMessage('statusUpdate', { status: 'Navigating to profile...' });
+        
+        // First check if user is logged in
+        this.checkLoginStatus();
+        await this.sleep(1000);
+
+        // 使用配置的选择器查找个人资料按钮
+        const profileButton = await this.waitForElement(this.selectors.navigation.profileButton);
+        profileButton.click();
+        console.log("Successfully clicked the 'Profile' button.");
+        
+        this.sendMessage('statusUpdate', { status: 'Loading profile page...' });
+        await this.waitWithProgress(3, 'Loading profile');
+        return true;
+      } catch (error) {
+        this.stopScript("The 'Profile' button was not found. Please make sure you are logged in to TikTok.", error);
+        return false;
+      }
+    }
+
+    async clickRepostTab() {
+      try {
+        this.sendMessage('statusUpdate', { status: 'Looking for Reposts tab...' });
+        
+        // 使用配置的选择器查找转发标签页
+        let repostTab = this.utils.findElement(this.selectors.navigation.repostTab);
+        
+        if (!repostTab) {
+          // 使用文本内容查找作为备用方案
+          repostTab = this.utils.findByText(this.selectors.navigation.repostTabFallback, 'repost');
+        }
+        
+        if (!repostTab) {
+          throw new Error('Reposts tab not found');
+        }
+        
+        repostTab.click();
+        console.log("Successfully clicked the 'Reposts' tab.");
+        
+        this.sendMessage('statusUpdate', { status: 'Loading reposts...' });
+        await this.waitWithProgress(3, 'Loading reposts');
+        
+        // Count total reposts using configured selectors
+        await this.sleep(2000);
+        const repostVideos = document.querySelectorAll(this.selectors.video.containers.join(', '));
+        this.totalReposts = repostVideos.length;
+        
+        if (this.totalReposts === 0) {
+          // Calculate duration even for no reposts found
+          const endTime = Date.now();
+          const totalDuration = endTime - this.startTime;
+          const minutes = Math.floor(totalDuration / 60000);
+          const seconds = Math.floor((totalDuration % 60000) / 1000);
+          
+          this.sendMessage('noRepostsFound', {
+            duration: {
+              total: totalDuration,
+              minutes: minutes,
+              seconds: seconds
+            }
+          });
+          return false;
+        }
+        
+        this.sendMessage('updateProgress', { current: 0, total: this.totalReposts });
+        this.sendMessage('statusUpdate', { status: `Found ${this.totalReposts} repost(s) to process` });
+        console.log(`Found ${this.totalReposts} reposted videos to remove.`);
+        return true;
+      } catch (error) {
+        this.stopScript("Error accessing the 'Reposts' tab. Make sure you have reposted videos.", error);
+        return false;
+      }
+    }
+
+    async clickRepostVideo() {
+      try {
+        this.sendMessage('statusUpdate', { status: 'Opening first repost...' });
+        
+        // 使用配置的选择器查找第一个视频
+        const firstVideo = await this.waitForElement(this.selectors.video.containers);
+        firstVideo.click();
+        console.log("Successfully opened the first reposted video.");
+        
+        await this.waitWithProgress(3, 'Opening video');
+        return true;
+      } catch (error) {
+        this.stopScript("No reposted videos found or unable to open", error);
+        return false;
+      }
+    }
+
+    async processRepostVideos() {
+      try {
+        let removedInSession = 0;
+        
+        while (this.currentIndex < this.totalReposts) {
+          // Check for pause at the beginning of each iteration
+          while (this.isPaused) {
+            await this.sleep(500);
+          }
+
+          this.currentIndex++;
+          
+          // Get current video information first
+          const videoInfo = this.getVideoInfo();
+          console.log('Processing video:', videoInfo);
+
+          this.sendMessage('updateProgress', { 
+            current: this.currentIndex, 
+            total: this.totalReposts,
+            title: videoInfo.title,
+            author: videoInfo.author,
+            url: videoInfo.url
+          });
+
+          this.sendMessage('statusUpdate', { 
+            status: `Processing repost ${this.currentIndex} of ${this.totalReposts}...` 
+          });
+
+          // 使用配置的选择器查找转发按钮
+          const repostButton = this.utils.findElement(this.selectors.video.repostButton);
+          
+          if (repostButton) {
+            // Check if the button indicates this is a repost
+            const isReposted = this.isVideoReposted(repostButton);
+            
+            if (isReposted) {
+              try {
+                repostButton.click();
+                this.removedCount++;
+                removedInSession++;
+                
+                // Create detailed log message with video info
+                this.sendMessage('videoRemoved', { 
+                  index: this.currentIndex,
+                  title: videoInfo.title,
+                  author: videoInfo.author,
+                  url: videoInfo.url
+                });
+                console.log(`Removed repost from video #${this.currentIndex}:`, videoInfo);
+                
+                // Wait a bit after removing
+                await this.waitWithProgress(3, 'Processing removal');
+              } catch (error) {
+                console.log(`Failed to remove repost from video #${this.currentIndex}:`, error);
+                this.sendMessage('videoSkipped', { 
+                  index: this.currentIndex, 
+                  reason: 'failed to click repost button',
+                  title: videoInfo.title,
+                  author: videoInfo.author,
+                  url: videoInfo.url
+                });
+              }
+            } else {
+              this.sendMessage('videoSkipped', { 
+                index: this.currentIndex, 
+                reason: 'not currently reposted',
+                title: videoInfo.title,
+                author: videoInfo.author,
+                url: videoInfo.url
+              });
+            }
+          } else {
+            this.sendMessage('videoSkipped', { 
+              index: this.currentIndex, 
+              reason: 'repost button not found',
+              title: videoInfo.title,
+              author: videoInfo.author,
+              url: videoInfo.url
+            });
+          }
+
+          // 使用配置的选择器查找下一个视频按钮
+          const nextVideoButton = this.utils.findElement(this.selectors.video.nextButton);
+          
+          if (!nextVideoButton || nextVideoButton.disabled) {
+            // No more videos, we're done
+            console.log('No more videos to process');
+            break;
+          }
+
+          try {
+            nextVideoButton.click();
+            console.log("Moved to next reposted video.");
+            
+            // Wait between videos to avoid being too aggressive
+            await this.sleep(1000);
+          } catch (error) {
+            console.log('Failed to move to next video:', error);
+            break;
+          }
+        }
+
+        // Close the video view
+        await this.closeVideo();
+        
+        // Calculate total duration
+        const endTime = Date.now();
+        const totalDuration = endTime - this.startTime;
+        const minutes = Math.floor(totalDuration / 60000);
+        const seconds = Math.floor((totalDuration % 60000) / 1000);
+        
+        this.sendMessage('complete', { 
+          removedCount: removedInSession,
+          duration: {
+            total: totalDuration,
+            minutes: minutes,
+            seconds: seconds
+          }
+        });
+        
+      } catch (error) {
+        this.stopScript("Error during reposted video removal", error);
+      }
+    }
+
+    isVideoReposted(repostButton) {
+      // 使用配置的选择器检查转发状态
+      const isPressed = repostButton.getAttribute(this.selectors.repostStatus.pressedAttribute) === 'true';
+      
+      // 检查配置的活动状态类名
+      const hasRepostedClass = this.selectors.repostStatus.activeClasses.some(className => 
+        repostButton.classList.contains(className) ||
+        repostButton.querySelector(`[class*="${className}"]`)
+      );
+      
+      // Check for visual indicators (different colors, filled icons, etc.)
+      const computedStyle = window.getComputedStyle(repostButton);
+      const hasActiveColor = computedStyle.color !== 'rgb(255, 255, 255)' && 
+                            computedStyle.color !== 'rgba(255, 255, 255, 1)';
+      
+      // 使用配置的选择器检查SVG填充
+      const hasFilledIcon = repostButton.querySelector(this.selectors.repostStatus.svgFillSelector) !== null;
+      
+      console.log('Repost button analysis:', {
+        isPressed,
+        hasRepostedClass,
+        hasActiveColor,
+        hasFilledIcon,
+        finalResult: isPressed || hasRepostedClass || hasActiveColor || hasFilledIcon
+      });
+      
+      return isPressed || hasRepostedClass || hasActiveColor || hasFilledIcon;
+    }
+
+    async closeVideo() {
+      try {
+        this.sendMessage('statusUpdate', { status: 'Closing video player...' });
+        
+        // 使用配置的选择器查找关闭按钮
+        const closeVideoButton = this.utils.findElement(this.selectors.video.closeButton);
+        
+        if (closeVideoButton) {
+          closeVideoButton.click();
+          console.log("Closed video view.");
+          await this.sleep(1000);
+        } else {
+          // Try alternative close methods
+          const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+          document.dispatchEvent(escapeEvent);
+          await this.sleep(1000);
+        }
+      } catch (error) {
+        console.log("Error closing the video:", error);
+      }
+    }
+
+    stopScript(message, error = "") {
+      this.isRunning = false;
+      this.sendMessage('error', { message: message, error: error.toString() });
+      console.log(`Script stopped: ${message}`, error);
+    }
+
+    // Add new method to navigate to reposts tab after refresh
+    async navigateToRepostsTab() {
+      try {
+        this.sendMessage('statusUpdate', { status: 'Navigating to profile and reposts...' });
+        
+        // Step 1: Navigate to profile if not already there
+        const currentUrl = window.location.href;
+        const isOnProfile = currentUrl.includes('/@') && !currentUrl.includes('/video/');
+        
+        if (!isOnProfile) {
+          // Click profile button to go to profile
+          const success = await this.clickProfileTab();
+          if (!success) {
+            this.sendMessage('statusUpdate', { status: 'Unable to navigate to profile' });
+            return;
+          }
+          
+          // Wait for profile page to load
+          await this.waitWithProgress(3, 'Loading profile');
+        }
+        
+        // Step 2: Click reposts tab
+        this.sendMessage('statusUpdate', { status: 'Opening reposts tab...' });
+        
+        // 使用配置的选择器查找转发标签页
+        let repostTab = this.utils.findElement(this.selectors.navigation.repostTab);
+        
+        if (!repostTab) {
+          // 使用文本内容查找作为备用方案
+          repostTab = this.utils.findByText(this.selectors.navigation.repostTabFallback, 'repost');
+        }
+        
+        if (repostTab) {
+          repostTab.click();
+          console.log('Successfully clicked reposts tab');
+          this.sendMessage('statusUpdate', { status: 'Reposts tab opened - You can see the results!' });
+          
+          // Wait a moment to let the tab load
+          setTimeout(() => {
+            // 使用配置的选择器检查剩余的转发视频
+            const repostVideos = document.querySelectorAll(this.selectors.video.containers.join(', '));
+            const remainingCount = repostVideos.length;
+            
+            if (remainingCount === 0) {
+              this.sendMessage('statusUpdate', { status: '🎉 All reposts successfully removed!' });
+            } else {
+              this.sendMessage('statusUpdate', { status: `${remainingCount} repost(s) remaining on your profile` });
+            }
+          }, 2000);
+          
+        } else {
+          this.sendMessage('statusUpdate', { status: 'Reposts tab not found - please check manually' });
+          console.log('Reposts tab not found');
+        }
+        
+      } catch (error) {
+        console.error('Error navigating to reposts tab:', error);
+        this.sendMessage('statusUpdate', { status: 'Error navigating to reposts - please check manually' });
+      }
+    }
+
+    async start() {
+      if (this.isRunning) {
+        console.log("Script is already running.");
+        return;
+      }
+
+      this.isRunning = true;
+      this.currentIndex = 0;
+      this.removedCount = 0;
+      this.startTime = Date.now(); // Record start time
+      
+      console.log("ClearTok script started...");
+      this.sendMessage('statusUpdate', { status: 'Starting removal process...' });
+      
+      try {
+        // Step 1: Navigate to profile
+        const wentToProfile = await this.clickProfileTab();
+        if (!wentToProfile) return;
+
+        // Step 2: Open reposts tab and count videos
+        const hasReposts = await this.clickRepostTab();
+        if (!hasReposts) return;
+
+        // Step 3: Open first video
+        const openedVideo = await this.clickRepostVideo();
+        if (!openedVideo) return;
+
+        // Step 4: Process all repost videos
+        await this.processRepostVideos();
+        // log total reposts
+        console.log('----total reposts count:', this.totalReposts);
+        console.log('---- reposts', this.totalReposts);
+      } catch (error) {
+        this.stopScript("Unexpected error in main flow", error);
+      }
+    }
+  }
+
+  // Check if we're on TikTok before starting
+  if (window.location.hostname.includes('tiktok.com')) {
+    // Create a global instance to prevent multiple instances with stronger checks
+    if (!window.clearTokRemover) {
+      window.clearTokRemover = new TikTokRepostRemover();
+      window.clearTokRemover.instanceId = `instance_${Date.now()}`; // Unique ID
+      console.log('ClearTok remover instance created with ID:', window.clearTokRemover.instanceId);
+    } else {
+      console.log('ClearTok remover instance already exists, using existing one');
+    }
+    
+    // Wait a bit for the page to fully load, then check login status
+    setTimeout(() => {
+      if (window.clearTokRemover) {
+        window.clearTokRemover.checkLoginStatus();
+      }
+    }, 3000);
+
+  } else {
+    console.log("This script only works on TikTok.com");
+  }
+}
