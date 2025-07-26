@@ -113,7 +113,7 @@ app.put(
         VALUES (?, ?, ?, ?)
       `).bind(
         session_id,
-        event_data.process_status || null, // 从事件数据中获取状态
+        event_data.event_name || null, // 从事件数据中获取状态
         event_data.login_status || null,
         JSON.stringify({ event_name, ...event_data }) // 将事件名和数据都存入raw_data
       ).run();
