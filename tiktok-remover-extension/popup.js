@@ -1,3 +1,5 @@
+chrome.runtime.sendMessage({ action: 'ensureSelectors' });
+
 class ClearTokExtension {
   constructor() {
     this.currentState = 'welcome';

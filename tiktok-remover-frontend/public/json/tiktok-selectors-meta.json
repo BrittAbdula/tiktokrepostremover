@@ -1,0 +1,73 @@
+{
+    "schema_version": 1,
+    "version": "1.0.0",
+    "app": "tiktokrepostremover.com",
+    "updated_at": "2025-07-27T00:00:00Z",
+  
+    "selectors": {
+      "navigation": {
+        "profileButton": "[data-e2e=\"nav-profile\"]",
+        "repostTab": [
+          "[class*=\"PRepost\"]",
+          "[data-e2e=\"profile-repost-tab\"]",
+          "a[href*=\"repost\"]",
+          "button[data-testid=\"repost-tab\"]"
+        ],
+        "repostTabFallback": "a, button, div[role=\"tab\"]"
+      },
+  
+      "loginStatus": {
+        "profileLink": "[data-e2e=\"nav-profile\"]",
+        "avatarImage": "img",
+        "svgIcon": "svg"
+      },
+  
+      "video": {
+        "containers": [
+          "[class*=\"DivPlayerContainer\"]",
+          "[data-e2e=\"user-post-item\"]"
+        ],
+        "title": [
+          "[data-e2e=\"video-desc\"]",
+          "[data-e2e=\"browse-video-desc\"]",
+          ".video-meta-title",
+          ".tt-video-meta-caption",
+          "h1[data-e2e=\"video-title\"]",
+          ".video-description",
+          ".tt-video-title",
+          "[data-testid=\"video-desc\"]"
+        ],
+        "author": [
+          "[data-e2e=\"video-author-uniqueid\"]",
+          "[data-e2e=\"browse-username\"]",
+          "[data-e2e=\"video-author-nickname\"]",
+          ".author-uniqueid",
+          ".username",
+          ".user-uniqueid",
+          "[data-testid=\"video-author\"]"
+        ],
+        "repostButton": [
+          "[data-e2e=\"video-share-repost\"]",
+          "[class*=\"repost\"]",
+          "button[aria-label*=\"repost\" i]"
+        ],
+        "nextButton": [
+          "[data-e2e=\"arrow-right\"]",
+          "[class*=\"arrow-right\"]",
+          "button[aria-label*=\"next\" i]"
+        ],
+        "closeButton": [
+          "[data-e2e=\"browse-close\"]",
+          "[class*=\"close\"]",
+          "button[aria-label*=\"close\" i]"
+        ]
+      },
+  
+      "repostStatus": {
+        "activeClasses": ["reposted", "active"],
+        "pressedAttribute": "aria-pressed",
+        "svgFillSelector": "svg [fill]:not([fill=\"none\"])"
+      }
+    }
+  }
+  

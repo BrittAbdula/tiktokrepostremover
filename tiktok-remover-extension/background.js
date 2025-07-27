@@ -1,6 +1,60 @@
+/* ========== 1. 最新版本 ========== */
+const META_URL = 'https://tiktokrepostremover.com/json/tiktok-selectors-meta.json';
+
+/* ========== 2. 比对并更新 ========== */
+async function checkMetaAndUpdate(force = false) {
+  const { selectorsMeta } = await chrome.storage.local.get('selectorsMeta');
+
+  /* 60 秒内已检查过且没强制刷新 → 直接返回 */
+  if (!force && selectorsMeta && Date.now() - selectorsMeta.fetchedAt < 60_000) {
+    return;
+  }
+
+  /* ---------- 1. 拉取单一 JSON ---------- */
+  let meta;
+  try {
+    const res = await fetch(META_URL, { cache: 'no-cache' });
+    if (!res.ok) return;                 // 网络错误 / 404
+    meta = await res.json();
+  } catch (e) {
+    console.warn('[ClearTok] fetch selectors meta failed:', e);
+    return;
+  }
+
+  /* ---------- 2. 基本字段校验 ---------- */
+  if (!meta?.version || !meta?.selectors) {
+    console.warn('[ClearTok] meta file missing version or selectors');
+    return;
+  }
+
+  /* ---------- 3. 版本一样就跳过 ---------- */
+  if (selectorsMeta?.version === meta.version) {
+    console.log('[ClearTok] selectors already up-to-date →', meta.version);
+    return;
+  }
+
+  /* ---------- 4. 写入缓存 ---------- */
+  await chrome.storage.local.set({
+    selectors    : meta.selectors,
+    selectorsMeta: { version: meta.version, fetchedAt: Date.now() }
+  });
+  console.log('[ClearTok] selectors upgraded →', meta.version);
+
+  /* ---------- 5. 通知所有 TikTok 页热替换 ---------- */
+  const tabs = await chrome.tabs.query({ url: '*://*.tiktok.com/*' });
+  tabs.forEach(t =>
+    chrome.tabs.sendMessage(t.id, { action: 'selectorsUpdated' }).catch(() => {})
+  );
+}
+
+/* ========== 3. 安装 / 启动触发一次 ========== */
+chrome.runtime.onStartup?.addListener(() => checkMetaAndUpdate(true));
+
+
 // Initialize side panel when extension is installed or enabled
 chrome.runtime.onInstalled.addListener(() => {
   console.log("ClearTok extension installed");
+  checkMetaAndUpdate(true);
   
   // Initialize side panel
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
@@ -51,7 +105,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     ids.slice(0, 100).forEach(id => processedMessages.delete(id));
   }
   
-  if (message.action === "removeRepostedVideos") {
+
+  if (message.action === 'ensureSelectors') {
+    checkMetaAndUpdate().then(() => sendResponse({ ok: true }));
+    return true;  // 让 Chrome 知道是异步
+  } else if (message.action === "removeRepostedVideos") {
     handleRemoveRepostedVideos(message);
   } else if (message.action === "pauseRemoval" || message.action === "resumeRemoval") {
     // Forward pause/resume commands to content script
