@@ -2,6 +2,7 @@ import { Context, Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { validator } from 'hono/validator'
 import statsRouter from './routes/stats'
+import cdnRouter from './routes/cdn'
 
 // 定义 Cloudflare Worker 的绑定类型
 type Bindings = {
@@ -315,6 +316,9 @@ app.post(
 
 // --- 统计路由 (Stats Routes) ---
 app.route('/stats', statsRouter)
+
+// --- CDN 路由 (CDN Routes) ---
+app.route('/cdn', cdnRouter)
 
 // --- 错误处理 (Error Handling) ---
 app.notFound((c) => {
