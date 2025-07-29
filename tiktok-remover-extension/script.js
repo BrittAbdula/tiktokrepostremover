@@ -19,7 +19,7 @@ async function loadSelectors() {
 
 
 /* ================================================================
- *  2) SelectorUtils（保持原实现）
+ *  2) SelectorUtils
  * ================================================================ */
 if (typeof window.SelectorUtils === 'undefined') {
   window.SelectorUtils = {
@@ -108,6 +108,9 @@ if (typeof window.SelectorUtils === 'undefined') {
   } else {
     window.clearTokExtensionLoaded = true;
 
+    /* ============================================================
+   *  TikTokRepostRemover 业务类（整合滚动加载 & 人性化节奏）
+   * ============================================================ */
     class TikTokRepostRemover {
       constructor() {
         // 直接使用全局变量
@@ -547,7 +550,7 @@ if (typeof window.SelectorUtils === 'undefined') {
               console.log("Moved to next reposted video.");
 
               // Wait between videos to avoid being too aggressive
-              await this.sleep(1000);
+              await this.sleep(rand(800,3400));
             } catch (error) {
               console.log('Failed to move to next video:', error);
               break;
@@ -733,26 +736,16 @@ if (typeof window.SelectorUtils === 'undefined') {
       }
     }
 
-    // Check if we're on TikTok before starting
-    if (window.location.hostname.includes('tiktok.com')) {
-      // Create a global instance to prevent multiple instances with stronger checks
-      if (!window.clearTokRemover) {
-        window.clearTokRemover = new TikTokRepostRemover();
-        window.clearTokRemover.instanceId = `instance_${Date.now()}`; // Unique ID
-        console.log('ClearTok remover instance created with ID:', window.clearTokRemover.instanceId);
-      } else {
-        console.log('ClearTok remover instance already exists, using existing one');
-      }
-
-      // Wait a bit for the page to fully load, then check login status
-      setTimeout(() => {
-        if (window.clearTokRemover) {
-          window.clearTokRemover.checkLoginStatus();
-        }
-      }, 3000);
-
+    // Create a global instance to prevent multiple instances with stronger checks
+    if (!window.clearTokRemover) {
+      window.clearTokRemover = new TikTokRepostRemover();
+      window.clearTokRemover.instanceId = `instance_${Date.now()}`; // Unique ID
+      console.log('ClearTok remover instance created with ID:', window.clearTokRemover.instanceId);
     } else {
-      console.log("This script only works on TikTok.com");
+      console.log('ClearTok remover instance already exists, using existing one');
     }
+
+    // Wait a bit for the page to fully load, then check login status
+    setTimeout(()=> window.clearTokRemover.checkLoginStatus?.(), 3000);
   }
 })();

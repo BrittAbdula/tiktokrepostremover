@@ -917,8 +917,23 @@ class ClearTokExtension {
     this.showNotification(this.getText('thankYouForFeedback', { rating: this.selectedRating }), 'success');
   }
 
-  handleRatingAction() {
+  async handleRatingAction() {
     if (this.selectedRating === 0) return;
+    
+    // 记录评分
+    this.recordRating(this.selectedRating);
+    
+    // 发送反馈到后端（对于高分用户，反馈为空）
+    try {
+      if (this.sessionId && window.apiService) {
+        await window.apiService.submitFeedback(this.sessionId, {
+          rating: this.selectedRating,
+          feedback: '' // 高分用户的反馈为空
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to submit feedback to backend:', error);
+    }
     
     // 只有高分（4-5星）才跳转到商店页面
     if (this.selectedRating >= 4) {
@@ -927,7 +942,6 @@ class ClearTokExtension {
     
     this.closeRatingModal();
     this.showNotification(this.getText('thankYouForRating'), 'success');
-    this.recordRating(this.selectedRating);
   }
 
   recordRating(rating, feedback = '') {

@@ -82,8 +82,6 @@ CREATE TABLE session_logs (
   
   -- 基本状态信息
   process_status TEXT,
-  login_status TEXT,
-  
   -- 删除数量记录
   total_reposts_found INTEGER,
   reposts_removed INTEGER,
@@ -118,44 +116,6 @@ CREATE TABLE user_feedback (
 CREATE INDEX idx_feedback_session_id ON user_feedback(session_id);
 CREATE INDEX idx_feedback_rating ON user_feedback(rating_score);
 CREATE INDEX idx_feedback_created_at ON user_feedback(created_at);
-
-
-SELECT 
-  DATE(session_start_at) as date,
-  COUNT(*) as total_sessions,
-  COUNT(DISTINCT ip_address) as unique_ip_count,
-  COUNT(CASE WHEN process_status = 'completed' THEN 1 END) as completed_sessions,
-  COUNT(CASE WHEN process_status = 'error' THEN 1 END) as error_sessions,
-  COUNT(CASE WHEN process_status = 'no_reposts' THEN 1 END) as no_reposts_sessions,
-  ROUND(AVG(CASE WHEN process_status = 'completed' THEN total_reposts_found END),2) as avg_total_reposts_found,
-  ROUND(AVG(CASE WHEN process_status = 'completed' THEN reposts_removed END),2) as avg_reposts_removed,
-  ROUND(AVG(CASE WHEN process_status = 'completed' THEN total_duration_seconds END),2) as avg_duration_seconds,
-  round(min(case when process_status = 'completed' then total_reposts_found end),2) as min_total_reposts_found,
-  round(min(case when process_status = 'completed' then reposts_removed end),2) as min_reposts_removed,
-  round(min(case when process_status = 'completed' then total_duration_seconds end),2) as min_duration_seconds,
-  round(max(case when process_status = 'completed' then total_reposts_found end),2) as max_total_reposts_found,
-  round(max(case when process_status = 'completed' then reposts_removed end),2) as max_reposts_removed,
-  round(max(case when process_status = 'completed' then total_duration_seconds end),2) as max_duration_seconds
-FROM user_sessions 
-GROUP BY DATE(session_start_at)
-ORDER BY date DESC;
-
-
-
-SELECT 
-  DATE(session_start_at) as date,
-  count(distinct country) as unique_country_count,
-  count(distinct ip_address) as unique_ip_count,
-  count(distinct tiktok_username) as unique_tiktok_username_count
-FROM user_sessions
-GROUP BY DATE(session_start_at)
-ORDER BY date DESC;
-
-select country,count(distinct ip_address) as unique_ip_count
-from user_sessions
-group by country
-order by unique_ip_count desc
-limit 10;
 
 
 
