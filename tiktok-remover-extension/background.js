@@ -1,5 +1,5 @@
 /* ========== 1. 最新版本 ========== */
-const META_URL = 'https://tiktokrepostremover.com/json/tiktok-selectors-meta.json';
+const META_URL = 'https://api.tiktokrepostremover.com/cdn/selectors';
 
 /* ========== 2. 比对并更新 ========== */
 async function checkMetaAndUpdate(force = false) {

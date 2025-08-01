@@ -21,6 +21,11 @@ async function loadSelectors() {
 /* ================================================================
  *  2) SelectorUtils
  * ================================================================ */
+// Helper function for random number generation
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 if (typeof window.SelectorUtils === 'undefined') {
   window.SelectorUtils = {
     // 尝试多个选择器，返回第一个找到的元素
@@ -384,6 +389,109 @@ if (typeof window.SelectorUtils === 'undefined') {
         }
       }
 
+      async autoScroll() {
+        return new Promise((resolve, reject) => {
+          let scrollAttempts = 0;
+          const maxScrollAttempts = 50; // 防止无限滚动
+          let lastHeight = 0;
+          let noChangeCount = 0;
+          const maxNoChangeCount = 3; // 连续3次高度不变则认为到底
+          let isPaused = false;
+          
+          this.sendMessage('statusUpdate', { status: 'Auto-scrolling to load all reposts...' });
+          
+          const performScroll = async () => {
+            // 检查暂停状态
+            while (this.isPaused) {
+              await this.sleep(500);
+            }
+            
+            window.scrollTo(0, document.body.scrollHeight);
+            scrollAttempts++;
+            
+            // 更新当前发现的 reposts 数量
+            const currentReposts = document.querySelectorAll(this.selectors.video.containers.join(', '));
+            const currentCount = currentReposts.length;
+            
+            if (currentCount > this.totalReposts) {
+              this.totalReposts = currentCount;
+              this.sendMessage('updateProgress', { 
+                current: 0, 
+                total: this.totalReposts,
+                status: `Loaded ${this.totalReposts} reposts so far...`
+              });
+            }
+            
+            // 检查是否到达底部
+            const currentHeight = document.body.scrollHeight;
+            if (currentHeight === lastHeight) {
+              noChangeCount++;
+            } else {
+              noChangeCount = 0;
+              lastHeight = currentHeight;
+            }
+            
+            // 如果连续多次高度不变，或者达到最大尝试次数，则停止
+            if (noChangeCount >= maxNoChangeCount || scrollAttempts >= maxScrollAttempts) {
+              observer.disconnect();
+              
+              // 等待2秒确保所有内容加载完成
+              setTimeout(async () => {
+                // 最终统计 reposts 数量
+                const finalReposts = document.querySelectorAll(this.selectors.video.containers.join(', '));
+                this.totalReposts = finalReposts.length;
+                
+                this.sendMessage('statusUpdate', { 
+                  status: `Auto-scroll complete. Found ${this.totalReposts} total reposts.` 
+                });
+                console.log(`Auto-scroll complete. Total reposts found: ${this.totalReposts}`);
+                resolve();
+              }, 2000);
+            } else {
+              // 继续滚动，间隔1-2秒
+              setTimeout(performScroll, rand(1000, 2000));
+            }
+          };
+          
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting && !isPaused) {
+                performScroll();
+              }
+            });
+          }, {
+            root: null,
+            rootMargin: '100px',
+            threshold: 0.1
+          });
+          
+          // 开始观察底部元素
+          const bottomElement = document.createElement('div');
+          bottomElement.style.height = '1px';
+          bottomElement.style.width = '100%';
+          bottomElement.style.position = 'absolute';
+          bottomElement.style.bottom = '0';
+          document.body.appendChild(bottomElement);
+          observer.observe(bottomElement);
+          
+          // 开始第一次滚动
+          setTimeout(() => {
+            performScroll();
+          }, 500);
+          
+          // 设置超时保护
+          setTimeout(() => {
+            observer.disconnect();
+            const finalReposts = document.querySelectorAll(this.selectors.video.containers.join(', '));
+            this.totalReposts = finalReposts.length;
+            this.sendMessage('statusUpdate', { 
+              status: `Auto-scroll timeout. Found ${this.totalReposts} total reposts.` 
+            });
+            resolve();
+          }, 120000); // 2分钟超时
+        });
+      }
+
       async clickRepostTab() {
         try {
           this.sendMessage('statusUpdate', { status: 'Looking for Reposts tab...' });
@@ -406,10 +514,8 @@ if (typeof window.SelectorUtils === 'undefined') {
           this.sendMessage('statusUpdate', { status: 'Loading reposts...' });
           await this.waitWithProgress(3, 'Loading reposts');
 
-          // Count total reposts using configured selectors
-          await this.sleep(2000);
-          const repostVideos = document.querySelectorAll(this.selectors.video.containers.join(', '));
-          this.totalReposts = repostVideos.length;
+          // 执行自动滚动加载所有 reposts
+          await this.autoScroll();
 
           if (this.totalReposts === 0) {
             // Calculate duration even for no reposts found
@@ -547,10 +653,8 @@ if (typeof window.SelectorUtils === 'undefined') {
 
             try {
               nextVideoButton.click();
-              console.log("Moved to next reposted video.");
-
-              // Wait between videos to avoid being too aggressive
-              await this.sleep(rand(800,3400));
+              await this.sleep(rand(800,2400));
+              console.log("Moved to next reposted video after 800-2400ms.");
             } catch (error) {
               console.log('Failed to move to next video:', error);
               break;
@@ -714,12 +818,10 @@ if (typeof window.SelectorUtils === 'undefined') {
 
         try {
           // Step 1: Navigate to profile
-          const wentToProfile = await this.clickProfileTab();
-          if (!wentToProfile) return;
+          if (!await this.clickProfileTab()) return;
 
           // Step 2: Open reposts tab and count videos
-          const hasReposts = await this.clickRepostTab();
-          if (!hasReposts) return;
+          if (!await this.clickRepostTab()) return;
 
           // Step 3: Open first video
           const openedVideo = await this.clickRepostVideo();

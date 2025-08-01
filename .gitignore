@@ -40,3 +40,4 @@ coverage/
 # Ignore misc
 *.swp
 *.tmp 
+.DS_Store

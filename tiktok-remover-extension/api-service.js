@@ -79,7 +79,7 @@ class ApiService {
   }
 
   /**
-   * 创建用户会话 (新版本)
+   * 创建用户会话
    * 不再需要任何参数，session_id 完全由后端生成。
    * @returns {Promise<Object>} 包含session_id的响应
    */
