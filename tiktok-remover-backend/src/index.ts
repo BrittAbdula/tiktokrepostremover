@@ -69,12 +69,14 @@ app.post('/session/create', async (c) => {
     const locationInfo = getLocationInfo(c);
     const userAgent = c.req.header('User-Agent') || 'unknown';
     const sessionId = generateSessionId();
+    const { version } = await c.req.json() || {};
     
     // 在 user_sessions 表中插入一条新记录，状态为 'started'
     const result = await c.env.DB.prepare(`
-      INSERT INTO user_sessions (session_id, ip_address, country, user_agent, process_status) 
-      VALUES (?, ?, ?, ?, 'started')
+      INSERT INTO user_sessions (version, session_id, ip_address, country, user_agent, process_status) 
+      VALUES (?, ?, ?, ?, ?, 'started')
     `).bind(
+      version || 'unknown',
       sessionId,
       locationInfo.ip,
       locationInfo.country,
@@ -106,18 +108,19 @@ app.put(
   }),
   async (c) => {
     try {
-      const { session_id, event_name, ...event_data } = c.req.valid('json');
+      const { session_id, event_name, version, ...event_data } = c.req.valid('json');
 
       // 1. 记录日志
       await c.env.DB.prepare(`
-        INSERT INTO session_logs (session_id, process_status, total_reposts_found, reposts_removed, raw_data) 
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO session_logs (version, session_id, process_status, total_reposts_found, reposts_removed, raw_data) 
+        VALUES (?, ?, ?, ?, ?, ?)
       `).bind(
+        version || 'unknown',
         session_id,
         event_name || null, 
         event_data.total_reposts_found || null,
         event_data.reposts_removed || null,
-        JSON.stringify({ event_name, ...event_data }) // 将事件名和数据都存入raw_data
+        JSON.stringify({ event_name, version, ...event_data }) // 将事件名、版本和数据都存入raw_data
       ).run();
 
       // 2. 更新主表
@@ -279,15 +282,16 @@ app.post(
   }),
   async (c) => {
     try {
-      const { session_id, rating_score, feedback_text } = c.req.valid('json');
+      const { session_id, rating_score, feedback_text, version } = c.req.valid('json');
       const locationInfo = getLocationInfo(c);
       const userAgent = c.req.header('User-Agent') || 'unknown';
       
       // 插入反馈数据到数据库
       const result = await c.env.DB.prepare(`
-        INSERT INTO user_feedback (session_id, rating_score, feedback_text, ip_address, country, user_agent) 
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO user_feedback (version, session_id, rating_score, feedback_text, ip_address, country, user_agent) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `).bind(
+        version || 'unknown',
         session_id,
         rating_score,
         feedback_text || null,

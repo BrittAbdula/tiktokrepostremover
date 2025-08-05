@@ -310,5 +310,11 @@
   },
   "thankYouForFeedback": {
     "message": "{rating}つ星の評価とフィードバックをありがとうございます！"
+  },
+  "repostChampionsTitle": {
+    "message": "🏆 あなたのリポストチャンピオン"
+  },
+  "loadingStats": {
+    "message": "お気に入りのクリエイターをスキャン中..."
   }
 } 

@@ -14,6 +14,27 @@ class ApiService {
     // 重试配置
     this.retryAttempts = 3;
     this.retryDelay = 1000;
+    
+    // 获取扩展版本号
+    this.version = this.getExtensionVersion();
+  }
+
+  /**
+   * 获取扩展版本号
+   * @returns {string} 版本号
+   */
+  getExtensionVersion() {
+    try {
+      // 尝试从manifest获取版本号
+      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest) {
+        return chrome.runtime.getManifest().version;
+      }
+      // 如果无法获取，返回默认版本
+      return '1.2.0';
+    } catch (error) {
+      console.warn('Failed to get extension version:', error);
+      return '1.2.0';
+    }
   }
 
   /**
@@ -87,7 +108,9 @@ class ApiService {
     try {
       const response = await this.request('/session/create', {
         method: 'POST',
-        body: JSON.stringify({}) // 发送一个空对象即可
+        body: JSON.stringify({ 
+          version: this.version 
+        })
       });
       
       console.log('Session created successfully:', response.session_id);
@@ -121,6 +144,7 @@ class ApiService {
         method: 'PUT',
         body: JSON.stringify({
           session_id: sessionId,
+          version: this.version,
           ...data
         })
       });
@@ -184,6 +208,7 @@ class ApiService {
         method: 'POST',
         body: JSON.stringify({
           session_id: sessionId,
+          version: this.version,
           rating_score: feedbackData.rating,
           feedback_text: feedbackData.feedback || ''
         })

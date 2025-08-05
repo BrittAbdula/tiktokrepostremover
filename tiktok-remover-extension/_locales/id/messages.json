@@ -310,5 +310,11 @@
   },
   "thankYouForFeedback": {
     "message": "Terima kasih atas penilaian {rating} bintang dan masukan Anda!"
+  },
+  "repostChampionsTitle": {
+    "message": "🏆 Juara Repost Anda"
+  },
+  "loadingStats": {
+    "message": "Memindai kreator favorit Anda..."
   }
 }

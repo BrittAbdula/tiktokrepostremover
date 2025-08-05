@@ -102,5 +102,7 @@
   "feedbackDescription": { "message": "We horen graag je suggesties om ClearTok beter te maken." },
   "feedbackPlaceholder": { "message": "Deel je gedachten en suggesties..." },
   "submitFeedbackButton": { "message": "Feedback versturen" },
-  "thankYouForFeedback": { "message": "Bedankt voor je {rating}-sterren beoordeling en feedback!" }
+  "thankYouForFeedback": { "message": "Bedankt voor je {rating}-sterren beoordeling en feedback!" },
+  "repostChampionsTitle": { "message": "🏆 Je Repost Kampioenen" },
+  "loadingStats": { "message": "Scannen naar je favoriete makers..." }
 } 

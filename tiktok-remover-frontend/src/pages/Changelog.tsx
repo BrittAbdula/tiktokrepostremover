@@ -6,6 +6,22 @@ import { Helmet } from "react-helmet-async";
 
 const changelog = [
   {
+    version: "v1.4.0",
+    date: "2025-08-04",
+    changes: [
+      "Improved repost detection accuracy",
+      "Maximized bulk deletion coverage",
+    ],
+  },
+  {
+    version: "v1.2.0",
+    date: "2025-07-27",
+    changes: [
+      "Hot-update support",
+      "When a newer tiktok UI version is detected, selectors are hot-reloaded without publishing a new build.",
+    ],
+  },
+  {
     version: "v1.1.3",
     date: "2025-07-14",
     changes: [

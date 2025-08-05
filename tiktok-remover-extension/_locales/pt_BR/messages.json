@@ -310,5 +310,11 @@
   },
   "thankYouForFeedback": {
     "message": "Obrigado pela sua avaliação de {rating} estrelas e feedback!"
+  },
+  "repostChampionsTitle": {
+    "message": "🏆 Seus Campeões de Repost"
+  },
+  "loadingStats": {
+    "message": "Escaneando seus criadores favoritos..."
   }
 }

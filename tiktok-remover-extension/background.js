@@ -1,5 +1,50 @@
 /* ========== 1. 最新版本 ========== */
 const META_URL = 'https://api.tiktokrepostremover.com/cdn/selectors';
+const CONTENT_SCRIPTS = [
+  "modules/config.js",
+  "modules/state.js",
+  "modules/ui.js",
+  "modules/workflow.js",
+  "modules/comm.js",
+  "main.js"
+];
+
+/**
+ * 确保内容脚本被注入到指定的标签页中。
+ * 如果脚本已存在，则直接返回 true。
+ * 如果脚本不存在，则尝试注入，成功后返回 true，失败则返回 false。
+ * @param {number} tabId - 目标标签页的ID
+ * @returns {Promise<boolean>} - 脚本是否就绪
+ */
+async function ensureScriptsInjected(tabId) {
+  try {
+    // 1. 尝试 Ping
+    const response = await chrome.tabs.sendMessage(tabId, { action: 'ping' });
+    if (response?.status === 'pong') {
+      console.log(`[ClearTok BG] Scripts already exist in tab ${tabId}.`);
+      return true; // 脚本已存在
+    }
+  } catch (e) {
+    // 2. Ping 失败 (通常是 Receiving end does not exist)
+    console.log(`[ClearTok BG] Scripts not found in tab ${tabId}. Injecting...`);
+    try {
+      // 尝试注入
+      await chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        files: CONTENT_SCRIPTS,
+      });
+      // 短暂等待脚本初始化
+      await new Promise(r => setTimeout(r, 500));
+      console.log(`[ClearTok BG] Scripts injected successfully into tab ${tabId}.`);
+      return true; // 注入成功
+    } catch (injectionError) {
+      console.error(`Failed to inject scripts into tab ${tabId}:`, injectionError);
+      return false; // 注入失败
+    }
+  }
+  // 如果 Ping 成功但回复不是 pong，也视为异常情况
+  return false;
+}
 
 /* ========== 2. 比对并更新 ========== */
 async function checkMetaAndUpdate(force = false) {
@@ -105,7 +150,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     ids.slice(0, 100).forEach(id => processedMessages.delete(id));
   }
   
-
+  if (message.action === 'ensureAndCheckLogin') {
+    (async () => {
+      const isReady = await ensureScriptsInjected(message.tabId);
+      if (isReady) {
+        chrome.tabs.sendMessage(message.tabId, { action: 'checkLoginStatus' });
+      }
+    })();
+    return; // 无需同步返回
+  }
   if (message.action === 'ensureSelectors') {
     checkMetaAndUpdate().then(() => sendResponse({ ok: true }));
     return true;  // 让 Chrome 知道是异步
@@ -117,7 +170,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else {
     // Forward other messages to popup (status updates, progress, etc.)
     // Only forward if the message came from a content script (has sender.tab)
-    if (sender.tab) {
+    if (sender.tab && message.action !== 'videoRemoved') {
       forwardToPopup(message);
     }
   }
@@ -125,65 +178,34 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 async function handleRemoveRepostedVideos(message) {
   try {
-    // Find TikTok tab or create one if it doesn't exist
     const tabs = await chrome.tabs.query({ url: "*://www.tiktok.com/*" });
-    
+    let tab;
+
     if (tabs.length === 0) {
-      // No TikTok tab found, create one
-      const tab = await chrome.tabs.create({
-        url: "https://www.tiktok.com/",
-        active: true,
-      });
-      
-      // Wait for tab to load and inject script
-      setTimeout(async () => {
-        try {
-          await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ["script.js"],
-          });
-          
-          // Start the removal process
-          setTimeout(() => {
-            chrome.tabs.sendMessage(tab.id, { action: 'startRemoval' });
-          }, 2000);
-        } catch (error) {
-          console.error('Error injecting script:', error);
-          chrome.runtime.sendMessage({ 
-            action: 'error', 
-            message: 'Failed to inject script into TikTok tab',
-            error: error.toString() 
-          });
-        }
-      }, 3000);
+      tab = await chrome.tabs.create({ url: "https://www.tiktok.com/", active: true });
+      // 给新标签页足够的时间加载
+      await new Promise(resolve => setTimeout(resolve, 3000)); 
     } else {
-      // Use existing TikTok tab
-      const tab = tabs[tabs.length - 1];
-      
-      // Ensure the tab is active
+      tab = tabs[tabs.length - 1];
       await chrome.tabs.update(tab.id, { active: true });
-      
-      try {
-        // Inject the script (it will handle duplicate prevention)
-        await chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ["script.js"],
-        });
-        
-        // Start the removal process
-        setTimeout(() => {
-          chrome.tabs.sendMessage(tab.id, { action: 'startRemoval' });
-        }, 1000);
-      } catch (error) {
-        console.error('Error injecting script:', error);
-        chrome.runtime.sendMessage({ 
-          action: 'error', 
-          message: 'Failed to inject script into TikTok tab',
-          error: error.toString() 
-        });
-      }
     }
-  } catch (error) {
+
+    // ▼▼▼ 看，现在多么简洁！▼▼▼
+    const isReady = await ensureScriptsInjected(tab.id);
+
+    if (isReady) {
+      // 脚本就绪，直接发送指令
+      chrome.tabs.sendMessage(tab.id, { action: 'startRemoval' });
+    } else {
+      // 错误处理
+      chrome.runtime.sendMessage({ 
+        action: 'error', 
+        message: 'Failed to prepare content scripts for removal process.'
+      });
+    }
+    // ▲▲▲ 代码变得非常清晰 ▲▲▲
+
+  }  catch (error) {
     console.error('Error handling remove reposts:', error);
     chrome.runtime.sendMessage({ 
       action: 'error', 

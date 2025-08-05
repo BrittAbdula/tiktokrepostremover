@@ -1219,3 +1219,83 @@ a {
 }
 
 
+/* ======================================= */
+/* Repost Champions Stats Styles          */
+/* ======================================= */
+.stats-container {
+  margin: 16px 0;
+  padding: 12px;
+  background-color: var(--color-surface);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+.stats-container .section-title {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.stats-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.stats-item-placeholder {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.stats-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.stats-rank {
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.stats-author-name {
+  flex-shrink: 0;
+  width: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 8px;
+  color: var(--color-text-secondary);
+}
+
+.stats-bar-wrapper {
+  flex-grow: 1;
+  height: 16px;
+  background-color: var(--color-background);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stats-bar {
+  height: 100%;
+  width: 0%; /* JS会动态更新宽度 */
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-alt));
+  border-radius: 4px;
+  transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 平滑动画 */
+}
+
+.stats-count {
+  flex-shrink: 0;
+  width: 30px;
+  text-align: right;
+  font-weight: 500;
+  padding-left: 8px;
+  color: var(--color-text);
+}

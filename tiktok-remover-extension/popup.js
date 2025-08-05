@@ -5,6 +5,7 @@ class ClearTokExtension {
     this.currentState = 'welcome';
     this.isProcessing = false;
     this.isPaused = false;
+    this.authorCounts = new Map();
     this.totalVideos = 0;
     this.processedVideos = 0;
     this.removedVideos = 0;
@@ -240,18 +241,10 @@ class ClearTokExtension {
       this.currentTikTokTab = tab;
       this.updateLoginStatus('opening');
       setTimeout(async () => {
-        try {
-          await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files: ["script.js"],
-          });
-          setTimeout(() => {
-            chrome.tabs.sendMessage(tab.id, { action: 'checkLoginStatus' });
-          }, 2000);
-        } catch (error) {
-          console.log('Error injecting script:', error);
-          this.updateLoginStatus('error');
-        }
+        chrome.runtime.sendMessage({
+          action: 'ensureAndCheckLogin',
+          tabId: tab.id  
+        });
       }, 4000);
     } catch (error) {
       console.log('Error opening TikTok:', error);
@@ -264,18 +257,10 @@ class ClearTokExtension {
       const tabs = await chrome.tabs.query({ url: "*://www.tiktok.com/*" });
       if (tabs.length > 0) {
         this.currentTikTokTab = tabs[0];
-        try {
-          await chrome.scripting.executeScript({
-            target: { tabId: tabs[0].id },
-            files: ["script.js"],
-          });
-          setTimeout(() => {
-            chrome.tabs.sendMessage(tabs[0].id, { action: 'checkLoginStatus' });
-          }, 1000);
-        } catch (error) {
-          console.log('Error checking login status:', error);
-          this.updateLoginStatus('ready');
-        }
+        chrome.runtime.sendMessage({
+          action: 'ensureAndCheckLogin',
+          tabId: tabs[0].id
+        });
       } else {
         this.updateLoginStatus('waiting');
       }
@@ -353,9 +338,15 @@ class ClearTokExtension {
     this.actionLog = [];
     this.removedUrls = [];
     this.pendingUrls = [];
+    this.authorCounts = new Map();
     
     const actionLog = document.getElementById('actionLog');
     if (actionLog) actionLog.innerHTML = '';
+
+    const statsList = document.getElementById('repostStatsList');
+    if (statsList) {
+      statsList.innerHTML = `<li class="stats-item-placeholder" data-i18n="loadingStats">Scanning for your favorite creators...</li>`;
+    }
     
     this.updateRemovedVideosList('removedVideosList', 'removedCount');
     this.updateRemovedVideosList('removedVideosListComplete', 'removedCountComplete');
@@ -603,10 +594,19 @@ class ClearTokExtension {
         this.updateStatus(`Processing video ${message.current} of ${message.total}`);
         break;
       case 'videoRemoved':
+        console.log('------------videoRemoved', message);
         this.removedVideos++;
         if (message.title || message.author || message.url) {
           this.addRemovedVideo({ title: message.title, author: message.author, url: message.url });
         }
+        
+        // 在这里添加作者统计逻辑
+        if (message.author) {
+          const currentCount = this.authorCounts.get(message.author) || 0;
+          this.authorCounts.set(message.author, currentCount + 1);
+          this.updateStatsChart(); // 更新统计图表
+        }
+        
         let removeLogMessage = this.getText('logVideoRemoved', {number: message.index});
         if (message.title && message.author) removeLogMessage = this.getText('logVideoRemovedWithTitle', {title: message.title, author: message.author});
         else if (message.title) removeLogMessage = this.getText('logVideoRemovedTitleOnly', {title: message.title});
@@ -702,17 +702,10 @@ class ClearTokExtension {
         this.addLogEntry(this.getText('logRefreshingPage'), 'info');
         this.showNotification(this.getText('notificationPageRefreshed'), 'success');
         setTimeout(async () => {
-          try {
-            await chrome.scripting.executeScript({
-              target: { tabId: tabs[0].id },
-              files: ["script.js"],
-            });
-            setTimeout(() => {
-              chrome.tabs.sendMessage(tabs[0].id, { action: 'navigateToReposts' });
-            }, 3000);
-          } catch (error) {
-            console.log('Error navigating to reposts:', error);
-          }
+          chrome.runtime.sendMessage({
+            action: 'ensureAndCheckLogin',
+            tabId: tabs[0].id
+          });
         }, 5000);
       }
     } catch (error) {
@@ -917,6 +910,27 @@ class ClearTokExtension {
     this.showNotification(this.getText('thankYouForFeedback', { rating: this.selectedRating }), 'success');
   }
 
+  // 添加浏览器检测函数
+  detectBrowser() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (userAgent.includes('edg/') || userAgent.includes('edge/')) {
+      return 'edge';
+    } else if (userAgent.includes('chrome/') || userAgent.includes('chromium/')) {
+      return 'chrome';
+    }
+    return 'chrome'; // 默认返回chrome
+  }
+
+  // 获取对应的商店URL
+  getStoreUrl() {
+    const browser = this.detectBrowser();
+    if (browser === 'edge') {
+      return 'https://microsoftedge.microsoft.com/addons/login?ru=/addons/detail/cleartok-tiktok-repost-/bgbcmapbnbdmmjibajjagnlbbdhcenoc';
+    } else {
+      return 'https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb/reviews/my-review';
+    }
+  }
+
   async handleRatingAction() {
     if (this.selectedRating === 0) return;
     
@@ -937,7 +951,8 @@ class ClearTokExtension {
     
     // 只有高分（4-5星）才跳转到商店页面
     if (this.selectedRating >= 4) {
-      chrome.tabs.create({ url: 'https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb/reviews/my-review' });
+      const storeUrl = this.getStoreUrl();
+      chrome.tabs.create({ url: storeUrl });
     }
     
     this.closeRatingModal();
@@ -956,6 +971,44 @@ class ClearTokExtension {
     } catch (error) {
       console.warn('Failed to save rating:', error);
     }
+  }
+
+  updateStatsChart() {
+    const statsList = document.getElementById('repostStatsList');
+    if (!statsList) return;
+
+    // 1. 将Map转换为数组并排序
+    const sortedAuthors = Array.from(this.authorCounts.entries())
+      .map(([author, count]) => ({ author, count }))
+      .sort((a, b) => b.count - a.count);
+
+    // 2. 取前10名
+    const topAuthors = sortedAuthors.slice(0, 6);
+    if (topAuthors.length === 0) return;
+
+    // 3. 计算最大值用于标准化宽度
+    const maxCount = topAuthors[0].count;
+
+    // 4. 生成HTML
+    statsList.innerHTML = topAuthors.map((item, index) => {
+      const widthPercentage = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
+      const rankIcons = ['🥇', '🥈', '🥉'];
+      const rank = index < 3 ? rankIcons[index] : `#${index + 1}`;
+
+      // 使用 escapeHtml 防止XSS
+      const authorName = this.escapeHtml(item.author);
+
+      return `
+        <li class="stats-item">
+          <span class="stats-rank">${rank}</span>
+          <span class="stats-author-name" title="${authorName}">${authorName}</span>
+          <div class="stats-bar-wrapper">
+            <div class="stats-bar" style="width: ${widthPercentage}%;"></div>
+          </div>
+          <span class="stats-count">${item.count}</span>
+        </li>
+      `;
+    }).join('');
   }
 }
 

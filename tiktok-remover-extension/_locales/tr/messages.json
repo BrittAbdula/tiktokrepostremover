@@ -310,5 +310,11 @@
   },
   "thankYouForFeedback": {
     "message": "{rating} yıldızlı değerlendirmeniz ve geri bildiriminiz için teşekkürler!"
+  },
+  "repostChampionsTitle": {
+    "message": "🏆 Repost Şampiyonlarınız"
+  },
+  "loadingStats": {
+    "message": "Favori içerik üreticileriniz taranıyor..."
   }
 }

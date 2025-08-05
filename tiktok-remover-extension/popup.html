@@ -51,10 +51,10 @@
 
         <!-- Processing State -->
         <div id="processingState" class="state hidden">
-          <!-- Status Display -->
           <div class="status-card">
             <div class="status-item">
               <span class="status-label" data-i18n="statusLabel">🧹 Status:</span>
+              <span id="statusMessage">Initializing...</span>
             </div>
             
             <div class="status-item">
@@ -63,12 +63,11 @@
                 <div class="progress-bar">
                   <div id="progressFill" class="progress-fill"></div>
                 </div>
-                <span id="progressText">6 / 14</span>
+                <span id="progressText">0 / 0</span>
               </div>
             </div>
           </div>
-
-          <!-- Control Buttons -->
+        
           <div class="controls">
             <button id="pauseButton" class="control-button pause" data-i18n="pauseButton">
               ⏸️ Pause
@@ -77,25 +76,27 @@
               🧾 View Log
             </button>
           </div>
-
-          <!-- Action Log -->
+          
+          <div id="repostStatsContainer" class="stats-container">
+            <h4 class="section-title" data-i18n="repostChampionsTitle">🏆 Your Repost Champions</h4>
+            <ul id="repostStatsList" class="stats-list">
+                <li class="stats-item-placeholder" data-i18n="loadingStats">
+                    Scanning for your favorite creators...
+                </li>
+            </ul>
+          </div>
+        
           <div class="log-container">
             <div id="actionLog" class="action-log">
-              <div class="log-item success">✅ Removed video #1</div>
-              <div class="log-item success">✅ Removed video #2</div>
-              <div class="log-item success">✅ Removed video #3</div>
-              <div class="log-item waiting">⏱️ Waiting 3s...</div>
-            </div>
+              </div>
           </div>
-
-          <!-- Removed Videos List -->
+        
           <div class="removed-videos-section">
             <h4 class="section-title">
               <span data-i18n="removedVideosTitle">🗑️ Removed Videos</span> (<span id="removedCount">0</span>)
             </h4>
             <div id="removedVideosList" class="removed-videos-list">
-              <!-- Removed videos will be added here dynamically -->
-            </div>
+              </div>
           </div>
         </div>
 

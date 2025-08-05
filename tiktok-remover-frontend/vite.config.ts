@@ -40,6 +40,7 @@ export default defineConfig(({ mode }) => ({
         "/terms-of-service",
         "/privacy-policy",
         "/stats",
+        "/changelog",
         ...blogPosts.map((post) => `/blog/${post.slug}`),
       ],
       selector: "#root",

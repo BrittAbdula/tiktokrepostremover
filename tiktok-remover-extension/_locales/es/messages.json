@@ -102,5 +102,7 @@
   "feedbackDescription": { "message": "Nos encantaría escuchar tus sugerencias para hacer ClearTok mejor." },
   "feedbackPlaceholder": { "message": "Comparte tus ideas y sugerencias..." },
   "submitFeedbackButton": { "message": "Enviar comentarios" },
-  "thankYouForFeedback": { "message": "¡Gracias por tu calificación de {rating} estrellas y tus comentarios!" }
+  "thankYouForFeedback": { "message": "¡Gracias por tu calificación de {rating} estrellas y tus comentarios!" },
+  "repostChampionsTitle": { "message": "🏆 Tus Campeones de Reposts" },
+  "loadingStats": { "message": "Escaneando tus creadores favoritos..." }
 } 

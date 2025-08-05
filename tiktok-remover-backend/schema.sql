@@ -39,6 +39,7 @@ CREATE TABLE user_sessions (
 
 create table user_sessions_new (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  version TEXT,
   session_id TEXT NOT NULL UNIQUE,
   
   -- 用户环境信息
@@ -75,7 +76,6 @@ create table user_sessions_new (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-
 CREATE TABLE session_logs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   session_id TEXT NOT NULL,
@@ -93,6 +93,25 @@ CREATE TABLE session_logs (
   
 );
 
+CREATE TABLE session_logs_new (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  version TEXT,
+  session_id TEXT NOT NULL,
+  
+  -- 基本状态信息
+  process_status TEXT,
+  -- 删除数量记录
+  total_reposts_found INTEGER,
+  reposts_removed INTEGER,
+  reposts_skipped INTEGER,
+  raw_data Json,
+  
+  -- 记录时间
+  logged_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  
+);
+
+
 -- 用户反馈表
 CREATE TABLE user_feedback (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -108,9 +127,31 @@ CREATE TABLE user_feedback (
   user_agent TEXT,
   
   -- 创建时间
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   
 );
+CREATE TABLE user_feedback_new (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  version TEXT,
+  session_id TEXT NOT NULL,
+  
+  -- 评分信息
+  rating_score INTEGER NOT NULL, -- 1-5星评分
+  feedback_text TEXT, -- 用户反馈建议内容
+  
+  -- 用户环境信息
+  ip_address TEXT,
+  country TEXT,
+  user_agent TEXT,
+  
+  -- 创建时间
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  
+);
+insert into user_feedback_new (version,session_id,rating_score,feedback_text,ip_address,country,user_agent,created_at) 
+select '1.2.0',session_id,rating_score,feedback_text,ip_address,country,user_agent,created_at from user_feedback;
+drop table user_feedback;
+alter table user_feedback_new rename to user_feedback;
 
 -- 为反馈表添加索引
 CREATE INDEX idx_feedback_session_id ON user_feedback(session_id);

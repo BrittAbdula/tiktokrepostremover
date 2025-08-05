@@ -33,6 +33,18 @@ Clean your profile in seconds. Start fresh—install ClearTok now.
 
 ## Recent Updates
 
+### v1.4.0(2025-08-04)
+- Improved repost detection accuracy
+- Maximized bulk deletion coverage
+
+### v1.2.0 (2025-07-27)
+- Hot-update support
+  When a newer tiktok UI version is detected, selectors are hot-reloaded without publishing a new build.
+
+### v1.1.2 (2025-07-12)
+- Hot-update support
+  When a newer tiktok UI version is detected, selectors are hot-reloaded without publishing a new build.
+
 ### v1.1.3(2025-07-14)
 - add Help us improve! Enviar comentarios	
 - Optimize processing logic

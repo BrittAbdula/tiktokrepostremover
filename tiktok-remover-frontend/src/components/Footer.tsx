@@ -177,7 +177,17 @@ const Footer = () => {
           </div>
         </div>
         <Separator className="bg-gray-800 mb-8" />
-        <div className="text-center text-gray-400 text-sm">
+        <div className="text-center text-gray-400 text-sm space-y-4">
+          <div className="bg-gray-900/50 rounded-lg p-4 max-w-2xl mx-auto">
+            <p className="font-medium text-gray-300 mb-2">
+              <strong>Disclaimer:</strong>
+            </p>
+            <p className="text-sm leading-relaxed">
+              This tool is not affiliated with or endorsed by TikTok. It runs locally in your browser. 
+              For information about data collection, please see our <Link to="/privacy-policy" className="text-[#FE2C55] hover:underline">Privacy Policy</Link>. 
+              ClearTok is an independent third-party extension designed to help users manage their TikTok content.
+            </p>
+          </div>
           <p>© 2025 ClearTok. Not affiliated with ByteDance or TikTok. "TikTok" is a trademark of ByteDance Ltd.</p>
         </div>
       </div>

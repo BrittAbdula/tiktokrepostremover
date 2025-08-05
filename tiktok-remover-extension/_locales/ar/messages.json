@@ -102,5 +102,7 @@
   "feedbackDescription": { "message": "نود سماع اقتراحاتك لجعل ClearTok أفضل." },
   "feedbackPlaceholder": { "message": "شارك أفكارك واقتراحاتك..." },
   "submitFeedbackButton": { "message": "إرسال الملاحظات" },
-  "thankYouForFeedback": { "message": "شكراً لتقييمك بـ {rating} نجوم وملاحظاتك!" }
+  "thankYouForFeedback": { "message": "شكراً لتقييمك بـ {rating} نجوم وملاحظاتك!" },
+  "repostChampionsTitle": { "message": "🏆 أبطال الإعادات لديك" },
+  "loadingStats": { "message": "جاري البحث عن المبدعين المفضلين..." }
 } 

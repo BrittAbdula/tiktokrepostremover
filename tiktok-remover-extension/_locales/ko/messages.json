@@ -102,5 +102,7 @@
   "feedbackDescription": { "message": "ClearTok을 더 좋게 만들기 위한 제안을 듣고 싶습니다." },
   "feedbackPlaceholder": { "message": "생각과 제안을 공유해 주세요..." },
   "submitFeedbackButton": { "message": "피드백 제출" },
-  "thankYouForFeedback": { "message": "{rating}별 평가와 피드백을 주셔서 감사합니다!" }
+  "thankYouForFeedback": { "message": "{rating}별 평가와 피드백을 주셔서 감사합니다!" },
+  "repostChampionsTitle": { "message": "🏆 당신의 리포스트 챔피언" },
+  "loadingStats": { "message": "좋아하는 크리에이터 스캔 중..." }
 } 
