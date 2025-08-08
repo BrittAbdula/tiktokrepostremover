@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { blogPosts } from "@/data/blogData";
 
 const LatestBlogSection = () => {
-  // Get latest 3 blog posts
+  // Get latest 3 blog posts sorted by publish date (newest first)
   const latestPosts = blogPosts
     .sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime())
     .slice(0, 3);

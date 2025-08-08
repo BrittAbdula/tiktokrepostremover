@@ -9,8 +9,12 @@ import { blogPosts } from "@/data/blogData";
 import { Helmet } from "react-helmet-async";
 
 const BlogList = () => {
-  const featuredPost = blogPosts.find(post => post.featured);
-  const otherPosts = blogPosts.filter(post => !post.featured);
+  // Sort posts by publish date (newest first) and get featured post
+  const sortedPosts = blogPosts.sort((a, b) => 
+    new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+  );
+  const featuredPost = sortedPosts.find(post => post.featured);
+  const otherPosts = sortedPosts.filter(post => !post.featured);
 
   return (
     <>

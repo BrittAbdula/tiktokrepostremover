@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-// 引入 Font Awesome 6 的 Chrome 图标
-import { FaChrome } from "react-icons/fa6";
+// 引入 Font Awesome 6 的 Chrome 和 Edge 图标
+import { FaChrome, FaEdge } from "react-icons/fa6";
 import RecentDeletionsScroll from "./RecentDeletionsScroll";
 
 const HeroSection = () => {
@@ -20,7 +20,7 @@ const HeroSection = () => {
       <div className="max-w-4xl mx-auto px-4 relative z-20">
         <Badge variant="secondary" className="mb-4 bg-gradient-to-r from-[#FE2C55] to-[#FF0050] text-white border-none
                                            shadow-lg animate-pulse">
-          Free Chrome Extension
+          Free Browser Extension
         </Badge>
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
           TikTok Repost Remover - Delete All Repost on TikTok in One Click
@@ -47,12 +47,30 @@ const HeroSection = () => {
             >
               {/* 渲染引入的 Font Awesome Chrome 图标 */}
               <FaChrome className="w-5 h-5 mr-2 text-white" />
-              Get ClearTok Free
+              Get ClearTok for Chrome
+            </a>
+          </Button>
+          <Button
+            size="lg"
+            className="text-lg px-8 py-4 bg-gradient-to-r from-[#0078D4] to-[#106EBE] hover:from-[#106EBE] hover:to-[#0078D4] 
+                     text-white font-bold shadow-lg hover:shadow-xl hover:shadow-[#0078D4]/50 transition-all duration-300
+                     transform hover:scale-105"
+            asChild
+          >
+            <a
+              href="https://microsoftedge.microsoft.com/addons/detail/cleartok-tiktok-repost-/bgbcmapbnbdmmjibajjagnlbbdhcenoc"
+              className="flex items-center justify-center"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {/* 渲染引入的 Font Awesome Edge 图标 */}
+              <FaEdge className="w-5 h-5 mr-2 text-white" />
+              Get ClearTok for Edge
             </a>
           </Button>
         </div>
         <p className="text-sm text-gray-400 mt-4">
-          Works on TikTok.com • Secure • No password stored
+          Works on TikTok.com • Secure • No password required
         </p>
       </div>
     </section>

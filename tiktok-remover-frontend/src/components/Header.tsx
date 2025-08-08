@@ -147,7 +147,7 @@ const Header = () => {
                 src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/googlechrome.svg" 
                 alt="Chrome" 
                 className="w-5 h-5 mr-2 filter invert"
-              />Download ClearTok</a>
+              />Add to Chrome</a>
           </Button>
         </nav>
 

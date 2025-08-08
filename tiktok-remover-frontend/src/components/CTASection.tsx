@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 // 引入 Font Awesome 6 图标组件
 import {
   FaChrome,         // 用于 Chrome 按钮图标
+  FaEdge,           // 用于 Edge 按钮图标
   FaShieldHalved,   // 用于 "100% Secure"
   FaGithub,         // 用于 "Open Source"
   FaLock            // 用于 "Privacy First" (替代 privacy.svg，更通用)
@@ -33,6 +34,22 @@ const CTASection = () => {
               {/* 渲染引入的 Font Awesome Chrome 图标 */}
               <FaChrome className="w-5 h-5 mr-2 text-black" /> {/* Chrome 按钮是白色背景，所以图标用黑色 */}
               Add ClearTok to Chrome – It's Free
+            </a>
+          </Button>
+          <Button 
+            size="lg" 
+            variant="secondary" 
+            className="text-lg px-8 py-4 bg-white text-black hover:bg-gray-100 font-bold shadow-lg hover:shadow-xl transition-all relative overflow-hidden 
+                       before:absolute before:inset-0 before:rounded-lg before:p-[2px] before:bg-gradient-to-r before:from-[#0078D4] before:via-[#106EBE] before:to-[#00F2EA] before:-z-10
+                       after:absolute after:inset-[2px] after:rounded-[6px] after:bg-white after:-z-10
+                       animate-pulse hover:animate-none
+                       shadow-[0_0_20px_rgba(0,120,212,0.5)] hover:shadow-[0_0_30px_rgba(0,120,212,0.8)]" 
+            asChild
+          >
+            <a href="https://microsoftedge.microsoft.com/addons/detail/cleartok-tiktok-repost-/bgbcmapbnbdmmjibajjagnlbbdhcenoc" className="flex items-center justify-center relative z-10" target="_blank">
+              {/* 渲染引入的 Font Awesome Edge 图标 */}
+              <FaEdge className="w-5 h-5 mr-2 text-black" /> {/* Edge 按钮是白色背景，所以图标用黑色 */}
+              Add ClearTok to Edge – It's Free
             </a>
           </Button>
         </div>

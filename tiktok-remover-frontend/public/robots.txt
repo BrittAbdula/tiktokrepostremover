@@ -14,4 +14,3 @@ User-agent: *
 Allow: /
 
 Sitemap: https://tiktokrepostremover.com/sitemap.xml
-llms: https://tiktokrepostremover.com/llms.txt
