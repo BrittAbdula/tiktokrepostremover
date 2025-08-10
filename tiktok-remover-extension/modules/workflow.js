@@ -48,7 +48,11 @@ class WorkflowManager {
      */
     async start() {
         if (this.state.isRunning) {
-            console.warn('[ClearTok] Process is already running.');
+            console.log('[ClearTok] Process is already running. Forcing restart...');
+            try {
+                // 向 background 请求强制重启
+                chrome.runtime?.sendMessage({ action: 'forceRestart' });
+            } catch (_) {}
             return;
         }
         this.state.start();
@@ -145,16 +149,16 @@ class WorkflowManager {
         }
 
         this.comms.sendMessage('statusUpdate', { status: 'Scrolling to load all reposts...' });
-        const totalFound = await this.ui.autoScrollToBottom('video.containers', (progress) => {
+        const totalFound = await this.ui.autoScrollToBottom('video.containers', (progress, isFinal) => {
             this.comms.sendMessage('updateProgress', {
                 current: 0,
                 total: progress,
+                phase: isFinal ? 'final' : 'first',
                 status: `Loaded ${progress} reposts so far...`
             });
         });
 
         this.state.setTotal(totalFound);
-        this.comms.sendMessage('updateProgress', { current: 0, total: this.state.totalReposts });
         this.comms.sendMessage('statusUpdate', { status: `Found ${this.state.totalReposts} reposts.` });
         console.log(`[ClearTok] Found ${this.state.totalReposts} total reposts.`);
         return true;
@@ -191,7 +195,7 @@ class WorkflowManager {
             // 查找并点击“取消转发”按钮
             const repostButton = this.ui.findElement('video.repostButton');
             if (repostButton && this.isVideoReposted(repostButton)) {
-                  repostButton.click();
+                repostButton.click();
                 this.state.incrementRemovedCount();
                 this.comms.sendMessage('videoRemoved', { index: currentIndex, ...videoInfo });
                 console.log(`[ClearTok] Removed repost #${currentIndex}`);
@@ -200,6 +204,8 @@ class WorkflowManager {
                 this.comms.sendMessage('videoSkipped', { index: currentIndex, reason: 'Not a repost or button not found', ...videoInfo });
                 console.log(`[ClearTok] Skipped video #${currentIndex}`);
             }
+            // Test
+            console.log('--------> click repostButton');
 
             // 移至下一个视频
             if (currentIndex < this.state.totalReposts) {

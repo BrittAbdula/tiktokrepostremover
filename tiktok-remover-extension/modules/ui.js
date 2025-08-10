@@ -24,7 +24,7 @@ class UIManager {
         const element = parent.querySelector(selector);
         if (element) return element;
       } catch (error) {
-          console.error(`[ClearTok] Invalid selector: "${selector}" from key "${selectorKey}"`, error);
+        console.error(`[ClearTok] Invalid selector: "${selector}" from key "${selectorKey}"`, error);
       }
     }
     return null;
@@ -37,10 +37,10 @@ class UIManager {
    * @returns {NodeListOf<Element>}
    */
   findAllElements(selectorKey, parent = document) {
-      const selectors = this.config.get(selectorKey);
-      if (!selectors) return document.querySelectorAll(''); // 返回空的NodeList
-      const selectorString = Array.isArray(selectors) ? selectors.join(', ') : selectors;
-      return parent.querySelectorAll(selectorString);
+    const selectors = this.config.get(selectorKey);
+    if (!selectors) return document.querySelectorAll(''); // 返回空的NodeList
+    const selectorString = Array.isArray(selectors) ? selectors.join(', ') : selectors;
+    return parent.querySelectorAll(selectorString);
   }
 
 
@@ -71,8 +71,9 @@ class UIManager {
    * @param {number} timeout
    * @returns {Promise<Element>}
    */
+  // 超时时原来是 reject(...) → 改成发送上报消息后 resolve(null)
   async waitForElement(selectorKey, timeout = 10000) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const interval = 200;
       const endTime = Date.now() + timeout;
 
@@ -81,7 +82,15 @@ class UIManager {
         if (element) {
           resolve(element);
         } else if (Date.now() > endTime) {
-          reject(new Error(`[ClearTok] Timeout waiting for element with key: "${selectorKey}"`));
+          try {
+            chrome.runtime?.sendMessage({
+              action: 'uiWaitTimeout',
+              selectorKey,
+              timeout,
+              url: window.location.href
+            });
+          } catch (_) { }
+          resolve(null);
         } else {
           setTimeout(check, interval);
         }
@@ -122,54 +131,69 @@ class UIManager {
    * @returns {string}
    */
   getText(selectorKey) {
-      const element = this.findElement(selectorKey);
-      return element ? element.textContent.trim() : '';
+    const element = this.findElement(selectorKey);
+    return element ? element.textContent.trim() : '';
   }
 
   /**
    * 自动滚动页面到底部以加载所有内容
-   * @param {function(number)} onProgress - 回调函数，用于报告进度
+   * 仅在两次时机触发回调：
+   * 1) 第一次检测到内容数量（首次滚动后）
+   * 2) 最终完成时
+   * @param {function(number)} onProgress - 回调函数（最多回调两次：首次与最终）
    * @returns {Promise<number>} - 返回找到的元素总数
    */
   async autoScrollToBottom(itemSelectorKey, onProgress) {
     return new Promise(async (resolve) => {
-        let totalItems = 0;
-        let lastHeight = 0;
-        let noChangeCount = 0;
-        const maxNoChangeCount = 2; // 连续2次高度不变则认为到底
+      let totalItems = 0;
+      let lastHeight = 0;
+      let noChangeCount = 0;
+      const maxNoChangeCount = 2;
+      let finished = false;
+      let firstProgressReported = false;
+      let tickCount = 0;
 
-        const scrollInterval = setInterval(() => {
-            window.scrollTo(0, document.body.scrollHeight);
-            
-            const currentItems = this.findAllElements(itemSelectorKey);
-            if (currentItems.length > totalItems) {
-                totalItems = currentItems.length;
-                if(onProgress) onProgress(totalItems);
-            }
+      const finalize = () => {
+        if (finished) return;
+        finished = true;
+        clearInterval(scrollInterval);
+        clearTimeout(timeoutId);
+        const finalItems = this.findAllElements(itemSelectorKey);
+        if (onProgress) onProgress(finalItems.length, true);
+        resolve(finalItems.length);
+      };
 
-            const currentHeight = document.body.scrollHeight;
-            if (currentHeight === lastHeight) {
-                noChangeCount++;
-            } else {
-                noChangeCount = 0;
-                lastHeight = currentHeight;
-            }
+      const scrollInterval = setInterval(() => {
+        tickCount += 1;
+        window.scrollTo(0, document.body.scrollHeight);
 
-            if (noChangeCount >= maxNoChangeCount) {
-                clearInterval(scrollInterval);
-                // 最后再确认一次数量
-                const finalItems = this.findAllElements(itemSelectorKey);
-                resolve(finalItems.length);
-            }
-        }, 1500); // 每1.5秒滚动一次
+        const currentItems = this.findAllElements(itemSelectorKey);
+        // 第一次滚动后，无论数量多少都回调一次
+        if (!firstProgressReported && tickCount === 1) {
+          firstProgressReported = true;
+          if (onProgress) onProgress(currentItems.length, false);
+        }
+        if (currentItems.length > totalItems) {
+          totalItems = currentItems.length;
+        }
 
-        // 设置一个超时保护
-        setTimeout(() => {
-            clearInterval(scrollInterval);
-            const finalItems = this.findAllElements(itemSelectorKey);
-            console.warn('[ClearTok] Auto-scroll timed out.');
-            resolve(finalItems.length);
-        }, 120000); // 2分钟超时
+        const currentHeight = document.body.scrollHeight;
+        if (currentHeight === lastHeight) {
+          noChangeCount++;
+        } else {
+          noChangeCount = 0;
+          lastHeight = currentHeight;
+        }
+
+        if (noChangeCount >= maxNoChangeCount) {
+          finalize();
+        }
+      }, 1500);
+
+      const timeoutId = setTimeout(() => {
+        console.warn('[ClearTok] Auto-scroll timed out.');
+        finalize();
+      }, 120000);
     });
   }
 }

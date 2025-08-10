@@ -159,6 +159,42 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     })();
     return; // 无需同步返回
   }
+  if (message.action === 'forceRestart') {
+    (async () => {
+      try {
+        // 打点：popup 请求强制重启
+        chrome.runtime.sendMessage({ action: 'statusUpdate', status: 'Force restarting…' });
+
+        // 找到或创建一个 TikTok 标签页并导航到首页
+        const tabs = await chrome.tabs.query({ url: '*://*.tiktok.com/*' });
+        let tab;
+        if (tabs.length === 0) {
+          tab = await chrome.tabs.create({ url: 'https://www.tiktok.com/', active: true });
+        } else {
+          tab = tabs[tabs.length - 1];
+          await chrome.tabs.update(tab.id, { url: 'https://www.tiktok.com/', active: true });
+        }
+
+        // 等待页面加载稳定
+        await new Promise(r => setTimeout(r, 3500));
+
+        // 注入或确保脚本存在
+        const isReady = await ensureScriptsInjected(tab.id);
+        if (isReady) {
+          // 再等待一点让内容脚本初始化
+          await new Promise(r => setTimeout(r, 500));
+          // 发送开始命令
+          chrome.tabs.sendMessage(tab.id, { action: 'startRemoval' });
+        } else {
+          chrome.runtime.sendMessage({ action: 'error', message: 'Failed to prepare scripts for restart.' });
+        }
+      } catch (e) {
+        console.error('[ClearTok BG] forceRestart failed:', e);
+        chrome.runtime.sendMessage({ action: 'error', message: 'Force restart failed', error: String(e) });
+      }
+    })();
+    return; // 无需同步返回
+  }
   if (message.action === 'ensureSelectors') {
     checkMetaAndUpdate().then(() => sendResponse({ ok: true }));
     return true;  // 让 Chrome 知道是异步
@@ -167,18 +203,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.action === "pauseRemoval" || message.action === "resumeRemoval") {
     // Forward pause/resume commands to content script
     forwardToTikTokTab(message);
-  } else {
-    // Forward other messages to popup (status updates, progress, etc.)
-    // Only forward if the message came from a content script (has sender.tab)
-    if (sender.tab && message.action !== 'videoRemoved') {
-      forwardToPopup(message);
-    }
   }
 });
 
 async function handleRemoveRepostedVideos(message) {
   try {
-    const tabs = await chrome.tabs.query({ url: "*://www.tiktok.com/*" });
+    const tabs = await chrome.tabs.query({ url: "*://*.tiktok.com/*" });
     let tab;
 
     if (tabs.length === 0) {
@@ -190,7 +220,6 @@ async function handleRemoveRepostedVideos(message) {
       await chrome.tabs.update(tab.id, { active: true });
     }
 
-    // ▼▼▼ 看，现在多么简洁！▼▼▼
     const isReady = await ensureScriptsInjected(tab.id);
 
     if (isReady) {
@@ -203,7 +232,6 @@ async function handleRemoveRepostedVideos(message) {
         message: 'Failed to prepare content scripts for removal process.'
       });
     }
-    // ▲▲▲ 代码变得非常清晰 ▲▲▲
 
   }  catch (error) {
     console.error('Error handling remove reposts:', error);
@@ -217,22 +245,11 @@ async function handleRemoveRepostedVideos(message) {
 
 async function forwardToTikTokTab(message) {
   try {
-    const tabs = await chrome.tabs.query({ url: "*://www.tiktok.com/*" });
+    const tabs = await chrome.tabs.query({ url: "*://*.tiktok.com/*" });
     if (tabs.length > 0) {
-      chrome.tabs.sendMessage(tabs[0].id, message);
+      chrome.tabs.sendMessage(tabs[tabs.length - 1].id, message);
     }
   } catch (error) {
     console.error('Error forwarding message to TikTok tab:', error);
-  }
-}
-
-function forwardToPopup(message) {
-  try {
-    // Try to send to any listening popups/sidepanels
-    chrome.runtime.sendMessage(message).catch(() => {
-      // Ignore errors if no popup is listening
-    });
-  } catch (error) {
-    console.error('Error forwarding message to popup:', error);
   }
 }

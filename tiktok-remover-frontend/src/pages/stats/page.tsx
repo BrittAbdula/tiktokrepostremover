@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,8 +7,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, Legend 
+  LineChart, Line, PieChart, Pie, Cell, Legend 
 } from 'recharts';
+import type { TooltipProps } from 'recharts';
 import './stats.css';
 
 interface OverviewStats {
@@ -87,6 +88,64 @@ const StatsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // 聚合：三天内按错误类型汇总
+  const aggregatedErrorTypes = useMemo(() => {
+    if (!errorStats || errorStats.length === 0) return [] as Array<{ error_message: string; error_count: number }>;
+    const countMap = new Map<string, number>();
+    for (const item of errorStats) {
+      if (!item.error_message) continue;
+      countMap.set(item.error_message, (countMap.get(item.error_message) || 0) + item.error_count);
+    }
+    return Array.from(countMap.entries())
+      .map(([error_message, error_count]) => ({ error_message, error_count }))
+      .sort((a, b) => b.error_count - a.error_count);
+  }, [errorStats]);
+
+  // 分组：按日期展示每天的错误类型统计（保持后端日期顺序）
+  const errorsByDate = useMemo(() => {
+    const groups = new Map<string, Array<{ error_message: string; error_count: number }>>();
+    if (!errorStats || errorStats.length === 0) {
+      return { groups, dateOrder: [] as string[] };
+    }
+    const dateOrder: string[] = [];
+    for (const item of errorStats) {
+      if (!dateOrder.includes(item.date)) {
+        dateOrder.push(item.date);
+      }
+      if (!groups.has(item.date)) groups.set(item.date, []);
+      groups.get(item.date)!.push({ error_message: item.error_message, error_count: item.error_count });
+    }
+    // 每日内按错误数量降序
+    groups.forEach(list => list.sort((a, b) => b.error_count - a.error_count));
+    return { groups, dateOrder };
+  }, [errorStats]);
+
+  // 工具：截断长文本
+  const truncateText = (text: string, maxLength: number) => {
+    if (!text) return '';
+    return text.length > maxLength ? `${text.slice(0, Math.max(0, maxLength - 1))}…` : text;
+  };
+
+  // 计算：Y 轴宽度基于最长错误名称
+  const errorYAxisWidth = useMemo(() => {
+    const maxLen = aggregatedErrorTypes.reduce((m, cur) => Math.max(m, (cur.error_message || '').length), 0);
+    // 估算每字符 7px，限制范围避免过大或过小
+    return Math.min(360, Math.max(140, maxLen * 7));
+  }, [aggregatedErrorTypes]);
+
+  // 自定义 Tooltip 显示完整错误名称
+  const ErrorTypeTooltip = ({ active, payload }: TooltipProps<number, string>) => {
+    if (!active || !payload || payload.length === 0) return null;
+    const data = payload[0].payload as { error_message: string; error_count: number };
+    return (
+      <div className="rounded-md border bg-white p-2 shadow-md max-w-[300px]">
+        <div className="text-xs text-gray-500 mb-1">Error</div>
+        <div className="text-sm text-gray-800 break-words whitespace-normal">{data.error_message}</div>
+        <div className="mt-1 text-xs text-gray-600">Count: {data.error_count}</div>
+      </div>
+    );
+  };
+
   const fetchStats = async () => {
     try {
       setLoading(true);
@@ -127,7 +186,8 @@ const StatsPage: React.FC = () => {
       setCountryDistribution(countryData.data);
       setDailySessions(dailyData.data.sort((a: DailySession, b: DailySession) => new Date(a.date).getTime() - new Date(b.date).getTime()));
       setRepostsStats(repostsData.data.sort((a: RepostsStats, b: RepostsStats) => new Date(a.date).getTime() - new Date(b.date).getTime()));
-      setErrorStats(errorData.data.sort((a: ErrorStats, b: ErrorStats) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+      // 保持后端排序（date DESC, error_count DESC），不在前端二次排序
+      setErrorStats(errorData.data);
       setFeedbackStats({
         ...feedbackData.data,
         feedbackTrend: feedbackData.data.feedbackTrend.sort((a: FeedbackTrendItem, b: FeedbackTrendItem) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -235,16 +295,16 @@ const StatsPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={dailySessions}>
+                  <LineChart data={dailySessions}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Area type="monotone" dataKey="unique_ip_count" stackId="1" stroke="#8884d8" fill="#8884d8" name="Unique IPs" />
-                    <Area type="monotone" dataKey="unique_tiktok_username_count" stackId="1" stroke="#82ca9d" fill="#82ca9d" name="Unique Users" />
-                    <Area type="monotone" dataKey="total_session_count" stackId="1" stroke="#ffc658" fill="#ffc658" name="Total Sessions" />
-                  </AreaChart>
+                    <Line type="monotone" dataKey="unique_ip_count" stroke="#8884d8" name="Unique IPs" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="unique_tiktok_username_count" stroke="#82ca9d" name="Unique Users" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="total_session_count" stroke="#ffc658" name="Total Sessions" strokeWidth={2} dot={false} />
+                  </LineChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
@@ -374,34 +434,102 @@ const StatsPage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="errors" className="space-y-4 tab-content">
-          <Card>
-            <CardHeader>
-              <CardTitle>Error Analysis</CardTitle>
-              <CardDescription>Error messages and their frequency (Last 3 days)</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                                  {errorStats.length === 0 ? (
-                    <div className="text-center py-8 empty-state">
-                      <div className="text-6xl mb-4 empty-icon">🎉</div>
-                      <p className="text-muted-foreground text-lg empty-text">No errors recorded in the last 3 days!</p>
+          {errorStats.length === 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Error Analysis</CardTitle>
+                <CardDescription>Error messages and their frequency (Last 3 days)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 empty-state">
+                  <div className="text-6xl mb-4 empty-icon">🎉</div>
+                  <p className="text-muted-foreground text-lg empty-text">No errors recorded in the last 3 days!</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              {/* 模块 1：三天内按错误类型统计（与日期无关） */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Error Types (Last 3 Days)</CardTitle>
+                  <CardDescription>Total occurrences per error type</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="w-full overflow-x-auto">
+                    <div style={{ minWidth: Math.max(560, errorYAxisWidth + 360) }}>
+                      <ResponsiveContainer width="100%" height={380}>
+                        <BarChart
+                          data={aggregatedErrorTypes.slice(0, 10)}
+                          layout="vertical"
+                          margin={{ left: 16, right: 24, top: 8, bottom: 8 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis type="number" />
+                          <YAxis
+                            type="category"
+                            dataKey="error_message"
+                            width={errorYAxisWidth}
+                            tickFormatter={(v: string) => truncateText(v, 32)}
+                            tick={{ fontSize: 12 }}
+                          />
+                          <Tooltip content={<ErrorTypeTooltip />} />
+                          <Legend />
+                          <Bar dataKey="error_count" fill="#ef4444" name="Count" />
+                        </BarChart>
+                      </ResponsiveContainer>
                     </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {errorStats.map((error, index) => (
-                        <div key={index} className="border rounded-lg p-4 bg-red-50 error-card">
-                        <div className="flex justify-between items-start mb-2">
-                          <Badge variant="destructive">{error.error_count} occurrences</Badge>
-                          <span className="text-sm text-gray-500">{error.date}</span>
-                        </div>
-                                                  <p className="text-sm text-gray-700 font-medium error-message">{error.error_message}</p>
-                      </div>
-                    ))}
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+
+              {/* 模块 2：按日期展示每天的错误类型统计 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Daily Error Breakdown</CardTitle>
+                  <CardDescription>Error types by day (Last 3 days)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {errorsByDate.dateOrder.map((date) => {
+                      const list = errorsByDate.groups.get(date) || [];
+                      const total = list.reduce((sum, item) => sum + item.error_count, 0);
+                      return (
+                        <div key={date} className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="text-sm text-gray-600">{date}</div>
+                            <Badge variant="secondary">Total: {total}</Badge>
+                          </div>
+                          <div className="border rounded-md overflow-hidden">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Error Message</TableHead>
+                                  <TableHead className="w-32 text-right">Count</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {list.map((item, idx) => (
+                                  <TableRow key={`${date}-${idx}`}>
+                                    <TableCell className="max-w-[600px] whitespace-normal break-words text-sm text-gray-700">
+                                      {item.error_message}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                      <Badge variant="destructive">{item.error_count}</Badge>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="feedback" className="space-y-4 tab-content">

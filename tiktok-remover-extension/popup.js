@@ -13,32 +13,41 @@ class ClearTokExtension {
     this.removedUrls = []; // Track removed video URLs
     this.pendingUrls = []; // Track pending video URLs
     this.currentTikTokTab = null;
-    this.processedMessages = new Set(); // Track processed messages to prevent duplicates
     this.lastMessageTimestamp = 0; // Track last message timestamp
-    
+
     // --- 会话追踪 (Session Tracking) ---
     this.sessionId = null;
     this.sessionStartTime = null;
     this.tikTokUsername = null;
-    
+
     // Session管理配置
     this.SESSION_EXPIRY_TIME = 60 * 60 * 1000; // 1小时过期
     this.SESSION_STORAGE_KEY = 'clearTokSessionData';
-    
+
     // 状态缓存
     this.currentLoginStatus = null;
-    
+
     this.initializeEventListeners();
     this.cleanupExpiredSessions(); // 清理过期session
     this.checkTikTokLogin();
     this.initializeSession();
-    
+
     // Delegated click listener for video link buttons
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.video-link-btn');
       if (btn && btn.dataset.url) {
         this.openVideoInNewTab(btn.dataset.url);
       }
+    });
+
+    // 在 popup 关闭时自动暂停并上报
+    window.addEventListener('beforeunload', () => {
+      try {
+        if (this.isProcessing && !this.isPaused) {
+          this.trackEvent('popup_closed_auto_paused');
+          chrome.runtime.sendMessage({ action: 'pauseRemoval' });
+        }
+      } catch (_) { /* noop */ }
     });
   }
 
@@ -54,18 +63,18 @@ class ClearTokExtension {
         await this.updateStoredSession({ ...existingSession, lastActiveTime: Date.now() });
         return;
       }
-      
+
       // 如果没有有效会话，则创建新的
       this.sessionStartTime = Date.now();
       // 假设 window.apiService.createSession() 是一个真实存在的函数
-      const response = await window.apiService.createSession(); 
+      const response = await window.apiService.createSession();
       this.sessionId = response.session_id;
       console.log('创建新session:', this.sessionId);
       await this.saveSessionToStorage();
-      
+
       // 追踪会话创建事件
       this.trackEvent('session_initialized');
-      
+
     } catch (error) {
       console.warn('Failed to initialize session:', error);
     }
@@ -80,24 +89,22 @@ class ClearTokExtension {
         console.warn(`Cannot track event "${eventName}", no session ID.`);
         return;
       }
-      console.warn(`Cannot track event "${eventName}", no session ID.`);
-      return;
     }
-    
+
     try {
       const payload = {
         event_name: eventName,
         ...data,
       };
-      
+
       // 使用现有的API更新函数来发送事件
       await window.apiService.updateSession(this.sessionId, payload);
       console.log(`✅ Event tracked: ${eventName}`, payload);
-      
+
       // 如果事件中包含用户名，则更新本地存储
       if (data.tiktok_username) {
-          this.tikTokUsername = data.tiktok_username;
-          await this.saveSessionToStorage();
+        this.tikTokUsername = data.tiktok_username;
+        await this.saveSessionToStorage();
       }
 
     } catch (error) {
@@ -106,7 +113,7 @@ class ClearTokExtension {
   }
 
   // --- Session 存储管理方法 (保持不变) ---
-  
+
   async getStoredSession() {
     try {
       const result = await chrome.storage.local.get([this.SESSION_STORAGE_KEY]);
@@ -115,17 +122,17 @@ class ClearTokExtension {
       console.warn('Failed to get stored session:', error); return null;
     }
   }
-  
+
   isSessionValid(sessionData) {
     if (!sessionData || !sessionData.sessionId || !sessionData.createdTime) return false;
     const sessionAge = Date.now() - sessionData.createdTime;
     if (sessionAge > this.SESSION_EXPIRY_TIME) {
-        console.log('Session expired, age:', Math.floor(sessionAge / 1000 / 60), 'minutes');
-        return false;
+      console.log('Session expired, age:', Math.floor(sessionAge / 1000 / 60), 'minutes');
+      return false;
     }
     return true;
   }
-  
+
   async saveSessionToStorage() {
     try {
       const sessionData = {
@@ -140,24 +147,24 @@ class ClearTokExtension {
       console.warn('Failed to save session to storage:', error);
     }
   }
-  
+
   async updateStoredSession(sessionData) {
-      try {
-          await chrome.storage.local.set({ [this.SESSION_STORAGE_KEY]: sessionData });
-      } catch (error) {
-          console.warn('Failed to update stored session:', error);
-      }
+    try {
+      await chrome.storage.local.set({ [this.SESSION_STORAGE_KEY]: sessionData });
+    } catch (error) {
+      console.warn('Failed to update stored session:', error);
+    }
   }
-  
+
   async clearStoredSession() {
-      try {
-          await chrome.storage.local.remove([this.SESSION_STORAGE_KEY]);
-          console.log('Stored session cleared');
-      } catch (error) {
-          console.warn('Failed to clear stored session:', error);
-      }
+    try {
+      await chrome.storage.local.remove([this.SESSION_STORAGE_KEY]);
+      console.log('Stored session cleared');
+    } catch (error) {
+      console.warn('Failed to clear stored session:', error);
+    }
   }
-  
+
   async cleanupExpiredSessions() {
     try {
       const existingSession = await this.getStoredSession();
@@ -198,41 +205,12 @@ class ClearTokExtension {
     document.getElementById('rateUsActionButton')?.addEventListener('click', () => this.handleRatingAction());
     document.getElementById('submitFeedbackButton')?.addEventListener('click', () => this.handleFeedbackSubmit());
     document.getElementById('alreadyRatedButton')?.addEventListener('click', () => this.closeRatingModal());
-    
+
     this.initializeRatingModal();
 
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      this.handleMessageWithDeduplication(message);
+      this.handleMessage(message);
     });
-  }
-
-  handleMessageWithDeduplication(message) {
-    const messageId = `${message.action}_${message.timestamp || Date.now()}_${message.instanceId || 'default'}`;
-    if (this.processedMessages.has(messageId)) {
-      console.log('Duplicate message detected, skipping:', messageId);
-      return;
-    }
-    const now = Date.now();
-    if (message.timestamp && Math.abs(now - message.timestamp) < 500) {
-      const recentSimilar = Array.from(this.processedMessages).some(id => {
-        const parts = id.split('_');
-        if (parts[0] === message.action && parts[2] !== message.instanceId) {
-          const msgTime = parseInt(parts[1]);
-          return Math.abs(msgTime - message.timestamp) < 500;
-        }
-        return false;
-      });
-      if (recentSimilar) {
-        console.log('Similar recent message detected, skipping:', messageId);
-        return;
-      }
-    }
-    this.processedMessages.add(messageId);
-    if (this.processedMessages.size > 100) {
-      const ids = Array.from(this.processedMessages);
-      ids.slice(0, 50).forEach(id => this.processedMessages.delete(id));
-    }
-    this.handleMessage(message);
   }
 
   async openTikTok() {
@@ -243,7 +221,7 @@ class ClearTokExtension {
       setTimeout(async () => {
         chrome.runtime.sendMessage({
           action: 'ensureAndCheckLogin',
-          tabId: tab.id  
+          tabId: tab.id
         });
       }, 4000);
     } catch (error) {
@@ -256,10 +234,10 @@ class ClearTokExtension {
     try {
       const tabs = await chrome.tabs.query({ url: "*://www.tiktok.com/*" });
       if (tabs.length > 0) {
-        this.currentTikTokTab = tabs[0];
+        this.currentTikTokTab = tabs[tabs.length - 1];
         chrome.runtime.sendMessage({
           action: 'ensureAndCheckLogin',
-          tabId: tabs[0].id
+          tabId: tabs[tabs.length - 1].id
         });
       } else {
         this.updateLoginStatus('waiting');
@@ -305,24 +283,24 @@ class ClearTokExtension {
         alert(this.getText('alertOpenTikTokFirst'));
         return;
       }
-      chrome.tabs.sendMessage(tabs[0].id, { action: 'checkLoginStatus' });
+      chrome.tabs.sendMessage(tabs[tabs.length - 1].id, { action: 'checkLoginStatus' });
       await new Promise(resolve => setTimeout(resolve, 1000));
     } catch (error) {
       console.log('Error checking tabs:', error);
     }
     this.isProcessing = true;
-    
+
     // 追踪 "处理开始" 事件
     this.trackEvent('process_started');
-    
+
     this.clearProcessingData();
     this.setState('processing');
     this.updateStatus(this.getText('statusInitializing'));
     this.updateProgress(0, 1);
     this.addLogEntry(this.getText('logStartingProcess'), 'info');
-    
+
     try {
-      chrome.runtime.sendMessage({ 
+      chrome.runtime.sendMessage({
         action: "removeRepostedVideos",
         extensionId: chrome.runtime.id
       });
@@ -339,7 +317,7 @@ class ClearTokExtension {
     this.removedUrls = [];
     this.pendingUrls = [];
     this.authorCounts = new Map();
-    
+
     const actionLog = document.getElementById('actionLog');
     if (actionLog) actionLog.innerHTML = '';
 
@@ -347,13 +325,13 @@ class ClearTokExtension {
     if (statsList) {
       statsList.innerHTML = `<li class="stats-item-placeholder" data-i18n="loadingStats">Scanning for your favorite creators...</li>`;
     }
-    
+
     this.updateRemovedVideosList('removedVideosList', 'removedCount');
     this.updateRemovedVideosList('removedVideosListComplete', 'removedCountComplete');
-    
+
     const progressFill = document.getElementById('progressFill');
     if (progressFill) progressFill.style.width = '0%';
-    
+
     const progressText = document.getElementById('progressText');
     if (progressText) progressText.textContent = '0 / 0';
   }
@@ -377,11 +355,11 @@ class ClearTokExtension {
   showDetailedLog() {
     let logContent = '';
     if (this.removedUrls.length > 0) {
-      logContent += this.getText('removedVideosHeader', {count: this.removedUrls.length}) + '\n';
+      logContent += this.getText('removedVideosHeader', { count: this.removedUrls.length }) + '\n';
       this.removedUrls.forEach((item, index) => {
         logContent += `${index + 1}. ${item.title || this.getText('videoUnknownTitle')} by ${item.author || this.getText('videoUnknownAuthor')}\n`;
         logContent += `   ${item.url}\n`;
-        logContent += `   ${this.getText('videoRemovedAt', {timestamp: item.timestamp})}\n\n`;
+        logContent += `   ${this.getText('videoRemovedAt', { timestamp: item.timestamp })}\n\n`;
       });
     }
     if (this.pendingUrls.length > 0) {
@@ -443,15 +421,15 @@ class ClearTokExtension {
   restart() {
     this.isProcessing = false;
     this.isPaused = false;
-    
+
     // 追踪 "重启" 事件
     if (this.sessionId) {
       this.trackEvent('process_restarted');
     }
-    
+
     this.clearProcessingData();
     this.setState('welcome');
-    
+
     const pauseButton = document.getElementById('pauseButton');
     if (pauseButton) {
       pauseButton.textContent = this.getText('pauseButton');
@@ -564,28 +542,27 @@ class ClearTokExtension {
   handleMessage(message) {
     switch (message.action) {
       case 'loginStatusUpdate':
-        if (message.method === 'username-check' && message.isLoggedIn) {
+        if (message.isLoggedIn) {
           if (message.username && message.username !== this.tikTokUsername) {
-            console.log('TikTok username detected:', message.username);
+            this.tikTokUsername = message.username;
             this.trackEvent('user_logged_in', { tiktok_username: message.username });
           }
           this.updateLoginStatus('loggedIn');
-        } else if (message.method === 'username-check' && !message.isLoggedIn) {
+        } else {
           if (this.tikTokUsername !== null) {
-              this.tikTokUsername = null;
-              this.trackEvent('user_logged_out');
+            this.tikTokUsername = null;
+            this.trackEvent('user_logged_out');
           }
           this.updateLoginStatus('notLoggedIn');
           this.showNotification('⚠️ Please log in to TikTok.com to continue', 'error');
-        } else {
-          this.updateLoginStatus('ready');
         }
         break;
       case 'updateProgress':
-        // 追踪 totalVideos 初始化事件
-        if (this.totalVideos === 0 && message.total > 0) {
-          this.trackEvent('total_reposts_found', { 
-            total_reposts_found: message.total 
+        // 仅在首次与最终两个阶段上报事件
+        if (message.phase === 'first' || message.phase === 'final') {
+          this.trackEvent('total_reposts_found', {
+            total_reposts_found: message.total,
+            phase: message.phase
           });
         }
         this.processedVideos = message.current;
@@ -599,37 +576,44 @@ class ClearTokExtension {
         if (message.title || message.author || message.url) {
           this.addRemovedVideo({ title: message.title, author: message.author, url: message.url });
         }
-        
+
         // 在这里添加作者统计逻辑
         if (message.author) {
           const currentCount = this.authorCounts.get(message.author) || 0;
           this.authorCounts.set(message.author, currentCount + 1);
           this.updateStatsChart(); // 更新统计图表
         }
-        
-        let removeLogMessage = this.getText('logVideoRemoved', {number: message.index});
-        if (message.title && message.author) removeLogMessage = this.getText('logVideoRemovedWithTitle', {title: message.title, author: message.author});
-        else if (message.title) removeLogMessage = this.getText('logVideoRemovedTitleOnly', {title: message.title});
-        else if (message.author) removeLogMessage = this.getText('logVideoRemovedAuthorOnly', {author: message.author});
+
+        let removeLogMessage = this.getText('logVideoRemoved', { number: message.index });
+        if (message.title && message.author) removeLogMessage = this.getText('logVideoRemovedWithTitle', { title: message.title, author: message.author });
+        else if (message.title) removeLogMessage = this.getText('logVideoRemovedTitleOnly', { title: message.title });
+        else if (message.author) removeLogMessage = this.getText('logVideoRemovedAuthorOnly', { author: message.author });
         this.addLogEntry(removeLogMessage, 'success', { title: message.title, author: message.author, url: message.url });
         break;
       case 'videoSkipped':
-        let skipLogMessage = this.getText('logVideoSkipped', {number: message.index});
-        if (message.title && message.author) skipLogMessage = this.getText('logVideoSkippedWithTitle', {title: message.title, author: message.author});
-        else if (message.title) skipLogMessage = this.getText('logVideoSkippedTitleOnly', {title: message.title});
-        else if (message.author) skipLogMessage = this.getText('logVideoSkippedAuthorOnly', {author: message.author});
-        skipLogMessage = this.getText('logVideoSkippedWithReason', {message: skipLogMessage, reason: message.reason});
+        let skipLogMessage = this.getText('logVideoSkipped', { number: message.index });
+        if (message.title && message.author) skipLogMessage = this.getText('logVideoSkippedWithTitle', { title: message.title, author: message.author });
+        else if (message.title) skipLogMessage = this.getText('logVideoSkippedTitleOnly', { title: message.title });
+        else if (message.author) skipLogMessage = this.getText('logVideoSkippedAuthorOnly', { author: message.author });
+        skipLogMessage = this.getText('logVideoSkippedWithReason', { message: skipLogMessage, reason: message.reason });
         this.addLogEntry(skipLogMessage, 'info');
         break;
       case 'waiting':
         if (message.seconds === 'paused') this.addLogEntry(this.getText('logWaitingPaused'), 'waiting');
-        else if (typeof message.seconds === 'number') this.addLogEntry(this.getText('logWaitingSeconds', {seconds: message.seconds}), 'waiting');
+        else if (typeof message.seconds === 'number') this.addLogEntry(this.getText('logWaitingSeconds', { seconds: message.seconds }), 'waiting');
         break;
       case 'statusUpdate':
         this.updateStatus(message.status);
         if (['Starting', 'Navigating', 'Looking', 'Loading', 'Found', 'Opening', 'Resuming', 'Closing'].some(term => message.status.includes(term))) {
           this.addLogEntry(message.status, 'info');
         }
+        break;
+      case 'uiWaitTimeout':
+        this.trackEvent('wait_for_element_timeout', {
+          selector_key: message.selectorKey,
+          timeout_ms: message.timeout,
+          page_url: message.url
+        });
         break;
       case 'error':
         this.handleError(message.message, message.error);
@@ -650,14 +634,14 @@ class ClearTokExtension {
     this.setState('error');
     const errorMessage = document.getElementById('errorMessage');
     if (errorMessage) errorMessage.textContent = message;
-    
+
     // 追踪 "错误" 事件
-    this.trackEvent('process_error', { 
+    this.trackEvent('process_error', {
       error_message: message,
       error_details: error ? error.toString() : ''
     });
-    
-    this.addLogEntry(this.getText('logError', {message: message}), 'error');
+
+    this.addLogEntry(this.getText('logError', { message: message }), 'error');
     if (error) console.error('Extension error:', error);
   }
 
@@ -668,7 +652,7 @@ class ClearTokExtension {
     const duration = message.duration;
     let durationText = '';
     const totalDurationSeconds = this.sessionStartTime ? Math.floor((Date.now() - this.sessionStartTime) / 1000) : (duration ? Math.floor(duration.total / 1000) : 0);
-    
+
     // 追踪 "完成" 事件，并附上最终数据
     this.trackEvent('process_completed', {
       reposts_removed: removedCount,
@@ -678,7 +662,7 @@ class ClearTokExtension {
     const completionMessage = document.getElementById('completionMessage');
     if (completionMessage) {
       if (duration) {
-        durationText = duration.minutes > 0 ? this.getText('durationMinutes', {minutes: duration.minutes, seconds: duration.seconds}) : this.getText('durationSeconds', {seconds: duration.seconds});
+        durationText = duration.minutes > 0 ? this.getText('durationMinutes', { minutes: duration.minutes, seconds: duration.seconds }) : this.getText('durationSeconds', { seconds: duration.seconds });
       }
       completionMessage.textContent = this.getText('completionMessageSuccess', { count: removedCount, plural: removedCount !== 1 ? 's' : '', duration: durationText });
     }
@@ -688,23 +672,23 @@ class ClearTokExtension {
       copyRemovedButton.style.display = this.removedUrls.length > 0 ? 'block' : 'none';
       copyRemovedButton.onclick = () => this.copyRemovedList();
     }
-    this.addLogEntry(this.getText('logProcessCompleted', {count: removedCount, duration: durationText}), 'success');
+    this.addLogEntry(this.getText('logProcessCompleted', { count: removedCount, duration: durationText }), 'success');
     if (removedCount > 0) {
       this.refreshTikTokPage();
     }
   }
-  
+
   async refreshTikTokPage() {
     try {
       const tabs = await chrome.tabs.query({ url: "*://www.tiktok.com/*" });
       if (tabs.length > 0) {
-        await chrome.tabs.reload(tabs[0].id);
+        await chrome.tabs.reload(tabs[tabs.length - 1].id);
         this.addLogEntry(this.getText('logRefreshingPage'), 'info');
         this.showNotification(this.getText('notificationPageRefreshed'), 'success');
         setTimeout(async () => {
           chrome.runtime.sendMessage({
             action: 'ensureAndCheckLogin',
-            tabId: tabs[0].id
+            tabId: tabs[tabs.length - 1].id
           });
         }, 5000);
       }
@@ -721,9 +705,9 @@ class ClearTokExtension {
     const listText = this.removedUrls.map((video, index) => {
       const title = video.title || this.getText('videoUnknownTitle');
       const author = video.author || this.getText('videoUnknownAuthor');
-      return `${index + 1}. ${title} by ${author}\n   ${video.url}\n   ${this.getText('videoRemovedAt', {timestamp: video.timestamp})}\n`;
+      return `${index + 1}. ${title} by ${author}\n   ${video.url}\n   ${this.getText('videoRemovedAt', { timestamp: video.timestamp })}\n`;
     }).join('\n');
-    const fullText = this.getText('removedVideosHeader', {count: this.removedUrls.length}) + '\n\n' + listText;
+    const fullText = this.getText('removedVideosHeader', { count: this.removedUrls.length }) + '\n\n' + listText;
     navigator.clipboard.writeText(fullText).then(() => {
       this.showNotification(this.getText('notificationUrlsCopied'), 'success');
     }).catch(() => {
@@ -744,15 +728,15 @@ class ClearTokExtension {
   handleNoReposts(message) {
     this.isProcessing = false;
     this.setState('complete');
-    
+
     // 追踪 "未找到转帖" 事件
     this.trackEvent('no_reposts_found');
-    
+
     const completionMessage = document.getElementById('completionMessage');
     if (completionMessage) completionMessage.textContent = this.getText('noRepostsFoundMessage');
     const copyRemovedButton = document.getElementById('copyRemovedButton');
     if (copyRemovedButton) copyRemovedButton.style.display = 'none';
-    this.addLogEntry(this.getText('logNoRepostsFound', {duration: ''}), 'info');
+    this.addLogEntry(this.getText('logNoRepostsFound', { duration: '' }), 'info');
     this.showNotification(this.getText('notificationNoRepostsFound'), 'info');
   }
 
@@ -775,7 +759,7 @@ class ClearTokExtension {
     document.querySelector('.stars-container')?.addEventListener('mouseleave', () => {
       this.updateStarDisplay(this.selectedRating);
     });
-    
+
     // 添加反馈输入框的字符计数功能
     const feedbackInput = document.getElementById('feedbackInput');
     const feedbackCharCount = document.getElementById('feedbackCharCount');
@@ -783,7 +767,7 @@ class ClearTokExtension {
       feedbackInput.addEventListener('input', () => {
         const currentLength = feedbackInput.value.length;
         feedbackCharCount.textContent = currentLength;
-        
+
         // 更新字符计数颜色
         if (currentLength > 450) {
           feedbackCharCount.style.color = 'var(--color-warning)';
@@ -813,7 +797,7 @@ class ClearTokExtension {
     this.updateRatingMessage();
     this.updateActionButton();
     this.updateFeedbackSection();
-    
+
     // 重置反馈输入框
     const feedbackInput = document.getElementById('feedbackInput');
     const feedbackCharCount = document.getElementById('feedbackCharCount');
@@ -856,13 +840,13 @@ class ClearTokExtension {
   updateActionButton() {
     const actionButton = document.getElementById('rateUsActionButton');
     const feedbackButton = document.getElementById('submitFeedbackButton');
-    
+
     if (actionButton) {
       actionButton.classList.toggle('active', this.selectedRating > 0);
       // 当评分≤3时，隐藏评分按钮，显示反馈按钮
       actionButton.classList.toggle('hidden', this.selectedRating > 0 && this.selectedRating <= 3);
     }
-    
+
     if (feedbackButton) {
       // 只有当评分≤3时才显示反馈提交按钮
       feedbackButton.classList.toggle('hidden', this.selectedRating === 0 || this.selectedRating > 3);
@@ -889,10 +873,10 @@ class ClearTokExtension {
 
     const feedbackInput = document.getElementById('feedbackInput');
     const feedbackText = feedbackInput ? feedbackInput.value.trim() : '';
-    
+
     // 记录评分和反馈
     this.recordRating(this.selectedRating, feedbackText);
-    
+
     // 发送反馈到后端
     try {
       if (this.sessionId && window.apiService) {
@@ -904,7 +888,7 @@ class ClearTokExtension {
     } catch (error) {
       console.warn('Failed to submit feedback to backend:', error);
     }
-    
+
     // 关闭模态框并显示感谢消息
     this.closeRatingModal();
     this.showNotification(this.getText('thankYouForFeedback', { rating: this.selectedRating }), 'success');
@@ -933,10 +917,10 @@ class ClearTokExtension {
 
   async handleRatingAction() {
     if (this.selectedRating === 0) return;
-    
+
     // 记录评分
     this.recordRating(this.selectedRating);
-    
+
     // 发送反馈到后端（对于高分用户，反馈为空）
     try {
       if (this.sessionId && window.apiService) {
@@ -948,13 +932,13 @@ class ClearTokExtension {
     } catch (error) {
       console.warn('Failed to submit feedback to backend:', error);
     }
-    
+
     // 只有高分（4-5星）才跳转到商店页面
     if (this.selectedRating >= 4) {
       const storeUrl = this.getStoreUrl();
       chrome.tabs.create({ url: storeUrl });
     }
-    
+
     this.closeRatingModal();
     this.showNotification(this.getText('thankYouForRating'), 'success');
   }
@@ -962,11 +946,11 @@ class ClearTokExtension {
   recordRating(rating, feedback = '') {
     console.log('User rated:', rating, 'stars', feedback ? 'with feedback' : 'without feedback');
     try {
-      chrome.storage.local.set({ 
-        'userRated': true, 
-        'ratingValue': rating, 
+      chrome.storage.local.set({
+        'userRated': true,
+        'ratingValue': rating,
         'ratingFeedback': feedback,
-        'ratingDate': Date.now() 
+        'ratingDate': Date.now()
       });
     } catch (error) {
       console.warn('Failed to save rating:', error);

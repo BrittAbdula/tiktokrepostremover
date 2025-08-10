@@ -3,7 +3,7 @@
 
   "name": "ClearTok - TikTok Repost Remover",
   "description": "Instantly remove all your TikTok reposts—no scrolling, no tapping.",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "permissions": ["scripting", "tabs", "activeTab", "sidePanel", "storage"],
   "host_permissions": [
     "https://*.tiktok.com/*",
