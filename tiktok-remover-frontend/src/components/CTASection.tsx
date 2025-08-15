@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 // 引入 Font Awesome 6 图标组件
 import {
   FaChrome,         // 用于 Chrome 按钮图标
@@ -9,8 +10,29 @@ import {
 } from "react-icons/fa6";
 
 const CTASection = () => {
+  const [browser, setBrowser] = useState<'chrome' | 'edge' | 'other'>('other');
+
+  useEffect(() => {
+    try {
+      const ua = navigator.userAgent || '';
+      if (/Edg/i.test(ua)) {
+        setBrowser('edge');
+        return;
+      }
+      if (/(Chrome|CriOS)/i.test(ua) && !/(OPR|Opera|Edg|SamsungBrowser)/i.test(ua)) {
+        setBrowser('chrome');
+        return;
+      }
+      setBrowser('other');
+    } catch {
+      setBrowser('other');
+    }
+  }, []);
+
+  const showChrome = browser === 'chrome' || browser === 'other';
+  const showEdge = browser === 'edge' || browser === 'other';
   return (
-    <section id="download" className="py-20 bg-gradient-to-br from-[#FE2C55] via-[#FF0050] to-[#00F2EA] rounded-2xl text-white text-center relative overflow-hidden">
+    <section id="download" className="py-16 md:py-20 bg-gradient-to-br from-[#FE2C55] via-[#FF0050] to-[#00F2EA] rounded-2xl text-white text-center relative overflow-hidden">
       <div className="absolute inset-0 bg-black/20"></div>
       <div className="max-w-3xl mx-auto px-4 relative z-10">
         <h2 className="text-4xl font-bold mb-6">
@@ -20,38 +42,42 @@ const CTASection = () => {
           Join thousands of users who have already cleaned up their TikTok profiles with ClearTok
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6 px-4">
-          <Button 
-            size="lg" 
-            variant="secondary" 
-            className="text-lg px-8 py-4 bg-white text-black hover:bg-gray-100 font-bold shadow-lg hover:shadow-xl transition-all relative overflow-hidden 
-                       before:absolute before:inset-0 before:rounded-lg before:p-[2px] before:bg-gradient-to-r before:from-[#FE2C55] before:via-[#FF0050] before:to-[#00F2EA] before:-z-10
-                       after:absolute after:inset-[2px] after:rounded-[6px] after:bg-white after:-z-10
-                       animate-pulse hover:animate-none
-                       shadow-[0_0_20px_rgba(254,44,85,0.5)] hover:shadow-[0_0_30px_rgba(254,44,85,0.8)]" 
-            asChild
-          >
-            <a href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb?utm_source=cleartok_website" className="flex items-center justify-center relative z-10" target="_blank">
-              {/* 渲染引入的 Font Awesome Chrome 图标 */}
-              <FaChrome className="w-5 h-5 mr-2 text-black" /> {/* Chrome 按钮是白色背景，所以图标用黑色 */}
-              Add ClearTok to Chrome – It's Free
-            </a>
-          </Button>
-          <Button 
-            size="lg" 
-            variant="secondary" 
-            className="text-lg px-8 py-4 bg-white text-black hover:bg-gray-100 font-bold shadow-lg hover:shadow-xl transition-all relative overflow-hidden 
-                       before:absolute before:inset-0 before:rounded-lg before:p-[2px] before:bg-gradient-to-r before:from-[#0078D4] before:via-[#106EBE] before:to-[#00F2EA] before:-z-10
-                       after:absolute after:inset-[2px] after:rounded-[6px] after:bg-white after:-z-10
-                       animate-pulse hover:animate-none
-                       shadow-[0_0_20px_rgba(0,120,212,0.5)] hover:shadow-[0_0_30px_rgba(0,120,212,0.8)]" 
-            asChild
-          >
-            <a href="https://microsoftedge.microsoft.com/addons/detail/cleartok-tiktok-repost-/bgbcmapbnbdmmjibajjagnlbbdhcenoc" className="flex items-center justify-center relative z-10" target="_blank">
-              {/* 渲染引入的 Font Awesome Edge 图标 */}
-              <FaEdge className="w-5 h-5 mr-2 text-black" /> {/* Edge 按钮是白色背景，所以图标用黑色 */}
-              Add ClearTok to Edge – It's Free
-            </a>
-          </Button>
+          {showChrome && (
+            <Button 
+              size="lg" 
+              variant="secondary" 
+              className="w-full sm:w-auto text-lg px-8 py-4 bg-white text-black hover:bg-gray-100 font-bold shadow-lg hover:shadow-xl transition-all relative overflow-hidden 
+                         before:absolute before:inset-0 before:rounded-lg before:p-[2px] before:bg-gradient-to-r before:from-[#FE2C55] before:via-[#FF0050] before:to-[#00F2EA] before:-z-10
+                         after:absolute after:inset-[2px] after:rounded-[6px] after:bg-white after:-z-10
+                         animate-pulse hover:animate-none
+                         shadow-[0_0_20px_rgba(254,44,85,0.5)] hover:shadow-[0_0_30px_rgba(254,44,85,0.8)]" 
+              asChild
+            >
+              <a href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb?utm_source=cleartok_website" className="flex items-center justify-center w-full relative z-10" target="_blank" rel="noopener noreferrer">
+                {/* 渲染引入的 Font Awesome Chrome 图标 */}
+                <FaChrome className="w-5 h-5 mr-2 text-black" /> {/* Chrome 按钮是白色背景，所以图标用黑色 */}
+                Add to Chrome – It's Free
+              </a>
+            </Button>
+          )}
+          {showEdge && (
+            <Button 
+              size="lg" 
+              variant="secondary" 
+              className="w-full sm:w-auto text-lg px-8 py-4 bg-white text-black hover:bg-gray-100 font-bold shadow-lg hover:shadow-xl transition-all relative overflow-hidden 
+                         before:absolute before:inset-0 before:rounded-lg before:p-[2px] before:bg-gradient-to-r before:from-[#0078D4] before:via-[#106EBE] before:to-[#00F2EA] before:-z-10
+                         after:absolute after:inset-[2px] after:rounded-[6px] after:bg-white after:-z-10
+                         animate-pulse hover:animate-none
+                         shadow-[0_0_20px_rgba(0,120,212,0.5)] hover:shadow-[0_0_30px_rgba(0,120,212,0.8)]" 
+              asChild
+            >
+              <a href="https://microsoftedge.microsoft.com/addons/detail/cleartok-tiktok-repost-/bgbcmapbnbdmmjibajjagnlbbdhcenoc" className="flex items-center justify-center w-full relative z-10" target="_blank" rel="noopener noreferrer">
+                {/* 渲染引入的 Font Awesome Edge 图标 */}
+                <FaEdge className="w-5 h-5 mr-2 text-black" /> {/* Edge 按钮是白色背景，所以图标用黑色 */}
+                Add to Edge – It's Free
+              </a>
+            </Button>
+          )}
         </div>
         <p className="text-sm opacity-80">
           No sign-up • Instant install • Works worldwide

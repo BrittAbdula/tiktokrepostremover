@@ -36,19 +36,19 @@ const FeaturesSection = () => {
     },
     {
       title: "Real-time Monitoring",
-      description: "Watch the repost remover tiktok deletion process live with detailed progress updates and statistics",
+      description: "Watch removals in real time with detailed progress and stats",
       badge: "Live",
       icon: FaEye
     },
     {
       title: "Smart Human-Delay",
-      description: "Our all repost remover extension mimics natural browsing speed to avoid account flags and maintain safety", 
+      description: "Removes reposts at human-like speed to avoid flags and stay safe", 
       badge: "Safe",
       icon: FaClock
     },
     {
       title: "Open-Source Transparency",
-      description: "Check the repost remover extension code, audit the privacy - our tiktok all repost remover is available on GitHub",
+      description: "Review the code and privacy approach — ClearTok is open-source on GitHub",
       badge: "Transparent",
       icon: FaGithub
     },
@@ -79,7 +79,7 @@ const FeaturesSection = () => {
           Key Features
         </h2>
         <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-        Everything you need in a repost remover tiktok extension to delete all repost on tiktok efficiently and safely
+          Everything you need to bulk-remove reposts — fast and safely
         </p>
       </div>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

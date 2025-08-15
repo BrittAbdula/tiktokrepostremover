@@ -32,6 +32,8 @@ Clean your profile in seconds. Start fresh—install ClearTok now.
 ---
 
 ## Recent Updates
+- image update
+- Bulk delete all reposts automatically — free, safe, and updated for the latest TikTok UI.
 
 ### v1.4.0(2025-08-04)
 - Improved repost detection accuracy

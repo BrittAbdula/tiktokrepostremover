@@ -11,20 +11,20 @@ const HowItWorksSection = () => {
     {
       step: "1",
       title: "Sign In to TikTok",
-      description: "Sign in to TikTok.com on Chrome browser to prepare for using the repost remover extension",
+      description: "Sign in to TikTok.com in Chrome/Edge to get started",
       // 直接引用图标组件
       icon: FaRightToBracket 
     },
     {
       step: "2", 
       title: "Launch ClearTok",
-      description: "Open the 'ClearTok' icon & click Start Removing to begin the cleanup process",
+      description: "Open the 'ClearTok' icon & click 'Start Removing Reposts' to begin the cleanup process",
       icon: FaPuzzlePiece 
     },
     {
       step: "3",
-      title: "Monitor Your All Repost Remover Progress",
-      description: "Watch real-time progress as our TikTok all repost remover works safely in the background. Switch tabs to multitask and export deleted URLs when the repost remover tiktok process is complete",
+      title: "Track Progress",
+      description: "Watch progress in real time as ClearTok works in the background. Switch tabs to multitask and export deleted URLs when it's done",
       icon: FaGear 
     }
   ];

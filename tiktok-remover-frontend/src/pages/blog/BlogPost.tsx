@@ -115,6 +115,28 @@ const BlogPost = () => {
         />
       </div>
     ),
+    table: ({ node, children, ...props }) => (
+      <div className="my-6 overflow-x-auto">
+        <table className="w-full border-collapse text-gray-300" {...props}>
+          {children}
+        </table>
+      </div>
+    ),
+    thead: ({ node, ...props }) => (
+      <thead className="bg-gray-900/40" {...props} />
+    ),
+    tr: ({ node, ...props }) => (
+      <tr className="border-b border-gray-800" {...props} />
+    ),
+    th: ({ node, ...props }) => (
+      <th
+        className="px-4 py-2 text-left font-semibold text-gray-200 border-b border-gray-700"
+        {...props}
+      />
+    ),
+    td: ({ node, ...props }) => (
+      <td className="px-4 py-2 text-gray-300 border-b border-gray-800" {...props} />
+    ),
   };
 
   return (
@@ -158,7 +180,7 @@ const BlogPost = () => {
               }
             },
             "datePublished": post.publishDate,
-            "dateModified": post.publishDate,
+            "dateModified": post.updatedDate || post.publishDate,
             "mainEntityOfPage": {
               "@type": "WebPage",
               "@id": `https://tiktokrepostremover.com/blog/${post.slug}`
@@ -176,7 +198,7 @@ const BlogPost = () => {
         <main className="container mx-auto px-4 py-8">
           {/* 返回按钮 */}
           <div className="mb-8">
-            <Button asChild variant="ghost" className="text-gray-400 hover:text-white">
+            <Button asChild variant="ghost" className="text-gray-400 hover:text-black">
               <Link to="/blog" className="flex items-center gap-2">
                 <ArrowLeft className="w-4 h-4" />
                 Back to Blog
@@ -244,6 +266,12 @@ const BlogPost = () => {
                   <CalendarDays className="w-4 h-4" />
                   {post.publishDate}
                 </div>
+                {post.updatedDate && (
+                  <div className="flex items-center gap-1">
+                    <CalendarDays className="w-4 h-4" />
+                    Updated {post.updatedDate}
+                  </div>
+                )}
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                   {post.readTime}
@@ -283,15 +311,15 @@ const BlogPost = () => {
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                         </svg>
-                        Get ClearTok Free
+                        Add to Chrome
                       </a>
                     </Button>
                     <Button asChild variant="outline" size="lg" className="border-[#00F2EA]/50 text-[#00F2EA] hover:bg-[#00F2EA] hover:border-[#00F2EA] hover:text-black font-semibold px-8 py-4 transition-all duration-300 transform hover:scale-105">
-                      <a href="https://tiktokrepostremover.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+                      <a href="https://microsoftedge.microsoft.com/addons/detail/cleartok-tiktok-repost-/bgbcmapbnbdmmjibajjagnlbbdhcenoc" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2a10 10 0 100 20 10 10 0 000-20z" />
                         </svg>
-                        Visit Website
+                        Add to Edge
                       </a>
                     </Button>
                   </div>

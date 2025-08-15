@@ -158,7 +158,28 @@ CREATE INDEX idx_feedback_session_id ON user_feedback(session_id);
 CREATE INDEX idx_feedback_rating ON user_feedback(rating_score);
 CREATE INDEX idx_feedback_created_at ON user_feedback(created_at);
 
+-- WaitList 表 - 用于收集用户邮箱，等待手机端APP发布
+CREATE TABLE waitlist (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT NOT NULL UNIQUE,
+  
+  -- 用户环境信息
+  ip_address TEXT,
+  country TEXT,
+  user_agent TEXT,
+  
+  -- 订阅状态
+  status TEXT DEFAULT 'subscribed', -- 'subscribed', 'unsubscribed'
+  
+  -- 创建时间
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
+-- 为waitlist表添加索引
+CREATE INDEX idx_waitlist_email ON waitlist(email);
+CREATE INDEX idx_waitlist_status ON waitlist(status);
+CREATE INDEX idx_waitlist_created_at ON waitlist(created_at);
 
 select error_message,count(1) from user_sessions group by 1 order by 2 desc;
 select process_status,count(1) from user_sessions group by 1 order by 2 desc;

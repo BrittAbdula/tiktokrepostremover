@@ -25,8 +25,8 @@ const Index = () => {
     <>
       <Helmet>
         <title>TikTok Repost Remover - Delete ALL Your Reposts in One Click</title>
-        <meta name="description" content="ClearTok - The FREE TikTok Repost Remover extension erases every reposted video from your profile in seconds. No coding or manual tapping." />
-        <link rel="canonical" href="https://tiktokrepostremover.com" />
+        <meta name="description" content="ClearTok - The FREE TikTok Repost Remover extension erases every reposted video from your profile in seconds. 100% local, No password required. Safer, Faster." />
+        <link rel="canonical" href="https://tiktokrepostremover.com/" />
         
         <meta property="og:title" content="TikTok Repost Remover - Delete ALL Reposts Instantly" />
         <meta property="og:description" content="One-click Extension to bulk delete all TikTok reposts. Maintain a clean feed & brand image. Free download." />
@@ -111,6 +111,55 @@ const Index = () => {
                   "@type": "SearchAction",
                   "target": "https://tiktokrepostremover.com/blog?search={search_term_string}",
                   "query-input": "required name=search_term_string"
+                }
+              }
+            ]
+          })}
+        </script>
+        {/* FAQ Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is SocialAut safe compared with ClearTok?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "ClearTok is open-source, runs 100% locally in your browser on TikTok.com, and never asks for your TikTok password. SocialAut requires logging in with your TikTok account (password) inside its app and its code is not publicly auditable."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is there a Socialaut extension? How does the Socialaut extension compare to ClearTok?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "ClearTok is a free Chrome/Edge browser extension for desktop. To our knowledge, SocialAut focuses on a mobile-app workflow and does not provide an official desktop browser extension."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "SocialAut PC vs ClearTok: can I use it on a computer?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "ClearTok is built for PC (Windows, macOS, Linux) via Chrome or Edge and works directly on TikTok.com. SocialAut primarily targets mobile and has no native PC version."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is there a SocialAut online web version?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "ClearTok works online in your browser—no app install and no password login required. SocialAut is a mobile app rather than a pure web ('online') tool."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How much does SocialAut cost compared to ClearTok?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "ClearTok is completely free. SocialAut typically charges about $5 for access (pricing may change). If you prefer a free, open-source option that never asks for your TikTok password, choose ClearTok."
                 }
               }
             ]

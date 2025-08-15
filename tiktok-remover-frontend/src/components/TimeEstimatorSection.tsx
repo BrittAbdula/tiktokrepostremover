@@ -105,7 +105,7 @@ const TimeEstimatorSection = () => {
             ⏱️ ClearTok Time Estimator
           </h2>
           <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-            Wondering how long our <strong className="text-[#FE2C55]">TikTok repost remover extension</strong> will take? 
+            Wondering how long remove all reposts will take? 
           </p>
         </div>
 

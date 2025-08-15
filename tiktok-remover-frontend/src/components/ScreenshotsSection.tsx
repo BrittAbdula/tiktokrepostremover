@@ -125,7 +125,7 @@ const ScreenshotsSection = () => {
 
         <div className="text-center">
           <p className="text-gray-400 text-sm mb-4">
-            ✨ All features work seamlessly within your Chrome browser
+            ✨ All features work seamlessly within your Chrome/Edge browser
           </p>
           <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-400">
             <div className="flex items-center space-x-2">

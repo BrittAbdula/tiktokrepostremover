@@ -19,8 +19,8 @@ const RecentDeletionsScroll = () => {
     
     const timeOptions = ['3s ago', '12s ago', '28s ago', '45s ago', '1m ago', '2m ago', '3m ago', '5m ago'];
     
-    return Array.from({ length:15 }, (_, i) => {
-      const count = Math.floor(Math.random() * 100) + 1;
+    return Array.from({ length:10 }, (_, i) => {
+      const count = Math.floor(Math.random() * 300) + 1;
       const durationMultiplier = Math.random() * 2 + 3; // 3-5秒的随机系数
       const duration = Math.round(count * durationMultiplier);
       

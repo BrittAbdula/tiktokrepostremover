@@ -1,12 +1,34 @@
 import { Button } from "@/components/ui/button";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { FaChrome, FaEdge } from "react-icons/fa6";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const headerRef = useRef<HTMLHeadElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // 浏览器识别（Chrome / Edge / 其他）
+  const [browser, setBrowser] = useState<'chrome' | 'edge' | 'other'>('other');
+  useEffect(() => {
+    try {
+      const ua = navigator.userAgent || '';
+      if (/Edg/i.test(ua)) {
+        setBrowser('edge');
+        return;
+      }
+      if (/(Chrome|CriOS)/i.test(ua) && !/(OPR|Opera|Edg|SamsungBrowser)/i.test(ua)) {
+        setBrowser('chrome');
+        return;
+      }
+      setBrowser('other');
+    } catch {
+      setBrowser('other');
+    }
+  }, []);
+  const showChrome = browser === 'chrome' || browser === 'other';
+  const showEdge = browser === 'edge' || browser === 'other';
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -135,20 +157,36 @@ const Header = () => {
           >
             FAQ
           </a>
-          <Button asChild className="bg-gradient-to-r from-[#FE2C55] to-[#FF0050] hover:from-[#FF0050] hover:to-[#FE2C55] 
-                                   text-white font-bold shadow-lg hover:shadow-xl hover:shadow-[#FE2C55]/50 transition-all duration-300
-                                   transform hover:scale-105">
-            <a 
-              href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb?utm_source=cleartok_website"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-            <img 
-                src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/googlechrome.svg" 
-                alt="Chrome" 
-                className="w-5 h-5 mr-2 filter invert"
-              />Add to Chrome</a>
-          </Button>
+          {showChrome && (
+            <Button asChild className="bg-gradient-to-r from-[#FE2C55] to-[#FF0050] hover:from-[#FF0050] hover:to-[#FE2C55] 
+                                     text-white font-bold shadow-lg hover:shadow-xl hover:shadow-[#FE2C55]/50 transition-all duration-300
+                                     transform hover:scale-105">
+              <a 
+                href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb?utm_source=cleartok_website"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center"
+              >
+                <FaChrome className="w-5 h-5 mr-2" />
+                Add to Chrome
+              </a>
+            </Button>
+          )}
+          {showEdge && (
+            <Button asChild className="bg-gradient-to-r from-[#0078D4] to-[#106EBE] hover:from-[#106EBE] hover:to-[#0078D4]
+                                     text-white font-bold shadow-lg hover:shadow-xl hover:shadow-[#0078D4]/50 transition-all duration-300
+                                     transform hover:scale-105">
+              <a 
+                href="https://microsoftedge.microsoft.com/addons/detail/cleartok-tiktok-repost-/bgbcmapbnbdmmjibajjagnlbbdhcenoc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center"
+              >
+                <FaEdge className="w-5 h-5 mr-2" />
+                Add to Edge
+              </a>
+            </Button>
+          )}
         </nav>
 
         {/* 移动端汉堡菜单按钮 */}
@@ -177,9 +215,11 @@ const Header = () => {
       </div>
 
       {/* 移动端导航菜单 */}
-      <div className={`md:hidden bg-black/98 backdrop-blur-sm border-t border-gray-800/50 transition-all duration-300 overflow-hidden ${
-        isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-      }`}>
+            <div
+        className={`md:hidden bg-black/98 backdrop-blur-sm border-t border-gray-800/50 transition-all duration-300 overflow-x-hidden ${
+          isMobileMenuOpen ? 'max-h-[75vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0 overflow-hidden'
+        }`}
+      >
         <nav className="container mx-auto px-4 py-4 space-y-4">
           <a 
             href="#calculator" 
@@ -221,23 +261,36 @@ const Header = () => {
           >
             FAQ
           </a>
-          <Button asChild className="w-full bg-gradient-to-r from-[#FE2C55] to-[#FF0050] hover:from-[#FF0050] hover:to-[#FE2C55] 
-                                   text-white font-bold shadow-lg hover:shadow-xl hover:shadow-[#FE2C55]/50 transition-all duration-300
-                                   mt-4">
-            <a 
-              href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb?utm_source=cleartok_website"
-              className="flex items-center justify-center" 
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img 
-                src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/googlechrome.svg" 
-                alt="Chrome" 
-                className="w-5 h-5 mr-2 filter invert"
-              />
-              Download ClearTok
-            </a>
-          </Button>
+          {showChrome && (
+            <Button asChild className="w-full bg-gradient-to-r from-[#FE2C55] to-[#FF0050] hover:from-[#FF0050] hover:to-[#FE2C55] 
+                                     text-white font-bold shadow-lg hover:shadow-xl hover:shadow-[#FE2C55]/50 transition-all duration-300
+                                     mt-4">
+              <a 
+                href="https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb?utm_source=cleartok_website"
+                className="flex items-center justify-center" 
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaChrome className="w-5 h-5 mr-2" />
+                Download for Chrome
+              </a>
+            </Button>
+          )}
+          {showEdge && (
+            <Button asChild className="w-full bg-gradient-to-r from-[#0078D4] to-[#106EBE] hover:from-[#106EBE] hover:to-[#0078D4]
+                                     text-white font-bold shadow-lg hover:shadow-xl hover:shadow-[#0078D4]/50 transition-all duration-300
+                                     mt-2">
+              <a 
+                href="https://microsoftedge.microsoft.com/addons/detail/cleartok-tiktok-repost-/bgbcmapbnbdmmjibajjagnlbbdhcenoc"
+                className="flex items-center justify-center" 
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaEdge className="w-5 h-5 mr-2" />
+                Download for Edge
+              </a>
+            </Button>
+          )}
         </nav>
       </div>
     </header>

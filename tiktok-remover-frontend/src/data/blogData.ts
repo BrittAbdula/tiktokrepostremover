@@ -6,6 +6,7 @@ export interface BlogPost {
   content: string;
   author: string;
   publishDate: string;
+  updatedDate?: string;
   readTime: string;
   tags: string[];
   featured?: boolean;
@@ -123,6 +124,71 @@ Keep an eye out for updates from TikTok, as they are reportedly looking into imp
     tags: ["TikTok", "Tutorial", "Reposts", "Bulk Delete"],
     featured: false,
     image: "/images/blog/tiktok-bulk-delete.png"
+  },
+  {
+    id: 9,
+    title: "ClearTok vs SocialAut — Free PC Alternative, No Password, Open-Source",
+    slug: "cleartok-vs-socialaut",
+    excerpt:
+      "Compare ClearTok and SocialAut: ClearTok is free, works on PC (Chrome/Edge), requires no TikTok password, and is open-source. See safety, pricing, setup, and which tool fits you.",
+    content: `
+> TL;DR  
+- **ClearTok**: **Free**, **PC (Chrome/Edge)**, **no password login**, **open-source**, runs locally on TikTok.com.  
+- **SocialAut**: ~**$5** (as of 2025-08), **mobile-only**, requires TikTok **password login**, closed-source.
+
+## Who is this for?
+Creators or users who want to bulk delete all TikTok reposts with the safest workflow and minimal friction.
+
+## Quick comparison table
+| Feature | ClearTok | SocialAut |
+|---|---|---|
+| Price | **Free** | **~$5** (as of 2025-08) |
+| Platform | **PC** (Chrome/Edge) | **Mobile app** |
+| Login | **No TikTok password required** | **Requires TikTok password** |
+| Safety model | **Local-only, open-source** | Closed-source |
+| Setup time | Install extension, click Start | Install app, sign in, configure |
+| Export/report | ✅ URLs & timestamps | – |
+| Open source | **Yes** | No public repo |
+
+## Why ClearTok is safer for your account
+- Runs **inside your browser** on TikTok.com, at human-like speed with built-in rate limits.  
+- **No credentials collected**; nothing leaves your device.  
+- **Open-source**: anyone can audit how it works.
+
+## Can I use SocialAut on PC? (SocialAut PC / Socialaut extension / SocialAut online)
+If you’re searching for a **Socialaut extension** or **SocialAut PC / SocialAut online**, note that SocialAut focuses on **mobile**.  
+**ClearTok** provides the **desktop/online** experience via a Chrome/Edge extension for Windows/macOS/Linux.
+
+## Pricing
+- **ClearTok**: Free.  
+- **SocialAut**: Around **$5** (pricing may change; check the latest information).
+
+## Is SocialAut safe?
+We can’t audit third-party code. For safety, prefer tools that are **open-source, local-only, and don’t ask for your TikTok password**. That’s ClearTok’s model.
+
+## How ClearTok works (2 mins)
+1. Install from Chrome Web Store / Edge Add-ons  
+2. Open TikTok.com → Reposts  
+3. Click **Start** → watch progress, export report
+
+## FAQs
+- **Is SocialAut safe?** See safety section above.  
+- **Is there a Socialaut extension?** ClearTok covers the desktop extension use-case.  
+- **SocialAut PC or online?** ClearTok runs online in your browser on PC.  
+- **Why is ClearTok free?** Open-source project; no data collection.
+
+## Switch in 30 seconds
+[Install ClearTok — Free on Chrome](https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb) · [Install on Edge](https://microsoftedge.microsoft.com/addons/detail/cleartok-tiktok-repost-/bgbcmapbnbdmmjibajjagnlbbdhcenoc)
+
+*Disclaimer: Prices and features referenced here are based on publicly available information as of 2025-08. “TikTok” and all related marks are trademarks of their respective owners.*
+    `,
+    author: "ClearTok Team",
+    publishDate: "2025-08-12",
+    updatedDate: "2025-08-12",
+    readTime: "5 min read",
+    tags: ["TikTok", "Comparison", "Reposts", "Safety"],
+    image: "/images/blog/cleartok-vs-socialaut.png",
+    featured: true,
   },
   {
     id: 3,
@@ -449,7 +515,7 @@ We're excited to welcome Edge users to the ClearTok family and look forward to h
     publishDate: "2025-08-04",
     readTime: "6 min read",
     tags: ["ClearTok", "Microsoft Edge", "Browser Support", "TikTok", "Extension"],
-    featured: true,
+    featured: false,
     image: "/images/blog/cleartok-edge-support.png"
   }
 ];
