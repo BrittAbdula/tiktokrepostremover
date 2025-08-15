@@ -19,7 +19,7 @@ const RecentDeletionsScroll = () => {
     
     const timeOptions = ['3s ago', '12s ago', '28s ago', '45s ago', '1m ago', '2m ago', '3m ago', '5m ago'];
     
-    return Array.from({ length:10 }, (_, i) => {
+    return Array.from({ length: 6 }, (_, i) => {
       const count = Math.floor(Math.random() * 300) + 1;
       const durationMultiplier = Math.random() * 2 + 3; // 3-5秒的随机系数
       const duration = Math.round(count * durationMultiplier);
@@ -42,15 +42,15 @@ const RecentDeletionsScroll = () => {
     const interval = setInterval(() => {
       setRecords(prev => {
         const newRecords = generateMockData();
-        return [...newRecords.slice(0, 5), ...prev.slice(0, 25)];
+        return [...newRecords.slice(0, 3), ...prev.slice(0, 15)];
       });
     }, 6000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // 根据记录数动态计算滚动时长（每条 2s，可自行微调）
-  const animationDuration = `${Math.max(records.length * 2, 30)}s`;
+  // 根据记录数动态计算滚动时长（每条 1.5s，可自行微调）
+  const animationDuration = `${Math.max(records.length * 1.5, 20)}s`;
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
@@ -63,7 +63,7 @@ const RecentDeletionsScroll = () => {
         
         {/* Scrolling container - faster animation */}
         <div 
-          className="h-full flex flex-col justify-start pt-8"
+          className="h-full flex flex-col justify-start pt-4"
           style={{
             animation: `scrollUp ${animationDuration} linear infinite`
           }}

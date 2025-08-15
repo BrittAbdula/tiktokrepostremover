@@ -28,6 +28,7 @@ app.use('*', cors({
     'http://localhost:8080',
     'http://localhost:5173',
     'https://tiktokrepostremover.com', 
+    'https://www.tiktokrepostremover.com',
     'chrome-extension://kmellgkfemijicfcpndnndiebmkdginb', // 允许你的 Chrome 扩展直接访问
     'chrome-extension://hmmoeamiibmgplmjeioeclpcabdbeinj'
   ],
@@ -314,6 +315,70 @@ app.post(
     } catch (error) {
       console.error('Database error in /feedback/submit:', error);
       return c.json({ error: 'Failed to submit feedback' }, 500);
+    }
+  }
+);
+
+/**
+ * @description 加入WaitList - 用户输入邮箱等待手机端APP发布
+ */
+app.post(
+  '/waitlist/subscribe',
+  validator('json', (value, c) => {
+    const { email } = value;
+    if (!email || typeof email !== 'string') return c.text('Invalid or missing email', 400);
+    
+    // 简单的邮箱格式验证
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return c.text('Invalid email format', 400);
+    }
+    
+    return value;
+  }),
+  async (c) => {
+    try {
+      const { email } = c.req.valid('json');
+      const locationInfo = getLocationInfo(c);
+      const userAgent = c.req.header('User-Agent') || 'unknown';
+      
+      // 检查邮箱是否已经存在
+      const existingEmail = await c.env.DB.prepare(`
+        SELECT id FROM waitlist WHERE email = ? AND status = 'subscribed'
+      `).bind(email).first();
+      
+      if (existingEmail) {
+        return c.json({ 
+          success: false, 
+          message: 'This email is already subscribed to our waitlist!' 
+        }, 409);
+      }
+      
+      // 插入到waitlist表
+      const result = await c.env.DB.prepare(`
+        INSERT INTO waitlist (email, ip_address, country, user_agent) 
+        VALUES (?, ?, ?, ?)
+      `).bind(
+        email.toLowerCase().trim(),
+        locationInfo.ip,
+        locationInfo.country,
+        userAgent
+      ).run();
+
+      if (result.success) {
+        console.log(`Waitlist subscription: Email ${email}, IP: ${locationInfo.ip}, Country: ${locationInfo.country}`);
+        return c.json({ 
+          success: true, 
+          message: 'Successfully joined the waitlist! We\'ll notify you when our mobile app is ready.',
+          subscription_id: result.meta?.last_row_id
+        });
+      } else {
+        throw new Error('Failed to insert email into waitlist');
+      }
+      
+    } catch (error) {
+      console.error('Database error in /waitlist/subscribe:', error);
+      return c.json({ error: 'Failed to subscribe to waitlist' }, 500);
     }
   }
 );

@@ -14,6 +14,13 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     // Handle trailing slash redirects in development
     middlewareMode: false,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8787',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
     configure: (server: ViteDevServer) => {
       server.middlewares.use((req: IncomingMessage, res: ServerResponse, next: () => void) => {
         const url = req.url;

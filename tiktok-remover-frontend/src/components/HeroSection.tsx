@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 // 引入 Font Awesome 6 的 Chrome 和 Edge 图标
 import { FaChrome, FaEdge, FaStar, FaStarHalfStroke } from "react-icons/fa6";
 import RecentDeletionsScroll from "./RecentDeletionsScroll";
+import WaitListSection from "./WaitListSection";
 
 const HeroSection = () => {
   const [browser, setBrowser] = useState<'chrome' | 'edge' | 'other'>('other');
@@ -154,6 +155,11 @@ const HeroSection = () => {
           </a>
         </p>
       )}
+
+      {/* WaitList Section */}
+      <div className="mt-16">
+        <WaitListSection />
+      </div>
     </section>
   );
 };

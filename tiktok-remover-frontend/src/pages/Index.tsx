@@ -19,6 +19,7 @@ import VideoDemoSection from "@/components/VideoDemoSection";
 import TopFeaturesSection from "@/components/TopFeaturesSection";
 import LatestBlogSection from "@/components/LatestBlogSection";
 import { Helmet } from "react-helmet-async";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 
 const Index = () => {
   return (
@@ -185,6 +186,7 @@ const Index = () => {
           <FAQSection />
         </main>
         <Footer />
+        <ScrollToTopButton />
       </div>
     </>
   );
