@@ -176,55 +176,51 @@ class WorkflowManager {
     }
 
     async step_processVideoQueue() {
-        for (let i = 0; i < this.state.totalReposts; i++) {
-            await this.checkPauseState();
-            if (!this.state.isRunning) break;
+    // 1️⃣ جلب كل الفيديوهات المعاد نشرها بالترتيب الطبيعي (الأول → الأخير)
+    const videoElements = Array.from(document.querySelectorAll('video.containers'));
 
-            const currentIndex = i + 1;
-            this.comms.sendMessage('statusUpdate', { status: `Processing repost ${currentIndex} of ${this.state.totalReposts}...` });
+    // 2️⃣ حلق على كل فيديو حسب الترتيب الطبيعي
+    for (let i = 0; i < videoElements.length; i++) {
+        const video = videoElements[i];
 
-            // 提取视频信息
-            const videoInfo = this.getVideoInfo();
-            this.state.setCurrentVideoInfo(videoInfo);
-            this.comms.sendMessage('updateProgress', {
-                current: currentIndex,
-                total: this.state.totalReposts,
-                ...videoInfo
-            });
+        await this.checkPauseState();
+        if (!this.state.isRunning) break;
 
-            // 查找并点击“取消转发”按钮
-            const repostButton = this.ui.findElement('video.repostButton');
-            if (repostButton && this.isVideoReposted(repostButton)) {
-                repostButton.click();
-                this.state.incrementRemovedCount();
-                this.comms.sendMessage('videoRemoved', { index: currentIndex, ...videoInfo });
-                console.log(`[ClearTok] Removed repost #${currentIndex}`);
-                await this.pausableSleep(this.getRandomDelay(1000, 2000));
-            } else {
-                this.comms.sendMessage('videoSkipped', { index: currentIndex, reason: 'Not a repost or button not found', ...videoInfo });
-                console.log(`[ClearTok] Skipped video #${currentIndex}`);
-            }
-            // Test
-            console.log('--------> click repostButton');
+        const currentIndex = i + 1;
 
-            // 移至下一个视频
-            if (currentIndex < this.state.totalReposts) {
-                const nextButton = this.ui.findElement('video.nextButton');
-                if (nextButton && !nextButton.disabled) {
-                    nextButton.click();
-                    await this.pausableSleep(this.getRandomDelay(800, 2400));
-                } else {
-                    console.warn('[ClearTok] Next button not found or disabled. Ending process.');
-                    break;
-                }
-            }
+        // تحديث الحالة
+        this.comms.sendMessage('statusUpdate', { status: `Processing repost ${currentIndex} of ${videoElements.length}...` });
+
+        // استخراج معلومات الفيديو
+        const videoInfo = this.getVideoInfo();
+        this.state.setCurrentVideoInfo(videoInfo);
+        this.comms.sendMessage('updateProgress', {
+            current: currentIndex,
+            total: videoElements.length,
+            ...videoInfo
+        });
+
+        // البحث عن زر إعادة النشر داخل الفيديو الحالي
+        const repostButton = video.querySelector(this.config.get('video.repostButtonSelector'));
+        if (repostButton && this.isVideoReposted(repostButton)) {
+            repostButton.click();
+            this.state.incrementRemovedCount();
+            this.comms.sendMessage('videoRemoved', { index: currentIndex, ...videoInfo });
+            console.log(`[ClearTok] Removed repost #${currentIndex}`);
+            await this.pausableSleep(this.getRandomDelay(1000, 2000));
+        } else {
+            this.comms.sendMessage('videoSkipped', { index: currentIndex, reason: 'Not a repost or button not found', ...videoInfo });
+            console.log(`[ClearTok] Skipped video #${currentIndex}`);
         }
-        // 关闭视频播放器
-        const closeButton = this.ui.findElement('video.closeButton');
-        if (closeButton) closeButton.click();
-        else document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-        await this.ui.sleep(1000);
     }
+
+    // 3️⃣ بعد الانتهاء، اغلق الفيديو
+    const closeButton = this.ui.findElement('video.closeButton');
+    if (closeButton) closeButton.click();
+    else document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await this.ui.sleep(1000);
+}
+
 
     // --- 辅助函数 ---
 
