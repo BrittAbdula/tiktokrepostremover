@@ -517,9 +517,266 @@ We're excited to welcome Edge users to the ClearTok family and look forward to h
     tags: ["ClearTok", "Microsoft Edge", "Browser Support", "TikTok", "Extension"],
     featured: false,
     image: "/images/blog/cleartok-edge-support.png"
+  },
+  {
+    id: 10,
+    title: "TikTok All Reposted Videos Remover: The Fastest Way to Clean Your Profile in 2026",
+    slug: "tiktok-all-reposted-videos-remover",
+    excerpt: "Looking for a TikTok all reposted videos remover? Learn the fastest, safest way to bulk-delete every reposted video from your TikTok profile in minutes — no password required, no ads.",
+    content: `
+## The Fastest Way to Remove All Reposted Videos from TikTok
+
+If you've been using TikTok's repost feature for a while, your profile may now show dozens — or even hundreds — of other people's videos alongside your own content. Whether you're a creator who wants a cleaner profile, a brand account doing a reset, or simply someone who changed their mind about reposts, the problem is the same: **TikTok has no built-in "remove all reposts" button**.
+
+This guide covers every method available in 2026, ranked by speed and safety.
+
+---
+
+## Quick Answer (Featured)
+
+**The fastest way to remove all reposted videos from TikTok is to use ClearTok**, a free browser extension for Chrome and Edge. It automatically detects and removes every reposted video from your profile in one click — no password required, no ads, and it runs entirely in your browser.
+
+**Steps:**
+1. Install [ClearTok from the Chrome Web Store](https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb)
+2. Open [TikTok.com](https://www.tiktok.com) and make sure you're logged in
+3. Click the ClearTok extension icon → tap **Start Removing**
+4. ClearTok automatically opens each repost, removes it, and loops until done
+
+Free plan removes 50–100 reposts/day. Most users finish in a single session.
+
+---
+
+## Why TikTok Doesn't Let You Remove All Reposts at Once
+
+TikTok's repost feature was designed for engagement — the platform benefits when users share content widely. As a result, the app deliberately lacks a bulk-delete option. Each repost must be removed individually through the share menu, which means:
+
+- **100 reposts = ~100 manual taps**, each requiring you to find the video, open the share menu, and confirm removal
+- The process takes 30–60 seconds per video
+- There is no "select all" or batch action in the TikTok app
+
+For anyone with more than 20–30 reposts, manual deletion is impractical.
+
+---
+
+## Method 1: ClearTok — Automated Bulk Removal (Recommended)
+
+**ClearTok** is a browser extension built specifically to solve this problem. It simulates the same taps you would make manually, but does so automatically and at scale.
+
+### How It Works
+
+ClearTok runs entirely inside your browser. It does not require your TikTok password, does not connect to any external server, and does not store any data. The extension:
+
+1. Reads your repost list directly from the TikTok web interface
+2. Simulates the "Remove repost" action for each video
+3. Pauses automatically if TikTok rate-limits your account
+4. Resumes where it left off if you stop and restart
+
+### Key Advantages
+
+| Feature | ClearTok | Manual Deletion |
+|---|---|---|
+| Time for 100 reposts | ~5 minutes | ~90 minutes |
+| Password required | No | N/A |
+| Ads | None | N/A |
+| Custom filter (select which to remove) | Yes | No |
+| Available on | Chrome, Edge, Android, iOS | TikTok app |
+| Cost | Free (50–100/day) | Free |
+
+### Custom Filter: Remove Only Specific Reposts
+
+One feature that sets ClearTok apart from any other tool is **Custom Filter**. Instead of removing every repost, you can specify:
+
+- **By keyword**: remove only reposts matching a search term
+- **By date range**: remove reposts older than a specific date
+- **By count**: remove only the first N reposts
+
+This is particularly useful for brand accounts or creators who want to keep some reposts while clearing others.
+
+### Installation
+
+- **Chrome**: [Install from Chrome Web Store](https://chromewebstore.google.com/detail/cleartok-repost-remover/kmellgkfemijicfcpndnndiebmkdginb)
+- **Edge**: [Install from Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/cleartok-tiktok-repost-/bgbcmapbnbdmmjibajjagnlbbdhcenoc)
+- **Android / iOS**: Available via [cleartok.io](https://cleartok.io)
+
+---
+
+## Method 2: Manual Removal (One by One)
+
+If you only have a small number of reposts (fewer than 10–15), manual removal is straightforward:
+
+1. Open the TikTok app or [TikTok.com](https://www.tiktok.com)
+2. Go to your profile and find the reposted video
+3. Tap the **Share** button (arrow icon)
+4. Select **Remove repost**
+5. Confirm the action
+
+Repeat for each video. This method requires no additional tools but becomes impractical above 20 reposts.
+
+---
+
+## Method 3: Contact TikTok Support
+
+TikTok does not offer bulk deletion through support, but you can submit a feature request:
+
+1. Open TikTok → Profile → Menu (three lines) → Settings and Privacy
+2. Scroll to **Support and about** → Report a problem
+3. Select any topic → tap **No** when asked if the problem is resolved
+4. Tap **Need more help** and write your request
+
+TikTok support will acknowledge your request but will not delete reposts on your behalf. This method is only useful as a long-term feature request.
+
+---
+
+## Frequently Asked Questions
+
+### Does removing reposts delete the original video?
+No. Removing a repost only removes it from your profile. The original video remains on the creator's profile and is unaffected.
+
+### Will TikTok penalize my account for bulk-removing reposts?
+No. Removing reposts is a normal account action. ClearTok includes automatic rate-limit detection and pauses if TikTok slows down responses, which prevents any account issues.
+
+### Can I remove reposts on iPhone or Android without a computer?
+Yes. ClearTok is available as a mobile app for both Android and iOS. Visit [cleartok.io](https://cleartok.io) to download.
+
+### How many reposts can I remove per day for free?
+The free plan supports 50–100 removals per day depending on platform. For unlimited daily removals, ClearTok Premium starts at $4.99/week.
+
+### Does ClearTok need my TikTok password?
+No. The Chrome/Edge extension version uses your existing browser session — the same session you use when you visit TikTok.com. No credentials are ever requested or stored.
+
+### What happens if I have more reposts than the daily limit?
+ClearTok will stop after reaching the daily limit and show you how many were removed. You can resume the next day and it will continue from where it left off.
+
+---
+
+## Summary
+
+For anyone searching for a **TikTok all reposted videos remover**, ClearTok is the most practical solution available in 2026. It handles the entire process automatically, works without your password, shows no ads, and includes a Custom Filter for precise control. The free tier covers most users' needs, and the process typically takes under 10 minutes regardless of how many reposts you have.
+
+[**Get ClearTok for free →**](https://cleartok.io)
+    `,
+    author: "ClearTok Team",
+    publishDate: "2026-04-18",
+    readTime: "7 min read",
+    tags: ["TikTok", "Repost Remover", "Bulk Delete", "ClearTok", "How To"],
+    featured: true,
+    image: "/images/blog/tiktok-all-reposted-videos-remover.png"
+  },
+  {
+    id: 11,
+    title: "Best TikTok Repost Remover Tools in 2026: An Honest Comparison",
+    slug: "best-tiktok-repost-remover-comparison-2026",
+    excerpt: "Comparing the top TikTok repost remover tools in 2026 — including free extensions, mobile apps, and paid services. Find out which one is right for your needs.",
+    content: `
+## Which TikTok Repost Remover Should You Use in 2026?
+
+As TikTok's repost feature has grown in popularity, so has the demand for tools that can remove reposts in bulk. Several options now exist, ranging from free browser extensions to paid mobile apps. This guide compares them honestly — including their limitations — so you can choose the right tool for your situation.
+
+> **Disclosure:** This site is maintained by the ClearTok team. We've done our best to represent all tools fairly, but you should verify current features directly with each provider.
+
+---
+
+## Quick Comparison Table
+
+| Feature | ClearTok | Other Apps | Manual (TikTok) |
+|---|---|---|---|
+| Price | Free (50–100/day) | Check app or paid | Free |
+| Password required | No (Extension) | Varies | No |
+| Ads | None | Varies | N/A |
+| Android / iOS | Yes | Yes | Yes |
+| Custom Filter | Yes | No | No |
+| Bulk removal speed | Fast (~5 min/100) | Varies | Slow (~90 min/100) |
+| No account risk | Yes (rate-limit detection) | Varies | Yes |
+
+---
+
+## ClearTok
+
+**Best for:** Users who want a free, no-password, no-ads solution with precise control.
+
+ClearTok is a browser extension (Chrome, Edge) and mobile app (Android, iOS) that automates the repost removal process entirely within your browser or device. It never requests your TikTok password — the extension version uses your existing browser session, while the mobile app uses TikTok's standard login flow.
+
+**What makes it different:**
+- **Custom Filter**: the only tool that lets you remove reposts selectively (by keyword, date, or count)
+- **No ads**: the interface is clean and uninterrupted
+- **Transparent operation**: every action is visible on screen as it happens
+- **Rate-limit detection**: automatically pauses if TikTok slows down, protecting your account
+
+**Limitations:**
+- Free plan is capped at 50–100 removals/day
+- Extension version requires a desktop or laptop browser
+
+[**Try ClearTok free →**](https://cleartok.io)
+
+---
+
+## Other Apps
+
+Several other tools offer TikTok repost removal. Most are available as mobile apps and some require a subscription or in-app purchase to access bulk removal features. Before choosing any tool, check:
+
+- Whether it requires your TikTok password (a significant security consideration)
+- Whether a free tier is available and what its limits are
+- Whether it has been updated recently (TikTok changes its interface frequently)
+- User reviews on the App Store or Google Play for recent reliability reports
+
+---
+
+## Manual Removal
+
+TikTok's built-in method requires removing reposts one at a time through the Share menu. This is free and requires no third-party tools, but becomes impractical above 15–20 reposts. See our [step-by-step manual removal guide](/blog/how-to-delete-a-repost-on-tiktok/) for full instructions.
+
+---
+
+## How to Choose
+
+The right tool depends on your situation:
+
+**Use ClearTok if:**
+- You have more than 20 reposts to remove
+- You want to avoid sharing your TikTok password with any third-party service
+- You want Custom Filter to keep some reposts while removing others
+- You prefer a free option with no ads
+
+**Use manual removal if:**
+- You have fewer than 15 reposts
+- You prefer not to install any extensions or apps
+
+**Use another app if:**
+- You need a mobile-only solution and ClearTok's mobile app doesn't meet your needs
+- You've checked current reviews and found a better-rated alternative
+
+---
+
+## Frequently Asked Questions
+
+### Is it safe to use third-party TikTok repost removers?
+Tools that do not require your TikTok password are generally safer, as they cannot access your account beyond what you've already authorized in your browser session. Always check whether a tool requests credentials before installing.
+
+### Will TikTok ban my account for using a repost remover?
+No tool can guarantee zero risk, but ClearTok specifically includes rate-limit detection to avoid triggering TikTok's automated systems. Removing reposts is a normal account action.
+
+### Do any of these tools work on iPhone?
+Yes. ClearTok has an iOS app available at [cleartok.io](https://cleartok.io). Other mobile apps are also available on the App Store.
+
+### What is the fastest way to remove all TikTok reposts?
+ClearTok's automated extension can process approximately 100 reposts in 5 minutes. This is significantly faster than any manual method.
+
+---
+
+## Conclusion
+
+For most users in 2026, ClearTok offers the best combination of speed, safety, and cost for removing TikTok reposts in bulk. Its Custom Filter feature is unique among available tools, and the free tier is sufficient for the majority of use cases. If you have specific requirements that ClearTok doesn't meet, check current reviews of alternative apps before deciding.
+
+[**Get ClearTok →**](https://cleartok.io)
+    `,
+    author: "ClearTok Team",
+    publishDate: "2026-04-18",
+    readTime: "6 min read",
+    tags: ["TikTok", "Repost Remover", "Comparison", "ClearTok", "Tools"],
+    featured: false,
+    image: "/images/blog/best-tiktok-repost-remover-comparison.png"
   }
 ];
-
-export const getBlogPostBySlug = (slug: string): BlogPost | undefined => {
+export const getBlogPostBySlugg = (slug: string): BlogPost | undefined => {
   return blogPosts.find(post => post.slug === slug);
 }; 
